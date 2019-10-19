@@ -6,13 +6,11 @@ using System.IO.IsolatedStorage;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace MsgPack.Rpc.Diagnostics
-{
+namespace MsgPack.Rpc.Diagnostics {
 	/// <summary>
 	///		Isolated storage file based <see cref="MessagePackStreamLogger"/> implementation.
 	/// </summary>
-	public class IsolatedStorageFileMessagePackStreamLogger : MessagePackStreamLogger
-	{
+	public class IsolatedStorageFileMessagePackStreamLogger : MessagePackStreamLogger {
 		private static readonly Regex _ipAddressEscapingRegex =
 			new Regex(
 				@"[:\./]",
@@ -33,56 +31,44 @@ namespace MsgPack.Rpc.Diagnostics
 		/// <param name="sessionStartTime">The <see cref="DateTimeOffset"/> when session was started.</param>
 		/// <param name="remoteEndPoint">The <see cref="EndPoint"/> which is data source of the <paramref name="stream"/>.</param>
 		/// <param name="stream">The MessagePack data stream. This value might be corrupted or actually not a MessagePack stream.</param>
-		public override void Write( DateTimeOffset sessionStartTime, EndPoint remoteEndPoint, IEnumerable<byte> stream )
-		{
+		public override void Write(DateTimeOffset sessionStartTime, EndPoint remoteEndPoint, IEnumerable<byte> stream) {
 			string remoteEndPointString;
 			DnsEndPoint dnsEndPoint;
 			IPEndPoint ipEndPoint;
-			if ( ( dnsEndPoint = remoteEndPoint as DnsEndPoint ) != null )
-			{
-				remoteEndPointString = _ipAddressEscapingRegex.Replace( dnsEndPoint.Host, "_" );
+			if ((dnsEndPoint = remoteEndPoint as DnsEndPoint) != null) {
+				remoteEndPointString = _ipAddressEscapingRegex.Replace(dnsEndPoint.Host, "_");
 			}
-			else if ( ( ipEndPoint = remoteEndPoint as IPEndPoint ) != null )
-			{
-				remoteEndPointString = _ipAddressEscapingRegex.Replace( ipEndPoint.Address.ToString(), "_" );
+			else if ((ipEndPoint = remoteEndPoint as IPEndPoint) != null) {
+				remoteEndPointString = _ipAddressEscapingRegex.Replace(ipEndPoint.Address.ToString(), "_");
 			}
-			else
-			{
+			else {
 				remoteEndPointString = "(unknown)";
 			}
 
-			string fileName = String.Format( CultureInfo.InvariantCulture, "{0:yyyyMMdd_HHmmss_fff}-{1}-{2}.mpac", sessionStartTime.UtcDateTime, remoteEndPointString, ThreadId );
+			string fileName = String.Format(CultureInfo.InvariantCulture, "{0:yyyyMMdd_HHmmss_fff}-{1}-{2}.mpac", sessionStartTime.UtcDateTime, remoteEndPointString, ThreadId);
 
-			while ( true )
-			{
-				try
-				{
-					using ( var storage = IsolatedStorageFile.GetUserStoreForApplication() )
-					using ( var fileStream = storage.OpenFile( fileName, FileMode.Append, FileAccess.Write, FileShare.Read ) )
-					{
-						if ( stream != null )
-						{
+			while (true) {
+				try {
+					using (var storage = IsolatedStorageFile.GetUserStoreForApplication())
+					using (var fileStream = storage.OpenFile(fileName, FileMode.Append, FileAccess.Write, FileShare.Read)) {
+						if (stream != null) {
 							long written = fileStream.Length;
-							foreach ( var b in Skip( stream, written ) )
-							{
-								fileStream.WriteByte( b );
+							foreach (var b in Skip(stream, written)) {
+								fileStream.WriteByte(b);
 							}
 						}
 					}
 
 					break;
 				}
-				catch ( DirectoryNotFoundException ) { }
+				catch (DirectoryNotFoundException) { }
 			}
 		}
 
-		private static IEnumerable<T> Skip<T>( IEnumerable<T> source, long count )
-		{
+		private static IEnumerable<T> Skip<T>(IEnumerable<T> source, long count) {
 			long index = 0;
-			foreach ( var item in source )
-			{
-				if ( index >= count )
-				{
+			foreach (var item in source) {
+				if (index >= count) {
 					yield return item;
 				}
 

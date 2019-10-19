@@ -6,31 +6,25 @@ using System.Net;
 using System.Security;
 using System.Threading;
 
-namespace MsgPack.Rpc.Diagnostics
-{
+namespace MsgPack.Rpc.Diagnostics {
 	/// <summary>
 	///		Implements basic common features for <see cref="IMessagePackStreamLogger"/>s.
 	/// </summary>
-	public abstract class MessagePackStreamLogger : IMessagePackStreamLogger, IDisposable
-	{
-		private static readonly ThreadLocal<TraceEventCache> _traceEventCache = new ThreadLocal<TraceEventCache>( () => new TraceEventCache() );
+	public abstract class MessagePackStreamLogger : IMessagePackStreamLogger, IDisposable {
+		private static readonly ThreadLocal<TraceEventCache> _traceEventCache = new ThreadLocal<TraceEventCache>(() => new TraceEventCache());
 		private static readonly DateTime _processStartTimeUtc = GetProcessStartTimeUtc();
 		private static readonly string _processName = GetProcessName();
 
-		private static DateTime GetProcessStartTimeUtc()
-		{
+		private static DateTime GetProcessStartTimeUtc() {
 #if !SILVERLIGHT
-			try
-			{
+			try {
 				return PrivilegedGetProcessStartTimeUtc();
 			}
-			catch ( SecurityException )
-			{
+			catch (SecurityException) {
 				// This value ensures that resulting process identifier is unique.
 				return DateTime.UtcNow;
 			}
-			catch ( MemberAccessException )
-			{
+			catch (MemberAccessException) {
 				// This value ensures that resulting process identifier is unique.
 				return DateTime.UtcNow;
 			}
@@ -41,28 +35,22 @@ namespace MsgPack.Rpc.Diagnostics
 
 #if !SILVERLIGHT
 		[SecuritySafeCritical]
-		private static DateTime PrivilegedGetProcessStartTimeUtc()
-		{
-			using ( var process = Process.GetCurrentProcess() )
-			{
+		private static DateTime PrivilegedGetProcessStartTimeUtc() {
+			using (var process = Process.GetCurrentProcess()) {
 				return process.StartTime.ToUniversalTime();
 			}
 		}
 #endif
 
-		private static string GetProcessName()
-		{
+		private static string GetProcessName() {
 #if !SILVERLIGHT
-			try
-			{
+			try {
 				return PrivilegedGetProcessName();
 			}
-			catch ( SecurityException )
-			{
+			catch (SecurityException) {
 				return String.Empty;
 			}
-			catch ( MemberAccessException )
-			{
+			catch (MemberAccessException) {
 				return String.Empty;
 			}
 #else
@@ -72,11 +60,9 @@ namespace MsgPack.Rpc.Diagnostics
 
 #if !SILVERLIGHT
 		[SecuritySafeCritical]
-		private static string PrivilegedGetProcessName()
-		{
-			using ( var process = Process.GetCurrentProcess() )
-			{
-				return Path.GetFileNameWithoutExtension( process.MainModule.ModuleName );
+		private static string PrivilegedGetProcessName() {
+			using (var process = Process.GetCurrentProcess()) {
+				return Path.GetFileNameWithoutExtension(process.MainModule.ModuleName);
 			}
 		}
 #endif
@@ -87,8 +73,7 @@ namespace MsgPack.Rpc.Diagnostics
 		/// <value>
 		///		The current process id.
 		/// </value>
-		protected static int ProcessId
-		{
+		protected static int ProcessId {
 			get { return _traceEventCache.Value.ProcessId; }
 		}
 
@@ -98,8 +83,7 @@ namespace MsgPack.Rpc.Diagnostics
 		/// <value>
 		///		The current process start time in UTC. 
 		/// </value>
-		protected static DateTime ProcessStartTimeUtc
-		{
+		protected static DateTime ProcessStartTimeUtc {
 			get { return _processStartTimeUtc; }
 		}
 
@@ -109,8 +93,7 @@ namespace MsgPack.Rpc.Diagnostics
 		/// <value>
 		///		The name of the current process.
 		/// </value>
-		protected static string ProcessName
-		{
+		protected static string ProcessName {
 			get { return _processName; }
 		}
 
@@ -120,8 +103,7 @@ namespace MsgPack.Rpc.Diagnostics
 		/// <value>
 		///		The managed thread identifier.
 		/// </value>
-		protected static string ThreadId
-		{
+		protected static string ThreadId {
 			get { return _traceEventCache.Value.ThreadId; }
 		}
 
@@ -133,18 +115,16 @@ namespace MsgPack.Rpc.Diagnostics
 		/// <summary>
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		public void Dispose()
-		{
-			this.Dispose( true );
-			GC.SuppressFinalize( this );
+		public void Dispose() {
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 
 		/// <summary>
 		///		Releases unmanaged and - optionally - managed resources
 		/// </summary>
 		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-		protected virtual void Dispose( bool disposing )
-		{
+		protected virtual void Dispose(bool disposing) {
 			// nop
 		}
 
@@ -154,6 +134,6 @@ namespace MsgPack.Rpc.Diagnostics
 		/// <param name="sessionStartTime">The <see cref="DateTimeOffset"/> when session was started.</param>
 		/// <param name="remoteEndPoint">The <see cref="EndPoint"/> which is data source of the <paramref name="stream"/>.</param>
 		/// <param name="stream">The MessagePack data stream. This value might be corrupted or actually not a MessagePack stream.</param>
-		public abstract void Write( DateTimeOffset sessionStartTime, EndPoint remoteEndPoint, IEnumerable<byte> stream );
+		public abstract void Write(DateTimeOffset sessionStartTime, EndPoint remoteEndPoint, IEnumerable<byte> stream);
 	}
 }

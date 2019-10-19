@@ -1,16 +1,14 @@
+using MsgPack.Rpc.Diagnostics;
 using System;
 using System.Diagnostics.Contracts;
-using MsgPack.Rpc.Diagnostics;
 
-namespace MsgPack.Rpc.Protocols.Filters
-{
+namespace MsgPack.Rpc.Protocols.Filters {
 	/// <summary>
 	///		Implements common functionalities of providers for <see cref="StreamLoggingMessageFilter{T}"/>.
 	/// </summary>
 	/// <typeparam name="T">The type of <see cref="InboundMessageContext"/>.</typeparam>
 	public abstract class StreamLoggingMessageFilterProvider<T> : MessageFilterProvider<T>
-		where T : InboundMessageContext
-	{
+		where T : InboundMessageContext {
 		private readonly IMessagePackStreamLogger _logger;
 
 		/// <summary>
@@ -19,8 +17,7 @@ namespace MsgPack.Rpc.Protocols.Filters
 		/// <value>
 		///		The logger which is the <see cref="IMessagePackStreamLogger"/> which will be log sink.
 		/// </value>
-		protected IMessagePackStreamLogger Logger
-		{
+		protected IMessagePackStreamLogger Logger {
 			get { return this._logger; }
 		}
 
@@ -31,11 +28,9 @@ namespace MsgPack.Rpc.Protocols.Filters
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="logger"/> is <c>null</c>.
 		/// </exception>
-		protected StreamLoggingMessageFilterProvider( IMessagePackStreamLogger logger )
-		{
-			if ( logger == null )
-			{
-				throw new ArgumentNullException( "logger" );
+		protected StreamLoggingMessageFilterProvider(IMessagePackStreamLogger logger) {
+			if (logger == null) {
+				throw new ArgumentNullException("logger");
 			}
 
 			Contract.EndContractBlock();

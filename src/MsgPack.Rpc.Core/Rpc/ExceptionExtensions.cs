@@ -1,12 +1,10 @@
 using System;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Defines extension methods for async-RPC related features.
 	/// </summary>
-	public static class ExceptionExtensions
-	{
+	public static class ExceptionExtensions {
 		/// <summary>
 		///		Gets the <see cref="Exception"/> instance that caused the current exception. 
 		/// </summary>
@@ -34,11 +32,9 @@ namespace MsgPack.Rpc
 		///			By using this method, you can get 'true' inner exception from catched <see cref="Exception"/>.
 		///		</para>
 		/// </remarks>
-		public static Exception GetInnerException( this Exception source )
-		{
-			if ( source == null )
-			{
-				throw new ArgumentNullException( "source" );
+		public static Exception GetInnerException(this Exception source) {
+			if (source == null) {
+				throw new ArgumentNullException("source");
 			}
 
 #if NET_4_5
@@ -46,18 +42,16 @@ namespace MsgPack.Rpc
 				return source.InnerException;
 #else
 			var inner = source.InnerException;
-			if ( inner == null )
-			{
+			if (inner == null) {
 				return null;
 			}
 
-			if ( !inner.Data.Contains( ExceptionModifiers.IsMatrioshkaInner ) )
-			{
+			if (!inner.Data.Contains(ExceptionModifiers.IsMatrioshkaInner)) {
 				return inner;
 			}
 
 			// inner is matrioshka.
-			return GetInnerException( inner );
+			return GetInnerException(inner);
 #endif
 		}
 	}

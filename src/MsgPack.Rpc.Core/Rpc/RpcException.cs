@@ -4,11 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Runtime.Serialization;
-using System.Security;
-using System.Security.Permissions;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Represents MessagePack-RPC related exception.
 	/// </summary>
@@ -60,10 +57,9 @@ namespace MsgPack.Rpc
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	[SuppressMessage( "Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData." )]
-	[SuppressMessage( "Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData." )]
-	public partial class RpcException : Exception
-	{
+	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
+	public partial class RpcException : Exception {
 		private const string _debugInformationKey = "DebugInformation";
 		private const string _remoteExceptionsKey = "RemoteExceptions";
 		private const string _rpcErrorIdentifierKey = "RpcError";
@@ -79,12 +75,10 @@ namespace MsgPack.Rpc
 		/// <value>
 		///		The metadata of the error. This value will not be <c>null</c>.
 		/// </value>
-		public RpcError RpcError
-		{
-			get
-			{
-				Contract.Ensures( Contract.Result<RpcError>() != null );
-				Contract.Assert( this._rpcError != null );
+		public RpcError RpcError {
+			get {
+				Contract.Ensures(Contract.Result<RpcError>() != null);
+				Contract.Assert(this._rpcError != null);
 				return this._rpcError;
 			}
 		}
@@ -99,8 +93,7 @@ namespace MsgPack.Rpc
 		///		The debug information of the error.
 		///		This value will not be <c>null</c> but may be empty for security reason, and its contents are for developers, not end users.
 		/// </value>
-		public string DebugInformation
-		{
+		public string DebugInformation {
 			get { return this._debugInformation ?? String.Empty; }
 		}
 
@@ -128,7 +121,7 @@ namespace MsgPack.Rpc
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcException( RpcError rpcError, string message, string debugInformation ) : this( rpcError, message, debugInformation, null ) { }
+		public RpcException(RpcError rpcError, string message, string debugInformation) : this(rpcError, message, debugInformation, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
@@ -157,9 +150,8 @@ namespace MsgPack.Rpc
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcException( RpcError rpcError, string message, string debugInformation, Exception inner )
-			: base( message ?? ( rpcError ?? RpcError.RemoteRuntimeError ).DefaultMessage, inner )
-		{
+		public RpcException(RpcError rpcError, string message, string debugInformation, Exception inner)
+			: base(message ?? (rpcError ?? RpcError.RemoteRuntimeError).DefaultMessage, inner) {
 			this._rpcError = rpcError ?? RpcError.RemoteRuntimeError;
 			this._debugInformation = debugInformation;
 #if !SILVERLIGHT && !MONO
@@ -222,18 +214,15 @@ namespace MsgPack.Rpc
 #endif
 
 #if !SILVERLIGHT && !MONO
-		internal static T Get<T>( SerializationEntry entry, string name, Func<SerializationEntry, T> getter )
-		{
-			Contract.Assert( name != null );
-			Contract.Assert( getter != null );
+		internal static T Get<T>(SerializationEntry entry, string name, Func<SerializationEntry, T> getter) {
+			Contract.Assert(name != null);
+			Contract.Assert(getter != null);
 
-			try
-			{
-				return getter( entry );
+			try {
+				return getter(entry);
 			}
-			catch ( InvalidCastException ex )
-			{
-				throw new SerializationException( String.Format( CultureInfo.CurrentCulture, "Invalid '{0}' value.", name ), ex );
+			catch (InvalidCastException ex) {
+				throw new SerializationException(String.Format(CultureInfo.CurrentCulture, "Invalid '{0}' value.", name), ex);
 			}
 		}
 
@@ -249,11 +238,9 @@ namespace MsgPack.Rpc
 		///		The overriding method MUST invoke base implementation, or the serialization should fail.
 		///	</remarks>
 		/// <seealso cref="ISafeSerializationData"/>
-		protected virtual void OnSerializeObjectState( object sender, SafeSerializationEventArgs e )
-		{
+		protected virtual void OnSerializeObjectState(object sender, SafeSerializationEventArgs e) {
 			e.AddSerializedState(
-				new SerializedState()
-				{
+				new SerializedState() {
 					DebugInformation = this._debugInformation,
 					RemoteExceptions = this._remoteExceptions,
 					RpcErrorIdentifier = this._rpcError.Identifier,
@@ -263,26 +250,23 @@ namespace MsgPack.Rpc
 			);
 		}
 
-		private void RegisterSerializeObjectStateEventHandler()
-		{
+		private void RegisterSerializeObjectStateEventHandler() {
 			this.SerializeObjectState += this.OnSerializeObjectState;
 		}
 
 		[Serializable]
-		private sealed class SerializedState : ISafeSerializationData
-		{
+		private sealed class SerializedState : ISafeSerializationData {
 			public string DebugInformation;
 			public RemoteExceptionInformation[] RemoteExceptions;
 			public string RpcErrorIdentifier;
 			public int? RpcErrorCode;
 			public List<string> PreservedStackTrace;
 
-			public void CompleteDeserialization( object deserialized )
-			{
+			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as RpcException;
 				enclosing._debugInformation = this.DebugInformation;
 				enclosing._remoteExceptions = this.RemoteExceptions;
-				enclosing._rpcError = MsgPack.Rpc.RpcError.FromIdentifier( this.RpcErrorIdentifier, this.RpcErrorCode );
+				enclosing._rpcError = MsgPack.Rpc.RpcError.FromIdentifier(this.RpcErrorIdentifier, this.RpcErrorCode);
 				enclosing._preservedStackTrace = this.PreservedStackTrace;
 				enclosing.RegisterSerializeObjectStateEventHandler();
 			}

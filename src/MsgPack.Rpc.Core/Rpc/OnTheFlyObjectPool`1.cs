@@ -1,8 +1,7 @@
 using System;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		The dummy implementation of the <see cref="ObjectPool{T}"/> for mainly testing purposes.
 	/// </summary>
@@ -13,8 +12,7 @@ namespace MsgPack.Rpc
 	///		This object actually does not pool any objects, simply creates and returns <typeparamref name="T"/> type instances.
 	/// </remarks>
 	public sealed class OnTheFlyObjectPool<T> : ObjectPool<T>
-		where T : class
-	{
+		where T : class {
 		private readonly Func<ObjectPoolConfiguration, T> _factory;
 		private readonly ObjectPoolConfiguration _configuration;
 
@@ -31,16 +29,13 @@ namespace MsgPack.Rpc
 		///		<paramref name="factory"/> is <c>null</c>.
 		///		Or <paramref name="configuration"/> is <c>null</c>.
 		/// </exception>
-		public OnTheFlyObjectPool( Func<ObjectPoolConfiguration, T> factory, ObjectPoolConfiguration configuration )
-		{
-			if ( factory == null )
-			{
-				throw new ArgumentNullException( "factory" );
+		public OnTheFlyObjectPool(Func<ObjectPoolConfiguration, T> factory, ObjectPoolConfiguration configuration) {
+			if (factory == null) {
+				throw new ArgumentNullException("factory");
 			}
 
-			if ( configuration == null )
-			{
-				throw new ArgumentNullException( "configuration" );
+			if (configuration == null) {
+				throw new ArgumentNullException("configuration");
 			}
 
 			Contract.EndContractBlock();
@@ -56,10 +51,9 @@ namespace MsgPack.Rpc
 		///		The item borrowed.
 		///		This value cannot be <c>null</c>.
 		/// </returns>
-		protected sealed override T BorrowCore()
-		{
-			var result = this._factory( this._configuration );
-			Contract.Assume( result != null );
+		protected sealed override T BorrowCore() {
+			var result = this._factory(this._configuration);
+			Contract.Assume(result != null);
 			return result;
 		}
 
@@ -67,8 +61,7 @@ namespace MsgPack.Rpc
 		///		Returns the specified borrowed item.
 		/// </summary>
 		/// <param name="value">The borrowed item. This value will not be <c>null</c>.</param>
-		protected sealed override void ReturnCore( T value )
-		{
+		protected sealed override void ReturnCore(T value) {
 			// nop.
 		}
 	}

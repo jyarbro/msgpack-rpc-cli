@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace MsgPack.Rpc.StandardObjectPoolTracing
-{
+namespace MsgPack.Rpc.StandardObjectPoolTracing {
 	/// <summary>
 	/// 	Defines trace for MsgPack.Rpc.StandardObjectPoolTracing namespace.
 	/// </summary>
-	internal static partial class StandardObjectPoolTrace
-	{
-		private static readonly TraceSource _source = new TraceSource( "MsgPack.Rpc.StandardObjectPoolTracing" );
+	internal static partial class StandardObjectPoolTrace {
+		private static readonly TraceSource _source = new TraceSource("MsgPack.Rpc.StandardObjectPoolTracing");
 
-		private static readonly Dictionary<MessageId, TraceEventType> _typeTable = 
-			new Dictionary<MessageId, TraceEventType> ( 18 )
+		private static readonly Dictionary<MessageId, TraceEventType> _typeTable =
+			new Dictionary<MessageId, TraceEventType>(18)
 			{
 				{ MessageId.InitializedWithDefaultConfiguration, TraceEventType.Verbose },
 				{ MessageId.InitializedWithConfiguration, TraceEventType.Verbose },
@@ -40,8 +37,7 @@ namespace MsgPack.Rpc.StandardObjectPoolTracing
 		/// <value>
 		/// 	The <see cref="TraceSource" />.
 		/// </value>
-		public static TraceSource Source
-		{
+		public static TraceSource Source {
 			get { return _source; }
 		}
 
@@ -54,9 +50,8 @@ namespace MsgPack.Rpc.StandardObjectPoolTracing
 		/// <returns>
 		/// 	<c>true</c> if the specified message should be traced; otherwise, <c>false</c>.
 		/// </returns>
-		public static bool ShouldTrace ( MessageId id )
-		{
-			return _source.Switch.ShouldTrace( _typeTable[ id ] );
+		public static bool ShouldTrace(MessageId id) {
+			return _source.Switch.ShouldTrace(_typeTable[id]);
 		}
 
 		/// <summary>
@@ -71,15 +66,12 @@ namespace MsgPack.Rpc.StandardObjectPoolTracing
 		/// <param name="args">
 		/// 	The format arguments of the descriptive message.
 		/// </param>
-		public static void TraceEvent ( MessageId id, string format, params object[] args )
-		{
-			if ( args == null || args.Length == 0 )
-			{
-				_source.TraceEvent( _typeTable[ id ], ( int )id, format );
+		public static void TraceEvent(MessageId id, string format, params object[] args) {
+			if (args == null || args.Length == 0) {
+				_source.TraceEvent(_typeTable[id], (int)id, format);
 			}
-			else
-			{
-				_source.TraceEvent( _typeTable[ id ], ( int )id, format, args );
+			else {
+				_source.TraceEvent(_typeTable[id], (int)id, format, args);
 			}
 		}
 
@@ -92,9 +84,8 @@ namespace MsgPack.Rpc.StandardObjectPoolTracing
 		/// <param name="data">
 		/// 	The raw data for this event.
 		/// </param>
-		public static void TraceData ( MessageId id, params object[] data )
-		{
-			_source.TraceData( _typeTable[ id ], ( int )id, data );
+		public static void TraceData(MessageId id, params object[] data) {
+			_source.TraceData(_typeTable[id], (int)id, data);
 		}
 
 		/// <summary>
@@ -169,8 +160,7 @@ namespace MsgPack.Rpc.StandardObjectPoolTracing
 		/// 	<see cref="MessageId" /> of .FailedToRefreshEvictionTImer (ID:391) message.
 		/// </summary>
 		public const MessageId FailedToRefreshEvictionTImer = MessageId.FailedToRefreshEvictionTImer;
-		public enum MessageId
-		{
+		public enum MessageId {
 			InitializedWithDefaultConfiguration = 1,
 			InitializedWithConfiguration = 2,
 			FailedToAddPoolInitially = 3,

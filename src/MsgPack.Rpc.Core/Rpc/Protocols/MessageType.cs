@@ -1,12 +1,8 @@
-﻿using System;
-
-namespace MsgPack.Rpc.Protocols
-{
+﻿namespace MsgPack.Rpc.Protocols {
 	/// <summary>
 	///		Define type of MsgPack-RPC message packet.
 	/// </summary>
-	public enum MessageType
-	{
+	public enum MessageType {
 		/// <summary>
 		///		Request message which will be replied as response.
 		/// </summary>

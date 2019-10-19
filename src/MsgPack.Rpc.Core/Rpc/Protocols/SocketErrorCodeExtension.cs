@@ -1,19 +1,13 @@
-﻿using System;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 
-namespace MsgPack.Rpc.Protocols
-{
-	internal static class SocketErrorCodeExtension
-	{
-		public static bool? IsError( this SocketError source )
-		{
-			switch ( source )
-			{
+namespace MsgPack.Rpc.Protocols {
+	internal static class SocketErrorCodeExtension {
+		public static bool? IsError(this SocketError source) {
+			switch (source) {
 				case SocketError.AlreadyInProgress:
 				case SocketError.Disconnecting:
 				case SocketError.IsConnected:
-				case SocketError.Shutdown:
-				{
+				case SocketError.Shutdown: {
 					return null;
 				}
 				case SocketError.InProgress:
@@ -21,47 +15,37 @@ namespace MsgPack.Rpc.Protocols
 				case SocketError.IOPending:
 				case SocketError.OperationAborted:
 				case SocketError.Success:
-				case SocketError.WouldBlock:
-				{
+				case SocketError.WouldBlock: {
 					return false;
 				}
-				default:
-				{
+				default: {
 					return true;
 				}
 			}
 		}
 
-		public static RpcError ToRpcError( this SocketError source )
-		{
-			if ( !source.IsError().GetValueOrDefault() )
-			{
+		public static RpcError ToRpcError(this SocketError source) {
+			if (!source.IsError().GetValueOrDefault()) {
 				return null;
 			}
 
-			switch ( source )
-			{
-				case SocketError.ConnectionRefused:
-				{
+			switch (source) {
+				case SocketError.ConnectionRefused: {
 					// Caller bug
 					return RpcError.ConnectionRefusedError;
 				}
 				case SocketError.HostNotFound:
 				case SocketError.HostUnreachable:
-				case SocketError.NetworkUnreachable:
-				{
+				case SocketError.NetworkUnreachable: {
 					return RpcError.NetworkUnreacheableError;
 				}
-				case SocketError.MessageSize:
-				{
+				case SocketError.MessageSize: {
 					return RpcError.MessageTooLargeError;
 				}
-				case SocketError.TimedOut:
-				{
+				case SocketError.TimedOut: {
 					return RpcError.ConnectionTimeoutError;
 				}
-				default:
-				{
+				default: {
 					// Caller bug
 					return RpcError.TransportError;
 				}

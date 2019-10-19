@@ -1,12 +1,8 @@
-using System;
-
-namespace MsgPack.Rpc.Protocols.Filters
-{
+namespace MsgPack.Rpc.Protocols.Filters {
 	/// <summary>
 	///		Represents location of the message filter is applied.
 	/// </summary>
-	public enum MessageFilteringLocation
-	{
+	public enum MessageFilteringLocation {
 		/// <summary>
 		///		After outbound message serialization.
 		/// </summary>

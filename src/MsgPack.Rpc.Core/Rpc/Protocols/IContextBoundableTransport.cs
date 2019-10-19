@@ -1,15 +1,12 @@
-﻿using System;
-using System.Diagnostics.Contracts;
+﻿using System.Diagnostics.Contracts;
 using System.Net.Sockets;
 
-namespace MsgPack.Rpc.Protocols
-{
+namespace MsgPack.Rpc.Protocols {
 	/// <summary>
 	///		Defines common interface for the transports which is bindable to the message context and async socket.
 	/// </summary>
-	[ContractClass( typeof( IContextBoundableTransportContract ) )]
-	internal interface IContextBoundableTransport
-	{
+	[ContractClass(typeof(IContextBoundableTransportContract))]
+	internal interface IContextBoundableTransport {
 		/// <summary>
 		///		Gets the bound socket.
 		/// </summary>
@@ -20,21 +17,18 @@ namespace MsgPack.Rpc.Protocols
 		/// </summary>
 		/// <param name="sender">The sender.</param>
 		/// <param name="e">The <see cref="System.Net.Sockets.SocketAsyncEventArgs"/> instance containing the event data.</param>
-		void OnSocketOperationCompleted( object sender, SocketAsyncEventArgs e );
+		void OnSocketOperationCompleted(object sender, SocketAsyncEventArgs e);
 	}
 
-	[ContractClassFor( typeof( IContextBoundableTransport ) )]
-	internal abstract class IContextBoundableTransportContract : IContextBoundableTransport
-	{
-		public Socket BoundSocket
-		{
+	[ContractClassFor(typeof(IContextBoundableTransport))]
+	internal abstract class IContextBoundableTransportContract : IContextBoundableTransport {
+		public Socket BoundSocket {
 			get { return null; } // No contract
 		}
 
-		public void OnSocketOperationCompleted( object sender, SocketAsyncEventArgs e )
-		{
-			Contract.Requires( sender != null );
-			Contract.Requires( e != null );
+		public void OnSocketOperationCompleted(object sender, SocketAsyncEventArgs e) {
+			Contract.Requires(sender != null);
+			Contract.Requires(e != null);
 		}
 	}
 

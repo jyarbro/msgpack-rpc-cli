@@ -1,15 +1,12 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
-[module: SuppressMessage( "Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Scope = "member", Target = "MsgPack.Rpc.ObjectPoolConfiguration.#ToString`1(!!0,System.Text.StringBuilder)", Justification = "Boolean value should be lower case." )]
+[module: SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Scope = "member", Target = "MsgPack.Rpc.ObjectPoolConfiguration.#ToString`1(!!0,System.Text.StringBuilder)", Justification = "Boolean value should be lower case.")]
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Represents configuratin of the <see cref="ObjectPool{T}"/>.
 	/// </summary>
-	public sealed partial class ObjectPoolConfiguration : FreezableObject
-	{
+	public sealed partial class ObjectPoolConfiguration : FreezableObject {
 		private static readonly ObjectPoolConfiguration _default = new ObjectPoolConfiguration().AsFrozen();
 
 		/// <summary>
@@ -19,8 +16,7 @@ namespace MsgPack.Rpc
 		///		The default frozen instance.
 		///		This value will not be <c>null</c>.
 		/// </value>
-		public static ObjectPoolConfiguration Default
-		{
+		public static ObjectPoolConfiguration Default {
 			get { return _default; }
 		}
 
@@ -35,8 +31,7 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		The shallow copy of this instance.
 		/// </returns>
-		public ObjectPoolConfiguration Clone()
-		{
+		public ObjectPoolConfiguration Clone() {
 			return this.CloneCore() as ObjectPoolConfiguration;
 		}
 
@@ -46,8 +41,7 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		This instance.
 		/// </returns>
-		public ObjectPoolConfiguration Freeze()
-		{
+		public ObjectPoolConfiguration Freeze() {
 			return this.FreezeCore() as ObjectPoolConfiguration;
 		}
 
@@ -58,8 +52,7 @@ namespace MsgPack.Rpc
 		/// This instance if it is already frozen.
 		/// Otherwise, frozen copy of this instance.
 		/// </returns>
-		public ObjectPoolConfiguration AsFrozen()
-		{
+		public ObjectPoolConfiguration AsFrozen() {
 			return this.AsFrozenCore() as ObjectPoolConfiguration;
 		}
 	}

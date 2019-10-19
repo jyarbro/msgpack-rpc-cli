@@ -1,15 +1,11 @@
 using System;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Marks the type represents service contract for the MessagePack-RPC.
 	/// </summary>
-	[AttributeUsage( AttributeTargets.Interface | AttributeTargets.Class, AllowMultiple = false, Inherited = true )]
-	public sealed class MessagePackRpcServiceContractAttribute : Attribute
-	{
+	[AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+	public sealed class MessagePackRpcServiceContractAttribute : Attribute {
 		private string _name;
 
 		/// <summary>
@@ -19,8 +15,7 @@ namespace MsgPack.Rpc
 		///		The name of the RPC procedure.
 		///		If the value is <c>null</c>, empty or consisted by whitespace characters only, the qualified type name will be used.
 		/// </value>
-		public string Name
-		{
+		public string Name {
 			get { return this._name; }
 			set { this._name = value; }
 		}
@@ -38,11 +33,10 @@ namespace MsgPack.Rpc
 		/// </summary>
 		public MessagePackRpcServiceContractAttribute() { }
 
-		internal string ToServiceId( Type serviceType )
-		{
+		internal string ToServiceId(Type serviceType) {
 			return
 				ServiceIdentifier.CreateServiceId(
-					String.IsNullOrWhiteSpace( this._name ) ? ServiceIdentifier.TruncateGenericsSuffix( serviceType.Name ) : this._name,
+					String.IsNullOrWhiteSpace(this._name) ? ServiceIdentifier.TruncateGenericsSuffix(serviceType.Name) : this._name,
 					this.Version
 				);
 		}

@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Thrown when object pool is in corrupted state.
 	/// </summary>
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	public sealed class ObjectPoolCorruptedException : Exception
-	{
+	public sealed class ObjectPoolCorruptedException : Exception {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPoolCorruptedException"/> class with a default message.
 		/// </summary>
-		public ObjectPoolCorruptedException() : this( null ) { }
+		public ObjectPoolCorruptedException() : this(null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPoolCorruptedException"/> class with a specified error message. 
 		/// </summary>
 		/// <param name="message">The message to describe the error.</param>
-		public ObjectPoolCorruptedException( string message ) : this( message, null ) { }
+		public ObjectPoolCorruptedException(string message) : this(message, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPoolCorruptedException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
@@ -29,7 +27,7 @@ namespace MsgPack.Rpc
 		/// <param name="inner">
 		///		The exception that is the cause of the current exception, or <c>null</c> if no inner exception is specified.
 		/// </param>
-		public ObjectPoolCorruptedException( string message, Exception inner ) : base( message ?? "Object pool may be corrupted.", inner ) { }
+		public ObjectPoolCorruptedException(string message, Exception inner) : base(message ?? "Object pool may be corrupted.", inner) { }
 
 #if !SILVERLIGHT
 		/// <summary>
@@ -48,8 +46,8 @@ namespace MsgPack.Rpc
 		///		THe class name is <c>null</c>,
 		///		or <see cref="P:System.Exception.HResult"/> is zero.
 		///	</exception>
-		private ObjectPoolCorruptedException( SerializationInfo info, StreamingContext context )
-			: base( info, context ) { }
+		private ObjectPoolCorruptedException(SerializationInfo info, StreamingContext context)
+			: base(info, context) { }
 #endif
 	}
 }

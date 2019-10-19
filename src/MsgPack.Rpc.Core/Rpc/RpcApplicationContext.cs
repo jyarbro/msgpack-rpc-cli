@@ -6,13 +6,11 @@ using Mono;
 using Mono.Threading;
 #endif
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Provides access to RPC server application context information.
 	/// </summary>
-	public sealed class RpcApplicationContext : IDisposable
-	{
+	public sealed class RpcApplicationContext : IDisposable {
 		internal static readonly object HardTimeoutToken = new object();
 		private const int StateActive = 0;
 		private const int StateSoftTimeout = 1;
@@ -29,8 +27,7 @@ namespace MsgPack.Rpc
 		///		The current context.
 		///		If this thread is initiated by the dispatcher, then <c>null</c>.
 		/// </value>
-		public static RpcApplicationContext Current
-		{
+		public static RpcApplicationContext Current {
 			get { return _current; }
 		}
 
@@ -38,10 +35,9 @@ namespace MsgPack.Rpc
 		///		Sets the current context for this thread.
 		/// </summary>
 		/// <param name="context">The context.</param>
-		internal static void SetCurrent( RpcApplicationContext context )
-		{
+		internal static void SetCurrent(RpcApplicationContext context) {
 			_current = context;
-			context._boundThread = new WeakReference( Thread.CurrentThread );
+			context._boundThread = new WeakReference(Thread.CurrentThread);
 #if !SILVERLIGHT
 			context._hardTimeoutWatcher.Reset();
 #endif
@@ -51,19 +47,15 @@ namespace MsgPack.Rpc
 		/// <summary>
 		///		Clears current instance.
 		/// </summary>
-		internal static void Clear()
-		{
+		internal static void Clear() {
 			var current = _current;
-			if ( current != null )
-			{
-				try
-				{
+			if (current != null) {
+				try {
 					current.StopTimeoutWatch();
 				}
-				finally
-				{
+				finally {
 					current._boundThread = null;
-					Interlocked.Exchange( ref current._state, StateActive );
+					Interlocked.Exchange(ref current._state, StateActive);
 					_current = null;
 				}
 			}
@@ -76,10 +68,8 @@ namespace MsgPack.Rpc
 		/// 	<c>true</c> if this pplication thread is canceled; otherwise, <c>false</c>.
 		/// 	Note that if <see cref="Current"/> returns <c>null</c>, then this property returns <c>false</c>.
 		/// </value>
-		public static bool IsCanceled
-		{
-			get
-			{
+		public static bool IsCanceled {
+			get {
 				var current = Current;
 				return current != null && current.CancellationToken.IsCancellationRequested;
 			}
@@ -92,17 +82,14 @@ namespace MsgPack.Rpc
 		/// 	<c>true</c> if the execution timeout is enabled on this application thread; otherwise, <c>false</c>.
 		/// 	Note that if <see cref="Current"/> returns <c>null</c>, then this property returns <c>false</c>.
 		/// </value>
-		public static bool IsExecutionTimeoutEnabled
-		{
-			get
-			{
+		public static bool IsExecutionTimeoutEnabled {
+			get {
 				var current = Current;
 				return current != null && current._softTimeout != null;
 			}
 		}
 
-		internal bool IsSoftTimeout
-		{
+		internal bool IsSoftTimeout {
 			get { return this._softTimeoutWatcher.IsTimeout; }
 		}
 
@@ -119,12 +106,10 @@ namespace MsgPack.Rpc
 		[Obsolete("DO NOT use this member except testing purposes.")]
 		internal event EventHandler DebugSoftTimeout;
 
-		private void OnDebugSoftTimeout()
-		{
+		private void OnDebugSoftTimeout() {
 			var handler = this.DebugSoftTimeout;
-			if ( handler != null )
-			{
-				handler( this, EventArgs.Empty );
+			if (handler != null) {
+				handler(this, EventArgs.Empty);
 			}
 		}
 #endif
@@ -152,23 +137,21 @@ namespace MsgPack.Rpc
 
 		private int _state;
 
-		internal bool IsDisposed
-		{
-			get { return Interlocked.CompareExchange( ref this._state, 0, 0 ) == StateDisposed; }
+		internal bool IsDisposed {
+			get { return Interlocked.CompareExchange(ref this._state, 0, 0) == StateDisposed; }
 		}
 
 		// called from SetCurrent
-		internal RpcApplicationContext( TimeSpan? softTimeout, TimeSpan? hardTimeout )
-		{
+		internal RpcApplicationContext(TimeSpan? softTimeout, TimeSpan? hardTimeout) {
 			this._softTimeout = softTimeout;
 #if !SILVERLIGHT
 			this._hardTimeout = hardTimeout;
 #endif
 			this._softTimeoutWatcher = new TimeoutWatcher();
-			this._softTimeoutWatcher.Timeout += ( sender, e ) => this.OnSoftTimeout();
+			this._softTimeoutWatcher.Timeout += (sender, e) => this.OnSoftTimeout();
 #if !SILVERLIGHT
 			this._hardTimeoutWatcher = new TimeoutWatcher();
-			this._hardTimeoutWatcher.Timeout += ( sender, e ) => this.OnHardTimeout();
+			this._hardTimeoutWatcher.Timeout += (sender, e) => this.OnHardTimeout();
 #endif
 			this._cancellationTokenSource = new CancellationTokenSource();
 		}
@@ -176,10 +159,8 @@ namespace MsgPack.Rpc
 		/// <summary>
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		public void Dispose()
-		{
-			if ( Interlocked.Exchange( ref this._state, StateDisposed ) != StateDisposed )
-			{
+		public void Dispose() {
+			if (Interlocked.Exchange(ref this._state, StateDisposed) != StateDisposed) {
 #if !SILVERLIGHT
 				this._hardTimeoutWatcher.Dispose();
 #endif
@@ -188,26 +169,21 @@ namespace MsgPack.Rpc
 			}
 		}
 
-		private void OnSoftTimeout()
-		{
-			if ( Interlocked.CompareExchange( ref this._state, StateSoftTimeout, StateActive ) != StateActive )
-			{
+		private void OnSoftTimeout() {
+			if (Interlocked.CompareExchange(ref this._state, StateSoftTimeout, StateActive) != StateActive) {
 				return;
 			}
 
-			try
-			{
+			try {
 				this._cancellationTokenSource.Cancel();
 			}
-			catch ( AggregateException ex )
-			{
-				Interlocked.Exchange( ref this._exceptionInCancellationCallback, ex );
+			catch (AggregateException ex) {
+				Interlocked.Exchange(ref this._exceptionInCancellationCallback, ex);
 			}
 
 #if !SILVERLIGHT
-			if ( this._hardTimeout != null )
-			{
-				this._hardTimeoutWatcher.Start( this._hardTimeout.Value );
+			if (this._hardTimeout != null) {
+				this._hardTimeoutWatcher.Start(this._hardTimeout.Value);
 			}
 #endif
 #if DEBUG
@@ -216,56 +192,46 @@ namespace MsgPack.Rpc
 		}
 
 #if !SILVERLIGHT
-		private void OnHardTimeout()
-		{
-			if ( Interlocked.CompareExchange( ref this._state, StateHardTimeout, StateSoftTimeout ) != StateSoftTimeout )
-			{
+		private void OnHardTimeout() {
+			if (Interlocked.CompareExchange(ref this._state, StateHardTimeout, StateSoftTimeout) != StateSoftTimeout) {
 				return;
 			}
 
-			try
-			{
+			try {
 				DoHardTimeout();
 			}
-			catch ( SecurityException ) { }
-			catch ( MemberAccessException ) { }
+			catch (SecurityException) { }
+			catch (MemberAccessException) { }
 		}
 
 		[SecuritySafeCritical]
-		private void DoHardTimeout()
-		{
+		private void DoHardTimeout() {
 			var thread = this._boundThread.Target as Thread;
-			if ( thread != null )
-			{
-				try
-				{
-					thread.Abort( HardTimeoutToken );
+			if (thread != null) {
+				try {
+					thread.Abort(HardTimeoutToken);
 				}
-				catch ( ThreadStateException ) { }
+				catch (ThreadStateException) { }
 			}
 		}
 #endif
 
-		internal void StartTimeoutWatch()
-		{
-			if ( this._softTimeout == null )
-			{
+		internal void StartTimeoutWatch() {
+			if (this._softTimeout == null) {
 				return;
 			}
 
-			this._softTimeoutWatcher.Start( this._softTimeout.Value );
+			this._softTimeoutWatcher.Start(this._softTimeout.Value);
 		}
 
-		internal void StopTimeoutWatch()
-		{
+		internal void StopTimeoutWatch() {
 #if !SILVERLIGHT
 			this._hardTimeoutWatcher.Stop();
 #endif
 			this._softTimeoutWatcher.Stop();
 
-			var exceptionInCancellationCallback = Interlocked.Exchange( ref _exceptionInCancellationCallback, null );
-			if ( exceptionInCancellationCallback != null )
-			{
+			var exceptionInCancellationCallback = Interlocked.Exchange(ref _exceptionInCancellationCallback, null);
+			if (exceptionInCancellationCallback != null) {
 				throw exceptionInCancellationCallback;
 			}
 		}

@@ -5,8 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace MsgPack.Rpc.Diagnostics
-{
+namespace MsgPack.Rpc.Diagnostics {
 	/// <summary>
 	///		File based <see cref="MessagePackStreamLogger"/> implementation.
 	/// </summary>
@@ -17,8 +16,7 @@ namespace MsgPack.Rpc.Diagnostics
 	///			AppDomainName is omitted in default AppDomain.
 	///		</note>
 	/// </remarks>
-	public class FileMessagePackStreamLogger : MessagePackStreamLogger
-	{
+	public class FileMessagePackStreamLogger : MessagePackStreamLogger {
 		private static readonly Regex _ipAddressEscapingRegex =
 			new Regex(
 				@"[:\./]",
@@ -33,8 +31,7 @@ namespace MsgPack.Rpc.Diagnostics
 		/// <value>
 		///		The base directory path.
 		/// </value>
-		public string BaseDirectoryPath
-		{
+		public string BaseDirectoryPath {
 			get { return this._baseDirectoryPath; }
 		}
 
@@ -46,8 +43,7 @@ namespace MsgPack.Rpc.Diagnostics
 		/// <value>
 		///		The calculated directory path which will store logfiles.
 		/// </value>
-		public string DirectoryPath
-		{
+		public string DirectoryPath {
 			get { return this._directoryPath; }
 		}
 
@@ -55,17 +51,14 @@ namespace MsgPack.Rpc.Diagnostics
 		/// Initializes a new instance of the <see cref="FileMessagePackStreamLogger"/> class.
 		/// </summary>
 		/// <param name="baseDirectoryPath">The base directory path.</param>
-		public FileMessagePackStreamLogger( string baseDirectoryPath )
-		{
+		public FileMessagePackStreamLogger(string baseDirectoryPath) {
 			this._baseDirectoryPath = baseDirectoryPath;
 			// {BaseDirectory}\{ProcessName}[-{AppDomainName}]\{ProcessStartTime}-{ProcessId}\{TimeStamp}-{EndPoint}-{ThreadId}.mpac
-			if ( AppDomain.CurrentDomain.IsDefaultAppDomain() )
-			{
-				this._directoryPath = Path.Combine( this._baseDirectoryPath, ProcessName, String.Format( CultureInfo.InvariantCulture, "{0:yyyyMMdd_HHmmss}-{1}", ProcessStartTimeUtc, ProcessId ) );
+			if (AppDomain.CurrentDomain.IsDefaultAppDomain()) {
+				this._directoryPath = Path.Combine(this._baseDirectoryPath, ProcessName, String.Format(CultureInfo.InvariantCulture, "{0:yyyyMMdd_HHmmss}-{1}", ProcessStartTimeUtc, ProcessId));
 			}
-			else
-			{
-				this._directoryPath = Path.Combine( this._baseDirectoryPath, ProcessName + "-" + AppDomain.CurrentDomain.FriendlyName, String.Format( CultureInfo.InvariantCulture, "{0:yyyyMMdd_HHmmss}-{1}", ProcessStartTimeUtc, ProcessId ) );
+			else {
+				this._directoryPath = Path.Combine(this._baseDirectoryPath, ProcessName + "-" + AppDomain.CurrentDomain.FriendlyName, String.Format(CultureInfo.InvariantCulture, "{0:yyyyMMdd_HHmmss}-{1}", ProcessStartTimeUtc, ProcessId));
 			}
 		}
 
@@ -75,60 +68,47 @@ namespace MsgPack.Rpc.Diagnostics
 		/// <param name="sessionStartTime">The <see cref="DateTimeOffset"/> when session was started.</param>
 		/// <param name="remoteEndPoint">The <see cref="EndPoint"/> which is data source of the <paramref name="stream"/>.</param>
 		/// <param name="stream">The MessagePack data stream. This value might be corrupted or actually not a MessagePack stream.</param>
-		public override void Write( DateTimeOffset sessionStartTime, EndPoint remoteEndPoint, IEnumerable<byte> stream )
-		{
+		public override void Write(DateTimeOffset sessionStartTime, EndPoint remoteEndPoint, IEnumerable<byte> stream) {
 			string remoteEndPointString;
 			DnsEndPoint dnsEndPoint;
 			IPEndPoint ipEndPoint;
-			if ( ( dnsEndPoint = remoteEndPoint as DnsEndPoint ) != null )
-			{
-				remoteEndPointString = _ipAddressEscapingRegex.Replace( dnsEndPoint.Host, "_" );
+			if ((dnsEndPoint = remoteEndPoint as DnsEndPoint) != null) {
+				remoteEndPointString = _ipAddressEscapingRegex.Replace(dnsEndPoint.Host, "_");
 			}
-			else if ( ( ipEndPoint = remoteEndPoint as IPEndPoint ) != null )
-			{
-				remoteEndPointString = _ipAddressEscapingRegex.Replace( ipEndPoint.Address.ToString(), "_" );
+			else if ((ipEndPoint = remoteEndPoint as IPEndPoint) != null) {
+				remoteEndPointString = _ipAddressEscapingRegex.Replace(ipEndPoint.Address.ToString(), "_");
 			}
-			else
-			{
+			else {
 				remoteEndPointString = "(unknown)";
 			}
 
-			string filePath = Path.Combine( this._directoryPath, String.Format( CultureInfo.InvariantCulture, "{0:yyyyMMdd_HHmmss_fff}-{1}-{2}.mpac", sessionStartTime.UtcDateTime, remoteEndPointString, ThreadId ) );
+			string filePath = Path.Combine(this._directoryPath, String.Format(CultureInfo.InvariantCulture, "{0:yyyyMMdd_HHmmss_fff}-{1}-{2}.mpac", sessionStartTime.UtcDateTime, remoteEndPointString, ThreadId));
 
-			while ( true )
-			{
-				if ( !Directory.Exists( this._directoryPath ) )
-				{
-					Directory.CreateDirectory( this._directoryPath );
+			while (true) {
+				if (!Directory.Exists(this._directoryPath)) {
+					Directory.CreateDirectory(this._directoryPath);
 				}
 
-				try
-				{
-					using ( var fileStream = new FileStream( filePath, FileMode.Append, FileAccess.Write, FileShare.Read, 64 * 1024, FileOptions.None ) )
-					{
-						if ( stream != null )
-						{
+				try {
+					using (var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, 64 * 1024, FileOptions.None)) {
+						if (stream != null) {
 							long written = fileStream.Length;
-							foreach ( var b in Skip( stream, written ) )
-							{
-								fileStream.WriteByte( b );
+							foreach (var b in Skip(stream, written)) {
+								fileStream.WriteByte(b);
 							}
 						}
 					}
 
 					break;
 				}
-				catch ( DirectoryNotFoundException ) { }
+				catch (DirectoryNotFoundException) { }
 			}
 		}
 
-		private static IEnumerable<T> Skip<T>( IEnumerable<T> source, long count )
-		{
+		private static IEnumerable<T> Skip<T>(IEnumerable<T> source, long count) {
 			long index = 0;
-			foreach ( var item in source )
-			{
-				if ( index >= count )
-				{
+			foreach (var item in source) {
+				if (index >= count) {
 					yield return item;
 				}
 

@@ -1,26 +1,22 @@
-﻿using System;
+﻿using MsgPack.Rpc.Protocols;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
-using System.Security;
-using MsgPack.Rpc.Protocols;
-using System.Security.Permissions;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Thrown if some arguments are wrong like its type was not match, its value was out of range, its value was null but it is not illegal, so on.
 	/// </summary>
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	[SuppressMessage( "Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData." )]
-	[SuppressMessage( "Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData." )]
-	public sealed class RpcArgumentException : RpcMethodInvocationException
-	{
+	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
+	public sealed class RpcArgumentException : RpcMethodInvocationException {
 		private const string _parameterNameKey = "ParameterName";
-		internal static readonly MessagePackObject ParameterNameKeyUtf8 = MessagePackConvert.EncodeString( _parameterNameKey );
+		internal static readonly MessagePackObject ParameterNameKeyUtf8 = MessagePackConvert.EncodeString(_parameterNameKey);
 
 		// NOT readonly for safe deserialization
 		private string _parameterName;
@@ -31,11 +27,9 @@ namespace MsgPack.Rpc
 		/// <value>
 		///		The mame of parameter causing this exception. This value will not be empty but may be <c>null</c>.
 		/// </value>
-		public string ParameterName
-		{
-			get
-			{
-				Contract.Ensures( Contract.Result<string>() != null );
+		public string ParameterName {
+			get {
+				Contract.Ensures(Contract.Result<string>() != null);
 				return this._parameterName ?? String.Empty;
 			}
 		}
@@ -55,8 +49,8 @@ namespace MsgPack.Rpc
 		/// <exception cref="ArgumentException">
 		///		<paramref name="methodName"/> or <paramref name="parameterName"/> is empty or blank.
 		/// </exception>
-		public RpcArgumentException( string methodName, string parameterName )
-			: this( methodName, parameterName, null, null, null ) { }
+		public RpcArgumentException(string methodName, string parameterName)
+			: this(methodName, parameterName, null, null, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcArgumentException"/> class with a specified error message.
@@ -91,8 +85,8 @@ namespace MsgPack.Rpc
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcArgumentException( string methodName, string parameterName, string message, string debugInformation )
-			: this( methodName, parameterName, message, debugInformation, null ) { }
+		public RpcArgumentException(string methodName, string parameterName, string message, string debugInformation)
+			: this(methodName, parameterName, message, debugInformation, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcArgumentException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
@@ -130,17 +124,14 @@ namespace MsgPack.Rpc
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcArgumentException( string methodName, string parameterName, string message, string debugInformation, Exception inner )
-			: base( RpcError.ArgumentError, methodName, message ?? RpcError.ArgumentError.DefaultMessage, debugInformation, inner )
-		{
-			if ( parameterName == null )
-			{
-				throw new ArgumentNullException( "parameterName" );
+		public RpcArgumentException(string methodName, string parameterName, string message, string debugInformation, Exception inner)
+			: base(RpcError.ArgumentError, methodName, message ?? RpcError.ArgumentError.DefaultMessage, debugInformation, inner) {
+			if (parameterName == null) {
+				throw new ArgumentNullException("parameterName");
 			}
 
-			if ( String.IsNullOrWhiteSpace( parameterName ) )
-			{
-				throw new ArgumentException( "'parameterName' cannot be empty.", "parameterName" );
+			if (String.IsNullOrWhiteSpace(parameterName)) {
+				throw new ArgumentException("'parameterName' cannot be empty.", "parameterName");
 			}
 
 			Contract.EndContractBlock();
@@ -157,11 +148,10 @@ namespace MsgPack.Rpc
 		/// <exception cref="SerializationException">
 		///		Cannot deserialize instance from <paramref name="unpackedException"/>.
 		/// </exception>
-		internal RpcArgumentException( MessagePackObject unpackedException )
-			: base( RpcError.ArgumentError, unpackedException )
-		{
-			this._parameterName = unpackedException.GetString( ParameterNameKeyUtf8 );
-			Contract.Assume( this._parameterName != null, "Unpacked data does not have ParameterName." );
+		internal RpcArgumentException(MessagePackObject unpackedException)
+			: base(RpcError.ArgumentError, unpackedException) {
+			this._parameterName = unpackedException.GetString(ParameterNameKeyUtf8);
+			Contract.Assume(this._parameterName != null, "Unpacked data does not have ParameterName.");
 		}
 
 #if MONO
@@ -228,10 +218,9 @@ namespace MsgPack.Rpc
 		/// <param name="includesDebugInformation">
 		///		<c>true</c>, when this method should include debug information; otherwise, <c>false</c>.
 		///	</param>
-		protected sealed override void GetExceptionMessage( IDictionary<MessagePackObject, MessagePackObject> store, bool includesDebugInformation )
-		{
-			base.GetExceptionMessage( store, includesDebugInformation );
-			store.Add( ParameterNameKeyUtf8, MessagePackConvert.EncodeString( this._parameterName ) );
+		protected sealed override void GetExceptionMessage(IDictionary<MessagePackObject, MessagePackObject> store, bool includesDebugInformation) {
+			base.GetExceptionMessage(store, includesDebugInformation);
+			store.Add(ParameterNameKeyUtf8, MessagePackConvert.EncodeString(this._parameterName));
 		}
 
 #if !SILVERLIGHT && !MONO
@@ -244,24 +233,20 @@ namespace MsgPack.Rpc
 		///		The overriding method adds its internal state to this object via <see cref="M:SafeSerializationEventArgs.AddSerializedState"/>.
 		///	</param>
 		/// <seealso cref="ISafeSerializationData"/>
-		protected override void OnSerializeObjectState( object sender, SafeSerializationEventArgs e )
-		{
-			base.OnSerializeObjectState( sender, e );
+		protected override void OnSerializeObjectState(object sender, SafeSerializationEventArgs e) {
+			base.OnSerializeObjectState(sender, e);
 			e.AddSerializedState(
-				new SerializedState()
-				{
+				new SerializedState() {
 					ParameterName = this._parameterName
 				}
 			);
 		}
 
 		[Serializable]
-		private sealed class SerializedState : ISafeSerializationData
-		{
+		private sealed class SerializedState : ISafeSerializationData {
 			public string ParameterName;
 
-			public void CompleteDeserialization( object deserialized )
-			{
+			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as RpcArgumentException;
 				enclosing._parameterName = this.ParameterName;
 			}

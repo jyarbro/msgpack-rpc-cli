@@ -1,13 +1,11 @@
 using System;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc.Protocols
-{
+namespace MsgPack.Rpc.Protocols {
 	/// <summary>
 	///		Contains event data for shutdown completion events both of client and server sides.
 	/// </summary>
-	public class ShutdownCompletedEventArgs : EventArgs
-	{
+	public class ShutdownCompletedEventArgs : EventArgs {
 		private readonly ShutdownSource _source;
 
 		/// <summary>
@@ -16,8 +14,7 @@ namespace MsgPack.Rpc.Protocols
 		/// <value>
 		///		A <see cref="ShutdownSource"/> value which indicates shutdown source.
 		/// </value>
-		public ShutdownSource Source
-		{
+		public ShutdownSource Source {
 			get { return this._source; }
 		}
 
@@ -28,20 +25,16 @@ namespace MsgPack.Rpc.Protocols
 		/// <exception cref="ArgumentOutOfRangeException">
 		///		The <paramref name="source"/> is not valid <see cref="ShutdownSource"/> enumeration value.
 		/// </exception>
-		public ShutdownCompletedEventArgs( ShutdownSource source )
-		{
-			switch ( source )
-			{
+		public ShutdownCompletedEventArgs(ShutdownSource source) {
+			switch (source) {
 				case ShutdownSource.Client:
 				case ShutdownSource.Server:
 				case ShutdownSource.Unknown:
-				case ShutdownSource.Disposing:
-				{
+				case ShutdownSource.Disposing: {
 					break;
 				}
-				default:
-				{
-					throw new ArgumentOutOfRangeException( "source" );
+				default: {
+					throw new ArgumentOutOfRangeException("source");
 				}
 			}
 

@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
-namespace MsgPack.Rpc.Protocols
-{
+namespace MsgPack.Rpc.Protocols {
 	/// <summary>
 	///		Exception thrown when network error occurred in/under transport layer.
 	/// </summary>
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	[SuppressMessage( "Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData." )]
-	[SuppressMessage( "Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData." )]
-	public sealed class RpcTransportException : RpcException
-	{
+	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
+	public sealed class RpcTransportException : RpcException {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcTransportException"/> class with the default error message.
 		/// </summary>
 		/// <param name="rpcError">
 		///		Metadata of error. If you specify null, <see cref="RpcError.TransportError"/> is used.
 		///	</param>
-		public RpcTransportException( RpcError rpcError ) : this( rpcError, null, null, null ) { }
+		public RpcTransportException(RpcError rpcError) : this(rpcError, null, null, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcTransportException"/> class with a specified error message.
@@ -47,7 +44,7 @@ namespace MsgPack.Rpc.Protocols
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>		
-		public RpcTransportException( RpcError rpcError, string message, string debugInformation ) : this( rpcError, message, debugInformation, null ) { }
+		public RpcTransportException(RpcError rpcError, string message, string debugInformation) : this(rpcError, message, debugInformation, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcTransportException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
@@ -76,7 +73,7 @@ namespace MsgPack.Rpc.Protocols
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcTransportException( RpcError rpcError, string message, string debugInformation, Exception inner ) : base( rpcError ?? RpcError.TransportError, message, debugInformation, inner ) { }
+		public RpcTransportException(RpcError rpcError, string message, string debugInformation, Exception inner) : base(rpcError ?? RpcError.TransportError, message, debugInformation, inner) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcTransportException"/> class with the unpacked data.
@@ -90,8 +87,8 @@ namespace MsgPack.Rpc.Protocols
 		/// <exception cref="SerializationException">
 		///		Cannot deserialize instance from <paramref name="message"/>.
 		/// </exception>
-		internal RpcTransportException( RpcError rpcError, MessagePackObject message )
-			: base( rpcError, message ) { }
+		internal RpcTransportException(RpcError rpcError, MessagePackObject message)
+			: base(rpcError, message) { }
 
 #if MONO
 		/// <summary>

@@ -1,26 +1,24 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Throwsn when the object pool with <see cref="ExhausionPolicy.ThrowException"/> is empty at borrowing.
 	/// </summary>
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	public sealed class ObjectPoolEmptyException : Exception
-	{
+	public sealed class ObjectPoolEmptyException : Exception {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPoolEmptyException"/> class with a default message.
 		/// </summary>
-		public ObjectPoolEmptyException() : this( null ) { }
+		public ObjectPoolEmptyException() : this(null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPoolEmptyException"/> class with a specified error message. 
 		/// </summary>
 		/// <param name="message">The message to describe the error.</param>
-		public ObjectPoolEmptyException( string message ) : this( message, null ) { }
+		public ObjectPoolEmptyException(string message) : this(message, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPoolEmptyException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
@@ -29,7 +27,7 @@ namespace MsgPack.Rpc
 		/// <param name="innerException">
 		///		The exception that is the cause of the current exception, or <c>null</c> if no inner exception is specified.
 		/// </param>
-		public ObjectPoolEmptyException( string message, Exception innerException ) : base( message ?? "The object pool is empty.", innerException ) { }
+		public ObjectPoolEmptyException(string message, Exception innerException) : base(message ?? "The object pool is empty.", innerException) { }
 
 #if !SILVERLIGHT
 		/// <summary>
@@ -48,7 +46,7 @@ namespace MsgPack.Rpc
 		///		THe class name is <c>null</c>,
 		///		or <see cref="P:System.Exception.HResult"/> is zero.
 		///	</exception>
-		private ObjectPoolEmptyException( SerializationInfo info, StreamingContext context ) : base( info, context ) { }
+		private ObjectPoolEmptyException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 #endif
 	}
 }

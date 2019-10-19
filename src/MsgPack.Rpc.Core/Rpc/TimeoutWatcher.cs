@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.Threading;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Watches timeout.
 	/// </summary>
-	internal class TimeoutWatcher : IDisposable
-	{
+	internal class TimeoutWatcher : IDisposable {
 		private const int StateIdle = 0;
 		private const int StateWatching = 1;
 		private const int StateTimeout = 2;
@@ -25,13 +22,11 @@ namespace MsgPack.Rpc
 		/// <value>
 		/// 	<c>true</c> if timeout is occurred; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsTimeout
-		{
-			get
-			{
+		public bool IsTimeout {
+			get {
 				this.VerifyIsNotDisposed();
 
-				return Interlocked.CompareExchange( ref this._state, 0, 0 ) == StateTimeout;
+				return Interlocked.CompareExchange(ref this._state, 0, 0) == StateTimeout;
 			}
 		}
 
@@ -40,66 +35,53 @@ namespace MsgPack.Rpc
 		/// <summary>
 		///		Occurs when operation timeout.
 		/// </summary>
-		public event EventHandler Timeout
-		{
-			add
-			{
+		public event EventHandler Timeout {
+			add {
 				this.VerifyIsNotDisposed();
 
 				EventHandler oldHandler;
 				EventHandler currentHandler = this._timeout;
-				do
-				{
+				do {
 					oldHandler = currentHandler;
-					var newHandler = Delegate.Combine( oldHandler, value ) as EventHandler;
-					currentHandler = Interlocked.CompareExchange( ref this._timeout, newHandler, oldHandler );
-				} while ( oldHandler != currentHandler );
+					var newHandler = Delegate.Combine(oldHandler, value) as EventHandler;
+					currentHandler = Interlocked.CompareExchange(ref this._timeout, newHandler, oldHandler);
+				} while (oldHandler != currentHandler);
 			}
-			remove
-			{
+			remove {
 				this.VerifyIsNotDisposed();
 
 				EventHandler oldHandler;
 				EventHandler currentHandler = this._timeout;
-				do
-				{
+				do {
 					oldHandler = currentHandler;
-					var newHandler = Delegate.Remove( oldHandler, value ) as EventHandler;
-					currentHandler = Interlocked.CompareExchange( ref this._timeout, newHandler, oldHandler );
-				} while ( oldHandler != currentHandler );
+					var newHandler = Delegate.Remove(oldHandler, value) as EventHandler;
+					currentHandler = Interlocked.CompareExchange(ref this._timeout, newHandler, oldHandler);
+				} while (oldHandler != currentHandler);
 			}
 		}
 
-		private void OnTimeout()
-		{
-			var handler = Interlocked.CompareExchange( ref this._timeout, null, null );
-			if ( handler != null )
-			{
-				handler( this, EventArgs.Empty );
+		private void OnTimeout() {
+			var handler = Interlocked.CompareExchange(ref this._timeout, null, null);
+			if (handler != null) {
+				handler(this, EventArgs.Empty);
 			}
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TimeoutWatcher"/> class.
 		/// </summary>
-		public TimeoutWatcher()
-		{
+		public TimeoutWatcher() {
 		}
 
 		/// <summary>
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		public void Dispose()
-		{
-			if ( Interlocked.Exchange( ref this._state, StateDisposed ) != StateDisposed )
-			{
-				lock ( this._resourceLock )
-				{
-					if ( this._waitHandle != null )
-					{
-						if ( this._registeredWaitHandle != null )
-						{
-							this._registeredWaitHandle.Unregister( this._waitHandle );
+		public void Dispose() {
+			if (Interlocked.Exchange(ref this._state, StateDisposed) != StateDisposed) {
+				lock (this._resourceLock) {
+					if (this._waitHandle != null) {
+						if (this._registeredWaitHandle != null) {
+							this._registeredWaitHandle.Unregister(this._waitHandle);
 							this._registeredWaitHandle = null;
 						}
 
@@ -109,28 +91,22 @@ namespace MsgPack.Rpc
 			}
 		}
 
-		private void VerifyIsNotDisposed()
-		{
-			if ( Interlocked.CompareExchange( ref this._state, 0, 0 ) == StateDisposed )
-			{
-				throw new ObjectDisposedException( this.ToString() );
+		private void VerifyIsNotDisposed() {
+			if (Interlocked.CompareExchange(ref this._state, 0, 0) == StateDisposed) {
+				throw new ObjectDisposedException(this.ToString());
 			}
 		}
 
 		/// <summary>
 		///		Resets this instance.
 		/// </summary>
-		public void Reset()
-		{
-			lock ( this._resourceLock )
-			{
+		public void Reset() {
+			lock (this._resourceLock) {
 				this.VerifyIsNotDisposed();
 
-				if ( this._waitHandle != null )
-				{
-					if ( this._registeredWaitHandle != null )
-					{
-						this._registeredWaitHandle.Unregister( this._waitHandle );
+				if (this._waitHandle != null) {
+					if (this._registeredWaitHandle != null) {
+						this._registeredWaitHandle.Unregister(this._waitHandle);
 						this._registeredWaitHandle = null;
 					}
 
@@ -139,7 +115,7 @@ namespace MsgPack.Rpc
 					this._waitHandle = null;
 				}
 
-				Interlocked.Exchange( ref this._state, StateIdle );
+				Interlocked.Exchange(ref this._state, StateIdle);
 			}
 		}
 
@@ -150,31 +126,25 @@ namespace MsgPack.Rpc
 		/// <exception cref="InvalidOperationException">
 		///		This instance already start wathing.
 		/// </exception>
-		public void Start( TimeSpan timeout )
-		{
-			lock ( this._resourceLock )
-			{
+		public void Start(TimeSpan timeout) {
+			lock (this._resourceLock) {
 				this.VerifyIsNotDisposed();
 
-				if ( this._registeredWaitHandle != null )
-				{
-					throw new InvalidOperationException( "Already started." );
+				if (this._registeredWaitHandle != null) {
+					throw new InvalidOperationException("Already started.");
 				}
 
-				if ( this._waitHandle == null )
-				{
-					this._waitHandle = new ManualResetEvent( false );
+				if (this._waitHandle == null) {
+					this._waitHandle = new ManualResetEvent(false);
 				}
 
-				this._registeredWaitHandle = ThreadPool.RegisterWaitForSingleObject( this._waitHandle, OnPulse, null, timeout, true );
-				Interlocked.Exchange( ref this._state, StateWatching );
+				this._registeredWaitHandle = ThreadPool.RegisterWaitForSingleObject(this._waitHandle, OnPulse, null, timeout, true);
+				Interlocked.Exchange(ref this._state, StateWatching);
 			}
 		}
 
-		private void OnPulse( object state, bool isTimeout )
-		{
-			if ( isTimeout && Interlocked.CompareExchange( ref this._state, StateTimeout, StateWatching ) == StateWatching )
-			{
+		private void OnPulse(object state, bool isTimeout) {
+			if (isTimeout && Interlocked.CompareExchange(ref this._state, StateTimeout, StateWatching) == StateWatching) {
 				this.OnTimeout();
 			}
 		}
@@ -182,17 +152,14 @@ namespace MsgPack.Rpc
 		/// <summary>
 		///		Stops timeout watch.
 		/// </summary>
-		public void Stop()
-		{
-			lock ( this._resourceLock )
-			{
+		public void Stop() {
+			lock (this._resourceLock) {
 				this.VerifyIsNotDisposed();
 
 				// Do not override Disposed/Timeout
-				Interlocked.CompareExchange( ref this._state, StateIdle, StateWatching );
+				Interlocked.CompareExchange(ref this._state, StateIdle, StateWatching);
 
-				if ( this._waitHandle != null )
-				{
+				if (this._waitHandle != null) {
 					this._waitHandle.Set();
 				}
 			}

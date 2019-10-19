@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc.Protocols.Filters
-{
+namespace MsgPack.Rpc.Protocols.Filters {
 	/// <summary>
 	///		Defines interfaces of the message filter.
 	/// </summary>
@@ -12,8 +11,7 @@ namespace MsgPack.Rpc.Protocols.Filters
 	/// </remarks>
 	/// <typeparam name="T"></typeparam>
 	public abstract class MessageFilter<T>
-		where T : MessageContext
-	{
+		where T : MessageContext {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="MessageFilter&lt;T&gt;"/> class.
 		/// </summary>
@@ -26,22 +24,20 @@ namespace MsgPack.Rpc.Protocols.Filters
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="context"/> is <c>null</c>.
 		/// </exception>
-		public void ProcessMessage( T context )
-		{
-			if ( context == null )
-			{
-				throw new ArgumentNullException( "context" );
+		public void ProcessMessage(T context) {
+			if (context == null) {
+				throw new ArgumentNullException("context");
 			}
 
 			Contract.EndContractBlock();
 
-			this.ProcessMessageCore( context );
+			this.ProcessMessageCore(context);
 		}
 
 		/// <summary>
 		///		Applies this filter to the specified message.
 		/// </summary>
 		/// <param name="context">The message context. This value is not <c>null</c>.</param>
-		protected abstract void ProcessMessageCore( T context );
+		protected abstract void ProcessMessageCore(T context);
 	}
 }

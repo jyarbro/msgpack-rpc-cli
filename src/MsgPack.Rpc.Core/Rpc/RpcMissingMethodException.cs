@@ -1,21 +1,18 @@
-﻿using System;
+﻿using MsgPack.Rpc.Protocols;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
-using MsgPack.Rpc.Protocols;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Thrown when specified method is not exist on remote server.
 	/// </summary>
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	[SuppressMessage( "Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData." )]
-	[SuppressMessage( "Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData." )]
-	public sealed class RpcMissingMethodException : RpcMethodInvocationException
-	{
+	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
+	public sealed class RpcMissingMethodException : RpcMethodInvocationException {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcMissingMethodException"/> class with the default error message.
 		/// </summary>
@@ -28,8 +25,8 @@ namespace MsgPack.Rpc
 		/// <exception cref="ArgumentException">
 		///		<paramref name="methodName"/> is empty or blank.
 		/// </exception>
-		public RpcMissingMethodException( string methodName )
-			: this( methodName, null, null, null ) { }
+		public RpcMissingMethodException(string methodName)
+			: this(methodName, null, null, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcMissingMethodException"/> class with a specified error message.
@@ -61,8 +58,8 @@ namespace MsgPack.Rpc
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcMissingMethodException( string methodName, string message, string debugInformation )
-			: this( methodName, message, debugInformation, null ) { }
+		public RpcMissingMethodException(string methodName, string message, string debugInformation)
+			: this(methodName, message, debugInformation, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcMissingMethodException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
@@ -97,8 +94,8 @@ namespace MsgPack.Rpc
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcMissingMethodException( string methodName, string message, string debugInformation, Exception inner )
-			: base( RpcError.NoMethodError, methodName, message ?? RpcError.NoMethodError.DefaultMessage, debugInformation, inner ) { }
+		public RpcMissingMethodException(string methodName, string message, string debugInformation, Exception inner)
+			: base(RpcError.NoMethodError, methodName, message ?? RpcError.NoMethodError.DefaultMessage, debugInformation, inner) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcMissingMethodException"/> class with the unpacked data.
@@ -109,8 +106,8 @@ namespace MsgPack.Rpc
 		/// <exception cref="SerializationException">
 		///		Cannot deserialize instance from <paramref name="unpackedException"/>.
 		/// </exception>
-		internal RpcMissingMethodException( MessagePackObject unpackedException )
-			: base( RpcError.NoMethodError, unpackedException ) { }
+		internal RpcMissingMethodException(MessagePackObject unpackedException)
+			: base(RpcError.NoMethodError, unpackedException) { }
 
 #if MONO
 		/// <summary>

@@ -2,15 +2,13 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace MsgPack.Rpc.Protocols.Filters
-{
+namespace MsgPack.Rpc.Protocols.Filters {
 	/// <summary>
 	///		Implements common functionalities of quota filter for inbound message.
 	/// </summary>
 	/// <typeparam name="T">The type of <see cref="InboundMessageContext"/>.</typeparam>
 	public abstract class QuotaMessageFilter<T> : MessageFilter<T>
-			where T : InboundMessageContext
-	{
+			where T : InboundMessageContext {
 		private readonly long _quota;
 
 		/// <summary>
@@ -19,8 +17,7 @@ namespace MsgPack.Rpc.Protocols.Filters
 		/// <value>
 		///		The quota.
 		/// </value>
-		public long Quota
-		{
+		public long Quota {
 			get { return this._quota; }
 		}
 
@@ -31,11 +28,9 @@ namespace MsgPack.Rpc.Protocols.Filters
 		/// <exception cref="ArgumentOutOfRangeException">
 		///		The value of <paramref name="quota"/> is negative.
 		/// </exception>
-		protected QuotaMessageFilter( long quota )
-		{
-			if ( quota < 0 )
-			{
-				throw new ArgumentOutOfRangeException( "quota", "Quota cannot be negative." );
+		protected QuotaMessageFilter(long quota) {
+			if (quota < 0) {
+				throw new ArgumentOutOfRangeException("quota", "Quota cannot be negative.");
 			}
 
 			Contract.EndContractBlock();
@@ -47,24 +42,21 @@ namespace MsgPack.Rpc.Protocols.Filters
 		///		Applies this filter to the specified message.
 		/// </summary>
 		/// <param name="context">The message context. This value is not <c>null</c>.</param>
-		protected override void ProcessMessageCore( T context )
-		{
-			if ( this._quota == 0 )
-			{
+		protected override void ProcessMessageCore(T context) {
+			if (this._quota == 0) {
 				// Infinite.
 				return;
 			}
 
-			long length = context.ReceivedData.Sum( s => ( long )s.Count );
+			long length = context.ReceivedData.Sum(s => (long)s.Count);
 
-			if ( length > this._quota )
-			{
+			if (length > this._quota) {
 				throw RpcError.MessageTooLargeError.ToException(
 					new MessagePackObject(
-						new MessagePackObjectDictionary( 2 )
-						{ 
+						new MessagePackObjectDictionary(2)
+						{
 							{ "ActualLength", length },
-							{ "Quota", this._quota } 
+							{ "Quota", this._quota }
 						},
 						true
 					)

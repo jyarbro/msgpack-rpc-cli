@@ -1,12 +1,8 @@
-﻿using System;
-
-namespace MsgPack.Rpc.Protocols
-{
+﻿namespace MsgPack.Rpc.Protocols {
 	/// <summary>
 	///		Represents the source which caused transport shutdown.
 	/// </summary>
-	public enum ShutdownSource
-	{
+	public enum ShutdownSource {
 		/// <summary>
 		///		Unknown. This might indicate internal runtime error.
 		/// </summary>

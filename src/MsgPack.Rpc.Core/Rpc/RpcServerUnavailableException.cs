@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Exception thrown when server is (maybe temporaly) unavailable.
 	/// </summary>
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	[SuppressMessage( "Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData." )]
-	[SuppressMessage( "Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData." )]
-	public sealed class RpcServerUnavailableException : RpcException
-	{
+	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
+	public sealed class RpcServerUnavailableException : RpcException {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcServerUnavailableException"/> class with the default error message.
 		/// </summary>
 		/// <param name="rpcError">
 		///		Metadata of error. If you specify null, <see cref="RpcError.RemoteRuntimeError"/> is used.
 		///	</param>
-		public RpcServerUnavailableException( RpcError rpcError ) : this( rpcError, null, null, null ) { }
+		public RpcServerUnavailableException(RpcError rpcError) : this(rpcError, null, null, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcServerUnavailableException"/> class with a specified error message.
@@ -47,8 +44,8 @@ namespace MsgPack.Rpc
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>		
-		public RpcServerUnavailableException( RpcError rpcError, string message, string debugInformation )
-			: this( rpcError, message, debugInformation, null ) { }
+		public RpcServerUnavailableException(RpcError rpcError, string message, string debugInformation)
+			: this(rpcError, message, debugInformation, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcServerUnavailableException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
@@ -77,8 +74,8 @@ namespace MsgPack.Rpc
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcServerUnavailableException( RpcError rpcError, string message, string debugInformation, Exception inner )
-			: base( rpcError ?? RpcError.ServerError, message, debugInformation, inner ) { }
+		public RpcServerUnavailableException(RpcError rpcError, string message, string debugInformation, Exception inner)
+			: base(rpcError ?? RpcError.ServerError, message, debugInformation, inner) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcServerUnavailableException"/> class with the unpacked data.
@@ -92,7 +89,7 @@ namespace MsgPack.Rpc
 		/// <exception cref="SerializationException">
 		///		Cannot deserialize instance from <paramref name="unpackedException"/>.
 		/// </exception>
-		internal RpcServerUnavailableException( RpcError rpcError, MessagePackObject unpackedException ) : base( rpcError, unpackedException ) { }
+		internal RpcServerUnavailableException(RpcError rpcError, MessagePackObject unpackedException) : base(rpcError, unpackedException) { }
 
 #if MONO
 		/// <summary>

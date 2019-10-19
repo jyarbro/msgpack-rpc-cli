@@ -2,8 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		The standard implementation of the <see cref="IFreezable"/> interface.
 	/// </summary>
@@ -20,9 +19,8 @@ namespace MsgPack.Rpc
 		/// <value>
 		///   <c>true</c> if this instance is frozen; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsFrozen
-		{
-			get { return Interlocked.CompareExchange( ref this._isFrozen, 0, 0 ) != 0; }
+		public bool IsFrozen {
+			get { return Interlocked.CompareExchange(ref this._isFrozen, 0, 0) != 0; }
 		}
 
 		/// <summary>
@@ -36,11 +34,9 @@ namespace MsgPack.Rpc
 		/// <exception cref="InvalidOperationException">
 		///		This instance is already frozen.
 		/// </exception>
-		protected void VerifyIsNotFrozen()
-		{
-			if ( this.IsFrozen )
-			{
-				throw new InvalidOperationException( "This instance is frozen." );
+		protected void VerifyIsNotFrozen() {
+			if (this.IsFrozen) {
+				throw new InvalidOperationException("This instance is frozen.");
 			}
 		}
 
@@ -50,10 +46,9 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		The shallow copy of this instance. Returned instance always is not frozen.
 		/// </returns>
-		protected virtual FreezableObject CloneCore()
-		{
+		protected virtual FreezableObject CloneCore() {
 			var clone = this.MemberwiseClone() as FreezableObject;
-			Interlocked.Exchange( ref clone._isFrozen, 0 );
+			Interlocked.Exchange(ref clone._isFrozen, 0);
 			return clone;
 		}
 
@@ -63,9 +58,8 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		This instance.
 		/// </returns>
-		protected virtual FreezableObject FreezeCore()
-		{
-			Interlocked.Exchange( ref this._isFrozen, 1 );
+		protected virtual FreezableObject FreezeCore() {
+			Interlocked.Exchange(ref this._isFrozen, 1);
 
 			return this;
 		}
@@ -77,10 +71,8 @@ namespace MsgPack.Rpc
 		/// This instance if it is already frozen.
 		/// Otherwise, frozen copy of this instance.
 		/// </returns>
-		protected virtual FreezableObject AsFrozenCore()
-		{
-			if ( this.IsFrozen )
-			{
+		protected virtual FreezableObject AsFrozenCore() {
+			if (this.IsFrozen) {
 				return this;
 			}
 
@@ -88,9 +80,8 @@ namespace MsgPack.Rpc
 		}
 
 #if !SILVERLIGHT
-		[SuppressMessage( "Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via CloneCore()." )]
-		object ICloneable.Clone()
-		{
+		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via CloneCore().")]
+		object ICloneable.Clone() {
 			return this.CloneCore();
 		}
 #endif
@@ -102,15 +93,13 @@ namespace MsgPack.Rpc
 		/// This instance if it is already frozen.
 		/// Otherwise, frozen copy of this instance.
 		/// </returns>
-		[SuppressMessage( "Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via AsFrozenCore()." )]
-		IFreezable IFreezable.AsFrozen()
-		{
+		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via AsFrozenCore().")]
+		IFreezable IFreezable.AsFrozen() {
 			return this.AsFrozenCore();
 		}
 
-		[SuppressMessage( "Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via FreezeCore()." )]
-		IFreezable IFreezable.Freeze()
-		{
+		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via FreezeCore().")]
+		IFreezable IFreezable.Freeze() {
 			return this.FreezeCore();
 		}
 	}

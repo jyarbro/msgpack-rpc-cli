@@ -13,8 +13,7 @@ using Mono.Threading;
 #endif
 using MsgPack.Rpc.StandardObjectPoolTracing;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Implements standard <see cref="ObjectPool{T}"/>.
 	/// </summary>
@@ -22,26 +21,23 @@ namespace MsgPack.Rpc
 	///		The type of objects to be pooled.
 	/// </typeparam>
 	internal sealed class StandardObjectPool<T> : ObjectPool<T>
-		where T : class
-	{
-		private static readonly bool _isDisposableTInternal = typeof( IDisposable ).IsAssignableFrom( typeof( T ) );
+		where T : class {
+		private static readonly bool _isDisposableTInternal = typeof(IDisposable).IsAssignableFrom(typeof(T));
 
 		// name for debugging purpose, explicitly specified, or automatically constructed.
 		private readonly string _name;
 
 		private readonly TraceSource _source;
 
-		internal TraceSource TraceSource
-		{
+		internal TraceSource TraceSource {
 			get { return this._source; }
 		}
 
 		private readonly ObjectPoolConfiguration _configuration;
 
 		private int _isCorrupted;
-		private bool IsCorrupted
-		{
-			get { return Interlocked.CompareExchange( ref this._isCorrupted, 0, 0 ) != 0; }
+		private bool IsCorrupted {
+			get { return Interlocked.CompareExchange(ref this._isCorrupted, 0, 0) != 0; }
 		}
 
 		private readonly Func<T> _factory;
@@ -49,16 +45,14 @@ namespace MsgPack.Rpc
 		private readonly TimeSpan _borrowTimeout;
 
 		// Debug
-		internal int PooledCount
-		{
+		internal int PooledCount {
 			get { return this._pool.Count; }
 		}
 
 		private readonly BlockingCollection<WeakReference> _leases;
 		private readonly ReaderWriterLockSlim _leasesLock;
 
-		internal int LeasedCount
-		{
+		internal int LeasedCount {
 			get { return this._leases.Count; }
 		}
 
@@ -79,31 +73,26 @@ namespace MsgPack.Rpc
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="factory"/> is <c>null</c>.
 		/// </exception>
-		public StandardObjectPool( Func<T> factory, ObjectPoolConfiguration configuration )
-		{
-			if ( factory == null )
-			{
-				throw new ArgumentNullException( "factory" );
+		public StandardObjectPool(Func<T> factory, ObjectPoolConfiguration configuration) {
+			if (factory == null) {
+				throw new ArgumentNullException("factory");
 			}
 
 			Contract.EndContractBlock();
 
-			var safeConfiguration = ( configuration ?? ObjectPoolConfiguration.Default ).AsFrozen();
+			var safeConfiguration = (configuration ?? ObjectPoolConfiguration.Default).AsFrozen();
 
-			if ( String.IsNullOrWhiteSpace( safeConfiguration.Name ) )
-			{
-				this._source = new TraceSource( this.GetType().FullName );
-				this._name = this.GetType().FullName + "@" + this.GetHashCode().ToString( "X", CultureInfo.InvariantCulture );
+			if (String.IsNullOrWhiteSpace(safeConfiguration.Name)) {
+				this._source = new TraceSource(this.GetType().FullName);
+				this._name = this.GetType().FullName + "@" + this.GetHashCode().ToString("X", CultureInfo.InvariantCulture);
 			}
-			else
-			{
-				this._source = new TraceSource( safeConfiguration.Name );
+			else {
+				this._source = new TraceSource(safeConfiguration.Name);
 				this._name = safeConfiguration.Name;
 			}
 
 #if !API_SIGNATURE_TEST
-			if ( configuration == null && this._source.ShouldTrace( StandardObjectPoolTrace.InitializedWithDefaultConfiguration ) )
-			{
+			if (configuration == null && this._source.ShouldTrace(StandardObjectPoolTrace.InitializedWithDefaultConfiguration)) {
 				this._source.TraceEvent(
 					StandardObjectPoolTrace.InitializedWithDefaultConfiguration,
 					"Initialized with default configuration. { \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }",
@@ -112,8 +101,7 @@ namespace MsgPack.Rpc
 					this.GetHashCode()
 				);
 			}
-			else if ( this._source.ShouldTrace( StandardObjectPoolTrace.InitializedWithConfiguration ) )
-			{
+			else if (this._source.ShouldTrace(StandardObjectPoolTrace.InitializedWithConfiguration)) {
 				this._source.TraceEvent(
 					StandardObjectPoolTrace.InitializedWithConfiguration,
 					"Initialized with specified configuration. { \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Configuration\" : {3} }",
@@ -126,30 +114,26 @@ namespace MsgPack.Rpc
 #endif
 			this._configuration = safeConfiguration;
 			this._factory = factory;
-			this._leasesLock = new ReaderWriterLockSlim( LockRecursionPolicy.NoRecursion );
-			this._borrowTimeout = safeConfiguration.BorrowTimeout ?? TimeSpan.FromMilliseconds( Timeout.Infinite );
-			this._pool = 
-				new BlockingCollection<T>( 
+			this._leasesLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+			this._borrowTimeout = safeConfiguration.BorrowTimeout ?? TimeSpan.FromMilliseconds(Timeout.Infinite);
+			this._pool =
+				new BlockingCollection<T>(
 #if !SILVERLIGHT
-					new ConcurrentStack<T>() 
+					new ConcurrentStack<T>()
 #else
 					new ConcurrentStack<T>() 
 #endif
 				);
 
-			if ( safeConfiguration.MaximumPooled == null )
-			{
-				this._leases = new BlockingCollection<WeakReference>( new ConcurrentQueue<WeakReference>() );
+			if (safeConfiguration.MaximumPooled == null) {
+				this._leases = new BlockingCollection<WeakReference>(new ConcurrentQueue<WeakReference>());
 			}
-			else
-			{
-				this._leases = new BlockingCollection<WeakReference>( new ConcurrentQueue<WeakReference>(), safeConfiguration.MaximumPooled.Value );
+			else {
+				this._leases = new BlockingCollection<WeakReference>(new ConcurrentQueue<WeakReference>(), safeConfiguration.MaximumPooled.Value);
 			}
 
-			for ( int i = 0; i < safeConfiguration.MinimumReserved; i++ )
-			{
-				if ( !this.AddToPool( factory(), 0 ) )
-				{
+			for (int i = 0; i < safeConfiguration.MinimumReserved; i++) {
+				if (!this.AddToPool(factory(), 0)) {
 #if !API_SIGNATURE_TEST
 					this._source.TraceEvent(
 						StandardObjectPoolTrace.FailedToAddPoolInitially,
@@ -162,29 +146,23 @@ namespace MsgPack.Rpc
 				}
 			}
 
-			this._evictionIntervalMilliseconds = safeConfiguration.EvitionInterval == null ? default( int? ) : unchecked( ( int )safeConfiguration.EvitionInterval.Value.TotalMilliseconds );
-			if ( safeConfiguration.MaximumPooled != null
+			this._evictionIntervalMilliseconds = safeConfiguration.EvitionInterval == null ? default(int?) : unchecked((int)safeConfiguration.EvitionInterval.Value.TotalMilliseconds);
+			if (safeConfiguration.MaximumPooled != null
 				&& safeConfiguration.MinimumReserved != safeConfiguration.MaximumPooled.GetValueOrDefault()
-				&& this._evictionIntervalMilliseconds != null )
-			{
-				this._evictionTimer = new Timer( this.OnEvictionTimerElapsed, null, this._evictionIntervalMilliseconds.Value, Timeout.Infinite );
+				&& this._evictionIntervalMilliseconds != null) {
+				this._evictionTimer = new Timer(this.OnEvictionTimerElapsed, null, this._evictionIntervalMilliseconds.Value, Timeout.Infinite);
 			}
-			else
-			{
+			else {
 				this._evictionTimer = null;
 			}
 		}
 
-		private bool AddToPool( T value, int millisecondsTimeout )
-		{
+		private bool AddToPool(T value, int millisecondsTimeout) {
 			bool result = false;
 			try { }
-			finally
-			{
-				if ( this._pool.TryAdd( value, millisecondsTimeout ) )
-				{
-					if ( this._leases.TryAdd( new WeakReference( value ) ) )
-					{
+			finally {
+				if (this._pool.TryAdd(value, millisecondsTimeout)) {
+					if (this._leases.TryAdd(new WeakReference(value))) {
 						result = true;
 					}
 				}
@@ -193,20 +171,16 @@ namespace MsgPack.Rpc
 			return result;
 		}
 
-		protected sealed override void Dispose( bool disposing )
-		{
-			if ( disposing )
-			{
+		protected sealed override void Dispose(bool disposing) {
+			if (disposing) {
 				this._pool.Dispose();
-				if ( this._evictionTimer != null )
-				{
+				if (this._evictionTimer != null) {
 					this._evictionTimer.Dispose();
 				}
 				this._leasesLock.Dispose();
 
 #if !API_SIGNATURE_TEST
-				if ( this._source.ShouldTrace( StandardObjectPoolTrace.Disposed ) )
-				{
+				if (this._source.ShouldTrace(StandardObjectPoolTrace.Disposed)) {
 					this._source.TraceEvent(
 						StandardObjectPoolTrace.Disposed,
 						"Object pool is disposed. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }}",
@@ -217,11 +191,9 @@ namespace MsgPack.Rpc
 				}
 #endif
 			}
-			else
-			{
+			else {
 #if !API_SIGNATURE_TEST
-				if ( this._source.ShouldTrace( StandardObjectPoolTrace.Finalized ) )
-				{
+				if (this._source.ShouldTrace(StandardObjectPoolTrace.Finalized)) {
 					this._source.TraceEvent(
 						StandardObjectPoolTrace.Finalized,
 						"Object pool is finalized. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }}",
@@ -233,35 +205,29 @@ namespace MsgPack.Rpc
 #endif
 			}
 
-			base.Dispose( disposing );
+			base.Dispose(disposing);
 		}
 
-		private void VerifyIsNotCorrupted()
-		{
-			if ( this.IsCorrupted )
-			{
+		private void VerifyIsNotCorrupted() {
+			if (this.IsCorrupted) {
 				throw new ObjectPoolCorruptedException();
 			}
 		}
 
-		private void SetIsCorrupted()
-		{
-			Interlocked.Exchange( ref this._isCorrupted, 1 );
+		private void SetIsCorrupted() {
+			Interlocked.Exchange(ref this._isCorrupted, 1);
 		}
 
-		private void OnEvictionTimerElapsed( object state )
-		{
-			this.EvictExtraItemsCore( false );
+		private void OnEvictionTimerElapsed(object state) {
+			this.EvictExtraItemsCore(false);
 
-			Contract.Assert( this._evictionIntervalMilliseconds.HasValue );
+			Contract.Assert(this._evictionIntervalMilliseconds.HasValue);
 
-			if ( this.IsCorrupted )
-			{
+			if (this.IsCorrupted) {
 				return;
 			}
 
-			if ( !this._evictionTimer.Change( this._evictionIntervalMilliseconds.Value, Timeout.Infinite ) )
-			{
+			if (!this._evictionTimer.Change(this._evictionIntervalMilliseconds.Value, Timeout.Infinite)) {
 #if !API_SIGNATURE_TEST
 				this._source.TraceEvent(
 					StandardObjectPoolTrace.FailedToRefreshEvictionTImer,
@@ -277,20 +243,16 @@ namespace MsgPack.Rpc
 		/// <summary>
 		///		Evicts the extra items from current pool.
 		/// </summary>
-		public sealed override void EvictExtraItems()
-		{
-			this.EvictExtraItemsCore( true );
+		public sealed override void EvictExtraItems() {
+			this.EvictExtraItemsCore(true);
 		}
 
-		private void EvictExtraItemsCore( bool isInduced )
-		{
+		private void EvictExtraItemsCore(bool isInduced) {
 			int remains = this._pool.Count - this._configuration.MinimumReserved;
 			int evicting = remains / 2 + remains % 2;
-			if ( evicting > 0 )
-			{
+			if (evicting > 0) {
 #if !API_SIGNATURE_TEST
-				if ( isInduced && this._source.ShouldTrace( StandardObjectPoolTrace.EvictingExtraItemsInduced ) )
-				{
+				if (isInduced && this._source.ShouldTrace(StandardObjectPoolTrace.EvictingExtraItemsInduced)) {
 					this._source.TraceEvent(
 						StandardObjectPoolTrace.EvictingExtraItemsInduced,
 						"Start induced eviction. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicting\" : {3} }}",
@@ -300,8 +262,7 @@ namespace MsgPack.Rpc
 						evicting
 					);
 				}
-				else if ( this._source.ShouldTrace( StandardObjectPoolTrace.EvictingExtraItemsPreiodic ) )
-				{
+				else if (this._source.ShouldTrace(StandardObjectPoolTrace.EvictingExtraItemsPreiodic)) {
 					this._source.TraceEvent(
 						StandardObjectPoolTrace.EvictingExtraItemsPreiodic,
 						"Start periodic eviction. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicting\" : {3} }}",
@@ -313,11 +274,10 @@ namespace MsgPack.Rpc
 				}
 #endif
 
-				var disposed = this.EvictItems( evicting );
+				var disposed = this.EvictItems(evicting);
 
 #if !API_SIGNATURE_TEST
-				if ( isInduced && this._source.ShouldTrace( StandardObjectPoolTrace.EvictedExtraItemsInduced ) )
-				{
+				if (isInduced && this._source.ShouldTrace(StandardObjectPoolTrace.EvictedExtraItemsInduced)) {
 					this._source.TraceEvent(
 						StandardObjectPoolTrace.EvictedExtraItemsInduced,
 						"Finish induced eviction. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicted\" : {3} }}",
@@ -327,8 +287,7 @@ namespace MsgPack.Rpc
 						disposed.Count
 					);
 				}
-				else if ( this._source.ShouldTrace( StandardObjectPoolTrace.EvictedExtraItemsPreiodic ) )
-				{
+				else if (this._source.ShouldTrace(StandardObjectPoolTrace.EvictedExtraItemsPreiodic)) {
 					this._source.TraceEvent(
 						StandardObjectPoolTrace.EvictedExtraItemsPreiodic,
 						"Finish periodic eviction. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicted\" : {3} }}",
@@ -340,71 +299,58 @@ namespace MsgPack.Rpc
 				}
 #endif
 
-				this.CollectLeases( disposed );
+				this.CollectLeases(disposed);
 			}
-			else
-			{
+			else {
 				// Just GC
-				this.CollectLeases( new List<T>( 0 ) );
+				this.CollectLeases(new List<T>(0));
 			}
 		}
 
-		private List<T> EvictItems( int count )
-		{
-			List<T> disposed = new List<T>( count );
-			for ( int i = 0; i < count; i++ )
-			{
+		private List<T> EvictItems(int count) {
+			List<T> disposed = new List<T>(count);
+			for (int i = 0; i < count; i++) {
 				T disposing;
-				if ( !this._pool.TryTake( out disposing, 0 ) )
-				{
+				if (!this._pool.TryTake(out disposing, 0)) {
 					// Race, cancel eviction now.
 					return disposed;
 				}
 
-				DisposeItem( disposing );
-				disposed.Add( disposing );
+				DisposeItem(disposing);
+				disposed.Add(disposing);
 			}
 
 			return disposed;
 		}
 
-		private void CollectLeases( List<T> disposed )
-		{
+		private void CollectLeases(List<T> disposed) {
 			bool isSuccess = false;
-			try
-			{
+			try {
 				this._leasesLock.EnterWriteLock();
-				try
-				{
-					var buffer = new List<WeakReference>( this._leases.Count + Environment.ProcessorCount * 2 );
+				try {
+					var buffer = new List<WeakReference>(this._leases.Count + Environment.ProcessorCount * 2);
 					WeakReference dequeud;
-					while ( this._leases.TryTake( out dequeud ) )
-					{
-						buffer.Add( dequeud );
+					while (this._leases.TryTake(out dequeud)) {
+						buffer.Add(dequeud);
 					}
 
 					bool isFlushed = false;
 					int freed = 0;
-					foreach ( var item in buffer )
-					{
-						if ( !isFlushed && item.IsAlive && !disposed.Exists( x => Object.ReferenceEquals( x, SafeGetTarget( item ) ) ) )
-						{
-							if ( !this._leases.TryAdd( item ) )
-							{
+					foreach (var item in buffer) {
+						if (!isFlushed && item.IsAlive && !disposed.Exists(x => Object.ReferenceEquals(x, SafeGetTarget(item)))) {
+							if (!this._leases.TryAdd(item)) {
 								// Just evict
 								isFlushed = true;
 								freed++;
 							}
 						}
-						else
-						{
+						else {
 							freed++;
 						}
 					}
 
 #if !API_SIGNATURE_TEST
-					if ( freed - disposed.Count > 0 && this._source.ShouldTrace( StandardObjectPoolTrace.GarbageCollectedWithLost ) )
-					{
+					if (freed - disposed.Count > 0 && this._source.ShouldTrace(StandardObjectPoolTrace.GarbageCollectedWithLost)) {
 						this._source.TraceEvent(
 							StandardObjectPoolTrace.GarbageCollectedWithLost,
 							"Garbage items are collected, but there may be lost items. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Collected\" : {3}, \"MayBeLost\" : {4} }}",
@@ -415,8 +361,7 @@ namespace MsgPack.Rpc
 							freed - disposed.Count
 						);
 					}
-					else if ( freed > 0 && this._source.ShouldTrace( StandardObjectPoolTrace.GarbageCollectedWithoutLost ) )
-					{
+					else if (freed > 0 && this._source.ShouldTrace(StandardObjectPoolTrace.GarbageCollectedWithoutLost)) {
 						this._source.TraceEvent(
 							StandardObjectPoolTrace.GarbageCollectedWithoutLost,
 							"Garbage items are collected. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Collected\" : {3} }}",
@@ -428,47 +373,37 @@ namespace MsgPack.Rpc
 					}
 #endif
 				}
-				finally
-				{
+				finally {
 					this._leasesLock.ExitWriteLock();
 				}
 
 				isSuccess = true;
 			}
-			finally
-			{
-				if ( !isSuccess )
-				{
+			finally {
+				if (!isSuccess) {
 					this.SetIsCorrupted();
 				}
 			}
 		}
 
-		private static T SafeGetTarget( WeakReference item )
-		{
-			try
-			{
+		private static T SafeGetTarget(WeakReference item) {
+			try {
 				return item.Target as T;
 			}
-			catch ( InvalidOperationException )
-			{
+			catch (InvalidOperationException) {
 				return null;
 			}
 		}
 
-		protected sealed override T BorrowCore()
-		{
+		protected sealed override T BorrowCore() {
 			this.VerifyIsNotCorrupted();
 
 			T result;
-			while ( true )
-			{
-				if ( this._pool.TryTake( out result, 0 ) )
-				{
+			while (true) {
+				if (this._pool.TryTake(out result, 0)) {
 #if !API_SIGNATURE_TEST
-					if ( this._source.ShouldTrace( StandardObjectPoolTrace.BorrowFromPool ) )
-					{
-						this.TraceBorrow( result );
+					if (this._source.ShouldTrace(StandardObjectPoolTrace.BorrowFromPool)) {
+						this.TraceBorrow(result);
 					}
 #endif
 
@@ -476,18 +411,14 @@ namespace MsgPack.Rpc
 				}
 
 				this._leasesLock.EnterReadLock(); // TODO: Timeout
-				try
-				{
-					if ( this._leases.Count < this._leases.BoundedCapacity )
-					{
+				try {
+					if (this._leases.Count < this._leases.BoundedCapacity) {
 						var newObject = this._factory();
-						Contract.Assume( newObject != null );
+						Contract.Assume(newObject != null);
 
-						if ( this._leases.TryAdd( new WeakReference( newObject ), 0 ) )
-						{
+						if (this._leases.TryAdd(new WeakReference(newObject), 0)) {
 #if !API_SIGNATURE_TEST
-							if ( this._source.ShouldTrace( StandardObjectPoolTrace.ExpandPool ) )
-							{
+							if (this._source.ShouldTrace(StandardObjectPoolTrace.ExpandPool)) {
 								this._source.TraceEvent(
 									StandardObjectPoolTrace.ExpandPool,
 									"Expand the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"NewCount\" : {3} }}",
@@ -498,15 +429,13 @@ namespace MsgPack.Rpc
 								);
 							}
 
-							this.TraceBorrow( newObject );
+							this.TraceBorrow(newObject);
 #endif
 							return newObject;
 						}
-						else
-						{
+						else {
 #if !API_SIGNATURE_TEST
-							if ( this._source.ShouldTrace( StandardObjectPoolTrace.FailedToExpandPool ) )
-							{
+							if (this._source.ShouldTrace(StandardObjectPoolTrace.FailedToExpandPool)) {
 								this._source.TraceEvent(
 									StandardObjectPoolTrace.FailedToExpandPool,
 									"Failed to expand the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"NewCount\" : {3} }}",
@@ -518,12 +447,11 @@ namespace MsgPack.Rpc
 							}
 #endif
 
-							DisposeItem( newObject );
+							DisposeItem(newObject);
 						}
 					}
 				}
-				finally
-				{
+				finally {
 					this._leasesLock.ExitReadLock();
 				}
 
@@ -532,8 +460,7 @@ namespace MsgPack.Rpc
 			}
 
 #if !API_SIGNATURE_TEST
-			if ( this._source.ShouldTrace( StandardObjectPoolTrace.PoolIsEmpty ) )
-			{
+			if (this._source.ShouldTrace(StandardObjectPoolTrace.PoolIsEmpty)) {
 				this._source.TraceEvent(
 					StandardObjectPoolTrace.PoolIsEmpty,
 					"Pool is empty. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }}",
@@ -544,21 +471,17 @@ namespace MsgPack.Rpc
 			}
 #endif
 
-			if ( this._configuration.ExhausionPolicy == ExhausionPolicy.ThrowException )
-			{
+			if (this._configuration.ExhausionPolicy == ExhausionPolicy.ThrowException) {
 				throw new ObjectPoolEmptyException();
 			}
-			else
-			{
-				if ( !this._pool.TryTake( out result, this._borrowTimeout ) )
-				{
-					throw new TimeoutException( String.Format( CultureInfo.CurrentCulture, "The object borrowing is not completed in the time out {0}.", this._borrowTimeout ) );
+			else {
+				if (!this._pool.TryTake(out result, this._borrowTimeout)) {
+					throw new TimeoutException(String.Format(CultureInfo.CurrentCulture, "The object borrowing is not completed in the time out {0}.", this._borrowTimeout));
 				}
 
 #if !API_SIGNATURE_TEST
-				if ( this._source.ShouldTrace( StandardObjectPoolTrace.BorrowFromPool ) )
-				{
-					this.TraceBorrow( result );
+				if (this._source.ShouldTrace(StandardObjectPoolTrace.BorrowFromPool)) {
+					this.TraceBorrow(result);
 				}
 #endif
 
@@ -567,8 +490,7 @@ namespace MsgPack.Rpc
 		}
 
 #if !API_SIGNATURE_TEST
-		private void TraceBorrow( T result )
-		{
+		private void TraceBorrow(T result) {
 			this._source.TraceEvent(
 				StandardObjectPoolTrace.BorrowFromPool,
 				"Borrow the value from the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicted\" : 0x{2:X}, \"Resource\" : \"{3}\", \"HashCodeOfResource\" : 0x{4:X} }}",
@@ -581,18 +503,14 @@ namespace MsgPack.Rpc
 		}
 #endif
 
-		private static void DisposeItem( T item )
-		{
-			if ( _isDisposableTInternal )
-			{
-				( ( IDisposable )item ).Dispose();
+		private static void DisposeItem(T item) {
+			if (_isDisposableTInternal) {
+				((IDisposable)item).Dispose();
 			}
 		}
 
-		protected sealed override void ReturnCore( T value )
-		{
-			if ( !this._pool.TryAdd( value ) )
-			{
+		protected sealed override void ReturnCore(T value) {
+			if (!this._pool.TryAdd(value)) {
 #if !API_SIGNATURE_TEST
 				this._source.TraceEvent(
 					StandardObjectPoolTrace.FailedToReturnToPool,
@@ -605,13 +523,11 @@ namespace MsgPack.Rpc
 				);
 #endif
 				this.SetIsCorrupted();
-				throw new ObjectPoolCorruptedException( "Failed to return the value to the pool." );
+				throw new ObjectPoolCorruptedException("Failed to return the value to the pool.");
 			}
-			else
-			{
+			else {
 #if !API_SIGNATURE_TEST
-				if ( this._source.ShouldTrace( StandardObjectPoolTrace.ReturnToPool ) )
-				{
+				if (this._source.ShouldTrace(StandardObjectPoolTrace.ReturnToPool)) {
 					this._source.TraceEvent(
 						StandardObjectPoolTrace.ReturnToPool,
 						"Return the value to the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"Value\" : 0x{2:X}, \"Resource\" : \"{3}\", \"HashCodeOfResource\" : 0x{4:X} }}",

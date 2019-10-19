@@ -3,22 +3,19 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Thrown when RPC invocation was time out.
 	/// </summary>
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	[SuppressMessage( "Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData." )]
-	[SuppressMessage( "Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData." )]
-	public sealed class RpcTimeoutException : RpcException
-	{
+	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
+	public sealed class RpcTimeoutException : RpcException {
 		private const string _clientTimeoutKey = "ClientTimeout";
-		internal static readonly MessagePackObject ClientTimeoutKeyUtf8 = MessagePackConvert.EncodeString( _clientTimeoutKey );
+		internal static readonly MessagePackObject ClientTimeoutKeyUtf8 = MessagePackConvert.EncodeString(_clientTimeoutKey);
 
 		// NOT readonly for safe deserialization
 		private TimeSpan? _clientTimeout;
@@ -27,8 +24,7 @@ namespace MsgPack.Rpc
 		///		Gets the timeout value which was expired in client.
 		/// </summary>
 		/// <value>The timeout value in client. This value may be <c>null</c> when the server turnes</value>
-		public TimeSpan? ClientTimeout
-		{
+		public TimeSpan? ClientTimeout {
 			get { return this._clientTimeout; }
 		}
 
@@ -36,7 +32,7 @@ namespace MsgPack.Rpc
 		///		Initializes a new instance of the <see cref="RpcTimeoutException"/> class with the default error message.
 		/// </summary>
 		/// <param name="timeout">Timeout value in client.</param>
-		public RpcTimeoutException( TimeSpan timeout ) : this( timeout, null, null, null ) { }
+		public RpcTimeoutException(TimeSpan timeout) : this(timeout, null, null, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcTimeoutException"/> class with a specified error message.
@@ -60,8 +56,8 @@ namespace MsgPack.Rpc
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcTimeoutException( TimeSpan timeout, string message, string debugInformation )
-			: this( timeout, message, debugInformation, null ) { }
+		public RpcTimeoutException(TimeSpan timeout, string message, string debugInformation)
+			: this(timeout, message, debugInformation, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcTimeoutException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
@@ -88,9 +84,8 @@ namespace MsgPack.Rpc
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcTimeoutException( TimeSpan timeout, string message, string debugInformation, Exception inner )
-			: base( RpcError.TimeoutError, message, debugInformation, inner )
-		{
+		public RpcTimeoutException(TimeSpan timeout, string message, string debugInformation, Exception inner)
+			: base(RpcError.TimeoutError, message, debugInformation, inner) {
 			this._clientTimeout = timeout;
 		}
 
@@ -103,11 +98,10 @@ namespace MsgPack.Rpc
 		/// <exception cref="SerializationException">
 		///		Cannot deserialize instance from <paramref name="unpackedException"/>.
 		/// </exception>
-		internal RpcTimeoutException( MessagePackObject unpackedException )
-			: base( RpcError.TimeoutError, unpackedException )
-		{
-			this._clientTimeout = unpackedException.GetTimeSpan( ClientTimeoutKeyUtf8 );
-			Contract.Assume( this._clientTimeout != null, "Unpacked data does not have ClientTimeout." );
+		internal RpcTimeoutException(MessagePackObject unpackedException)
+			: base(RpcError.TimeoutError, unpackedException) {
+			this._clientTimeout = unpackedException.GetTimeSpan(ClientTimeoutKeyUtf8);
+			Contract.Assume(this._clientTimeout != null, "Unpacked data does not have ClientTimeout.");
 		}
 
 #if MONO
@@ -173,10 +167,9 @@ namespace MsgPack.Rpc
 		/// <param name="includesDebugInformation">
 		///		<c>true</c>, when this method should include debug information; otherwise, <c>false</c>.
 		///	</param>
-		protected sealed override void GetExceptionMessage( IDictionary<MessagePackObject, MessagePackObject> store, bool includesDebugInformation )
-		{
-			base.GetExceptionMessage( store, includesDebugInformation );
-			store.Add( ClientTimeoutKeyUtf8, this._clientTimeout == null ? MessagePackObject.Nil : this._clientTimeout.Value.Ticks );
+		protected sealed override void GetExceptionMessage(IDictionary<MessagePackObject, MessagePackObject> store, bool includesDebugInformation) {
+			base.GetExceptionMessage(store, includesDebugInformation);
+			store.Add(ClientTimeoutKeyUtf8, this._clientTimeout == null ? MessagePackObject.Nil : this._clientTimeout.Value.Ticks);
 		}
 
 #if !SILVERLIGHT && !MONO
@@ -189,24 +182,20 @@ namespace MsgPack.Rpc
 		///		The overriding method adds its internal state to this object via <see cref="M:SafeSerializationEventArgs.AddSerializedState"/>.
 		///	</param>
 		/// <seealso cref="ISafeSerializationData"/>
-		protected override void OnSerializeObjectState( object sender, SafeSerializationEventArgs e )
-		{
-			base.OnSerializeObjectState( sender, e );
+		protected override void OnSerializeObjectState(object sender, SafeSerializationEventArgs e) {
+			base.OnSerializeObjectState(sender, e);
 			e.AddSerializedState(
-				new SerializedState()
-				{
+				new SerializedState() {
 					ClientTimeout = this._clientTimeout
 				}
 			);
 		}
 
 		[Serializable]
-		private sealed class SerializedState : ISafeSerializationData
-		{
+		private sealed class SerializedState : ISafeSerializationData {
 			public TimeSpan? ClientTimeout;
 
-			public void CompleteDeserialization( object deserialized )
-			{
+			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as RpcTimeoutException;
 				enclosing._clientTimeout = this.ClientTimeout;
 			}

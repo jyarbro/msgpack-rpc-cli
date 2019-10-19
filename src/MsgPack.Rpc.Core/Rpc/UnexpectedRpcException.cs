@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Exception in unexpected error.
 	/// </summary>
@@ -14,10 +12,9 @@ namespace MsgPack.Rpc
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	[SuppressMessage( "Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData." )]
-	[SuppressMessage( "Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData." )]
-	public sealed class UnexpectedRpcException : RpcException
-	{
+	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
+	public sealed class UnexpectedRpcException : RpcException {
 		private const string _errorKey = "Error";
 		private const string _errorDetailKey = "ErrorDetail";
 
@@ -31,8 +28,7 @@ namespace MsgPack.Rpc
 		///		Value of error field of response.
 		///		This value is not nil, but its content is arbitary.
 		/// </value>
-		public MessagePackObject Error
-		{
+		public MessagePackObject Error {
 			get { return this._error; }
 		}
 
@@ -46,8 +42,7 @@ namespace MsgPack.Rpc
 		///		Value of return field of response in error.
 		///		This value may be nil, but server can set any value.
 		/// </value>
-		public MessagePackObject ErrorDetail
-		{
+		public MessagePackObject ErrorDetail {
 			get { return this._errorDetail; }
 		}
 
@@ -62,9 +57,8 @@ namespace MsgPack.Rpc
 		///		Value of return field of response in error.
 		///		This value may be nil, but server can set any value.
 		/// </param>
-		public UnexpectedRpcException( MessagePackObject error, MessagePackObject errorDetail )
-			: base( RpcError.Unexpected, RpcError.Unexpected.DefaultMessage, null )
-		{
+		public UnexpectedRpcException(MessagePackObject error, MessagePackObject errorDetail)
+			: base(RpcError.Unexpected, RpcError.Unexpected.DefaultMessage, null) {
 			this._error = error;
 			this._errorDetail = errorDetail;
 		}
@@ -130,12 +124,10 @@ namespace MsgPack.Rpc
 		///		The overriding method adds its internal state to this object via <see cref="M:SafeSerializationEventArgs.AddSerializedState"/>.
 		///	</param>
 		/// <seealso cref="ISafeSerializationData"/>
-		protected override void OnSerializeObjectState( object sender, SafeSerializationEventArgs e )
-		{
-			base.OnSerializeObjectState( sender, e );
+		protected override void OnSerializeObjectState(object sender, SafeSerializationEventArgs e) {
+			base.OnSerializeObjectState(sender, e);
 			e.AddSerializedState(
-				new SerializedState()
-				{
+				new SerializedState() {
 					Error = this._error,
 					ErrorDetail = this._errorDetail
 				}
@@ -143,13 +135,11 @@ namespace MsgPack.Rpc
 		}
 
 		[Serializable]
-		private sealed class SerializedState : ISafeSerializationData
-		{
+		private sealed class SerializedState : ISafeSerializationData {
 			public MessagePackObject Error;
 			public MessagePackObject ErrorDetail;
 
-			public void CompleteDeserialization( object deserialized )
-			{
+			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as UnexpectedRpcException;
 				enclosing._error = this.Error;
 				enclosing._errorDetail = this.ErrorDetail;

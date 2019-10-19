@@ -1,18 +1,16 @@
 using System;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Defines common interfaces and basic features of the object pool.
 	/// </summary>
 	/// <typeparam name="T">
 	///		The type of objects to be pooled.
 	/// </typeparam>
-	[ContractClass( typeof( ObjectPoolContracts<> ) )]
+	[ContractClass(typeof(ObjectPoolContracts<>))]
 	public abstract class ObjectPool<T> : IDisposable
-		where T : class
-	{
+		where T : class {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPool&lt;T&gt;"/> class.
 		/// </summary>
@@ -21,18 +19,16 @@ namespace MsgPack.Rpc
 		/// <summary>
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		public void Dispose()
-		{
-			this.Dispose( true );
-			GC.SuppressFinalize( this );
+		public void Dispose() {
+			this.Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 
 		/// <summary>
 		/// Releases unmanaged and - optionally - managed resources
 		/// </summary>
 		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-		protected virtual void Dispose( bool disposing )
-		{
+		protected virtual void Dispose(bool disposing) {
 			// nop
 		}
 
@@ -48,9 +44,8 @@ namespace MsgPack.Rpc
 		///		The item borrowed.
 		///		This value will not be <c>null</c>.
 		/// </returns>
-		public T Borrow()
-		{
-			Contract.Ensures( Contract.Result<T>() != null );
+		public T Borrow() {
+			Contract.Ensures(Contract.Result<T>() != null);
 
 			return this.BorrowCore();
 		}
@@ -71,40 +66,35 @@ namespace MsgPack.Rpc
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="value"/> is <c>null</c>.
 		/// </exception>
-		public void Return( T value )
-		{
-			if ( value == null )
-			{
-				throw new ArgumentNullException( "value" );
+		public void Return(T value) {
+			if (value == null) {
+				throw new ArgumentNullException("value");
 			}
 
 			Contract.EndContractBlock();
 
-			this.ReturnCore( value );
+			this.ReturnCore(value);
 		}
 
 		/// <summary>
 		///		Returns the specified borrowed item.
 		/// </summary>
 		/// <param name="value">The borrowed item. This value will not be <c>null</c>.</param>
-		protected abstract void ReturnCore( T value );
+		protected abstract void ReturnCore(T value);
 	}
 
-	[ContractClassFor( typeof( ObjectPool<> ) )]
+	[ContractClassFor(typeof(ObjectPool<>))]
 	internal abstract class ObjectPoolContracts<T> : ObjectPool<T>
-		where T : class
-	{
+		where T : class {
 		private ObjectPoolContracts() { }
 
-		protected sealed override T BorrowCore()
-		{
-			Contract.Ensures( Contract.Result<T>() != null );
-			return default( T );
+		protected sealed override T BorrowCore() {
+			Contract.Ensures(Contract.Result<T>() != null);
+			return default(T);
 		}
 
-		protected sealed override void ReturnCore( T value )
-		{
-			Contract.Requires( value != null );
+		protected sealed override void ReturnCore(T value) {
+			Contract.Requires(value != null);
 		}
 	}
 }

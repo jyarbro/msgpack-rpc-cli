@@ -1,24 +1,21 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
-namespace MsgPack.Rpc.Protocols
-{
+namespace MsgPack.Rpc.Protocols {
 	/// <summary>
 	///		Thrown if incoming MsgPack-RPC message exceeds the quota.
 	/// </summary>
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	[SuppressMessage( "Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData." )]
-	[SuppressMessage( "Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData." )]
-	public sealed class RpcMessageTooLongException : RpcProtocolException
-	{
+	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
+	public sealed class RpcMessageTooLongException : RpcProtocolException {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcMessageTooLongException"/> class with the default error message.
 		/// </summary>
-		public RpcMessageTooLongException() : this( null, null ) { }
+		public RpcMessageTooLongException() : this(null, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcMessageTooLongException"/> class with a specified error message.
@@ -30,7 +27,7 @@ namespace MsgPack.Rpc.Protocols
 		///		Debug information of error.
 		///		This value can be null for security reason, and its contents are for developers, not end users.
 		/// </param>
-		public RpcMessageTooLongException( string message, string debugInformation ) : this( message, debugInformation, null ) { }
+		public RpcMessageTooLongException(string message, string debugInformation) : this(message, debugInformation, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcMessageTooLongException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
@@ -45,7 +42,7 @@ namespace MsgPack.Rpc.Protocols
 		/// <param name="inner">
 		///		Exception which caused this error.
 		/// </param>		
-		public RpcMessageTooLongException( string message, string debugInformation, Exception inner ) : base( RpcError.MessageTooLargeError, message, debugInformation, inner ) { }
+		public RpcMessageTooLongException(string message, string debugInformation, Exception inner) : base(RpcError.MessageTooLargeError, message, debugInformation, inner) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcException"/> class with the unpacked data.
@@ -56,7 +53,7 @@ namespace MsgPack.Rpc.Protocols
 		/// <exception cref="SerializationException">
 		///		Cannot deserialize instance from <paramref name="unpackedException"/>.
 		/// </exception>
-		internal RpcMessageTooLongException( MessagePackObject unpackedException ) : base( RpcError.MessageTooLargeError, unpackedException ) { }
+		internal RpcMessageTooLongException(MessagePackObject unpackedException) : base(RpcError.MessageTooLargeError, unpackedException) { }
 
 #if MONO
 		/// <summary>

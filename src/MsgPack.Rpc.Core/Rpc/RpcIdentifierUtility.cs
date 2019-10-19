@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Utility to ensure valid identifier.
 	/// </summary>
-	internal static class RpcIdentifierUtility
-	{
+	internal static class RpcIdentifierUtility {
 		// There is NO SPEC for RPC identifiers, so use UAX-31.
 		// See http://www.unicode.org/reports/tr31/
 		// Note that UAX-31 (and CLS) does not allow leading underscore('_') in the identifier.
@@ -34,26 +31,23 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		Normalized identifier.
 		/// </returns>
-		public static string EnsureValidIdentifier( string identifier, string parameterName )
-		{
-			if ( String.IsNullOrEmpty( identifier ) )
-			{
+		public static string EnsureValidIdentifier(string identifier, string parameterName) {
+			if (String.IsNullOrEmpty(identifier)) {
 				return identifier;
 			}
 
 			string normalized =
 #if !SILVERLIGHT
-				identifier.Normalize( NormalizationForm.FormC );
+				identifier.Normalize(NormalizationForm.FormC);
 #else
 				identifier;
 #endif
-			if ( !_validIdentififerPattern.IsMatch( normalized ) )
-			{
+			if (!_validIdentififerPattern.IsMatch(normalized)) {
 				throw new ArgumentException(
 					String.Format(
 						CultureInfo.CurrentCulture,
 						"'{0}' is not valid identifier.",
-						Escape( identifier )
+						Escape(identifier)
 					),
 					parameterName
 				);
@@ -62,23 +56,18 @@ namespace MsgPack.Rpc
 			return normalized;
 		}
 
-		private static string Escape( string identifier )
-		{
-			var buffer = new StringBuilder( identifier.Length );
-			foreach ( var c in identifier )
-			{
-				switch ( CharUnicodeInfo.GetUnicodeCategory( c ) )
-				{
+		private static string Escape(string identifier) {
+			var buffer = new StringBuilder(identifier.Length);
+			foreach (var c in identifier) {
+				switch (CharUnicodeInfo.GetUnicodeCategory(c)) {
 					case UnicodeCategory.Control:
 					case UnicodeCategory.OtherNotAssigned:
-					case UnicodeCategory.PrivateUse:
-					{
-						buffer.AppendFormat( CultureInfo.InvariantCulture, "\\u{0:X}", ( ushort )c );
+					case UnicodeCategory.PrivateUse: {
+						buffer.AppendFormat(CultureInfo.InvariantCulture, "\\u{0:X}", (ushort)c);
 						break;
 					}
-					default:
-					{
-						buffer.Append( c );
+					default: {
+						buffer.Append(c);
 						break;
 					}
 				}

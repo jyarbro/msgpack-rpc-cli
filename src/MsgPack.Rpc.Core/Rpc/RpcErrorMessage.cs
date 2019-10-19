@@ -2,21 +2,18 @@
 using System.Diagnostics.Contracts;
 using System.Globalization;
 
-namespace MsgPack.Rpc
-{
+namespace MsgPack.Rpc {
 	/// <summary>
 	///		Represents MsgPack-RPC error instance.
 	/// </summary>
-	public struct RpcErrorMessage : IEquatable<RpcErrorMessage>
-	{
+	public struct RpcErrorMessage : IEquatable<RpcErrorMessage> {
 		/// <summary>
 		///		Gets the instance which represents success (that is, not error.)
 		/// </summary>
 		/// <value>
 		///		The instance which represents success (that is, not error.)
 		/// </value>
-		public static RpcErrorMessage Success
-		{
+		public static RpcErrorMessage Success {
 			get { return new RpcErrorMessage(); }
 		}
 
@@ -26,8 +23,7 @@ namespace MsgPack.Rpc
 		/// <value>
 		///		If this instance represents success then true.
 		/// </value>
-		public bool IsSuccess
-		{
+		public bool IsSuccess {
 			get { return this._error == null; }
 		}
 
@@ -42,13 +38,10 @@ namespace MsgPack.Rpc
 		/// <exception cref="InvalidOperationException">
 		///		<see cref="IsSuccess"/> is true.
 		/// </exception>
-		public RpcError Error
-		{
-			get
-			{
-				if ( this._error == null )
-				{
-					throw new InvalidOperationException( "Operation success." );
+		public RpcError Error {
+			get {
+				if (this._error == null) {
+					throw new InvalidOperationException("Operation success.");
 				}
 
 				return this._error;
@@ -66,13 +59,10 @@ namespace MsgPack.Rpc
 		/// <exception cref="InvalidOperationException">
 		///		<see cref="IsSuccess"/> is true.
 		/// </exception>
-		public MessagePackObject Detail
-		{
-			get
-			{
-				if ( this._error == null )
-				{
-					throw new InvalidOperationException( "Operation success." );
+		public MessagePackObject Detail {
+			get {
+				if (this._error == null) {
+					throw new InvalidOperationException("Operation success.");
 				}
 
 				return this._detail;
@@ -87,11 +77,9 @@ namespace MsgPack.Rpc
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="error"/> is null.
 		/// </exception>
-		public RpcErrorMessage( RpcError error, MessagePackObject detail )
-		{
-			if ( error == null )
-			{
-				throw new ArgumentNullException( "error" );
+		public RpcErrorMessage(RpcError error, MessagePackObject detail) {
+			if (error == null) {
+				throw new ArgumentNullException("error");
 			}
 
 			Contract.EndContractBlock();
@@ -109,29 +97,25 @@ namespace MsgPack.Rpc
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="error"/> is <c>null</c>.
 		/// </exception>
-		public RpcErrorMessage( RpcError error, string description, string debugInformation )
-		{
-			if ( error == null )
-			{
-				throw new ArgumentNullException( "error" );
+		public RpcErrorMessage(RpcError error, string description, string debugInformation) {
+			if (error == null) {
+				throw new ArgumentNullException("error");
 			}
 
 			Contract.EndContractBlock();
 
 			this._error = error;
 
-			var data = new MessagePackObjectDictionary( 2 );
-			if ( description != null )
-			{
-				data.Add( RpcException.MessageKeyUtf8, description );
+			var data = new MessagePackObjectDictionary(2);
+			if (description != null) {
+				data.Add(RpcException.MessageKeyUtf8, description);
 			}
 
-			if ( debugInformation != null )
-			{
-				data.Add( RpcException.DebugInformationKeyUtf8, debugInformation );
+			if (debugInformation != null) {
+				data.Add(RpcException.DebugInformationKeyUtf8, debugInformation);
 			}
 
-			this._detail = new MessagePackObject( data );
+			this._detail = new MessagePackObject(data);
 		}
 
 		/// <summary>
@@ -141,19 +125,16 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		<c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.
 		/// </returns>
-		public override bool Equals( object obj )
-		{
-			if ( Object.ReferenceEquals( obj, null ) )
-			{
+		public override bool Equals(object obj) {
+			if (Object.ReferenceEquals(obj, null)) {
 				return false;
 			}
 
-			if ( !( obj is RpcErrorMessage ) )
-			{
+			if (!(obj is RpcErrorMessage)) {
 				return false;
 			}
 
-			return this.Equals( ( RpcErrorMessage )obj );
+			return this.Equals((RpcErrorMessage)obj);
 		}
 
 		/// <summary>
@@ -165,8 +146,7 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		<x>true</x> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
 		/// </returns>
-		public bool Equals( RpcErrorMessage other )
-		{
+		public bool Equals(RpcErrorMessage other) {
 			return this._error == other._error && this._detail == other._detail;
 		}
 
@@ -176,9 +156,8 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
 		/// </returns>
-		public override int GetHashCode()
-		{
-			return ( this._error == null ? 0 : this._error.GetHashCode() ) ^ this._detail.GetHashCode();
+		public override int GetHashCode() {
+			return (this._error == null ? 0 : this._error.GetHashCode()) ^ this._detail.GetHashCode();
 		}
 
 		/// <summary>
@@ -187,15 +166,12 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		String representation of this error.
 		/// </returns>
-		public override string ToString()
-		{
-			if ( this.IsSuccess )
-			{
+		public override string ToString() {
+			if (this.IsSuccess) {
 				return String.Empty;
 			}
-			else
-			{
-				return String.Format( CultureInfo.CurrentCulture, "{{ \"ID\" : \"{0}\", \"Code\" : {1}, \"Detail\" : {2} }}", this._error.Identifier, this._error.ErrorCode, this._detail );
+			else {
+				return String.Format(CultureInfo.CurrentCulture, "{{ \"ID\" : \"{0}\", \"Code\" : {1}, \"Detail\" : {2} }}", this._error.Identifier, this._error.ErrorCode, this._detail);
 			}
 		}
 
@@ -206,14 +182,12 @@ namespace MsgPack.Rpc
 		/// <exception cref="InvalidOperationException">
 		///		<see cref="IsSuccess"/> is true.
 		/// </exception>
-		public RpcException ToException()
-		{
-			if ( this.IsSuccess )
-			{
-				throw new InvalidOperationException( "Operation has been succeeded." );
+		public RpcException ToException() {
+			if (this.IsSuccess) {
+				throw new InvalidOperationException("Operation has been succeeded.");
 			}
 
-			return this._error.ToException( this._detail );
+			return this._error.ToException(this._detail);
 		}
 
 		/// <summary>
@@ -224,9 +198,8 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		<c>true</c> if the <see cref="RpcErrorMessage"/> instances are equivalent; otherwise, <c>false</c>.
 		/// </returns>
-		public static bool operator ==( RpcErrorMessage left, RpcErrorMessage right )
-		{
-			return left.Equals( right );
+		public static bool operator ==(RpcErrorMessage left, RpcErrorMessage right) {
+			return left.Equals(right);
 		}
 
 		/// <summary>
@@ -237,9 +210,8 @@ namespace MsgPack.Rpc
 		/// <returns>
 		///		<c>true</c> if the <see cref="RpcErrorMessage"/> instances are not equivalent; otherwise, <c>false</c>.
 		/// </returns>
-		public static bool operator !=( RpcErrorMessage left, RpcErrorMessage right )
-		{
-			return !left.Equals( right );
+		public static bool operator !=(RpcErrorMessage left, RpcErrorMessage right) {
+			return !left.Equals(right);
 		}
 	}
 }

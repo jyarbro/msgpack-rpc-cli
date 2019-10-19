@@ -3,22 +3,19 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
-namespace MsgPack.Rpc.Protocols
-{
+namespace MsgPack.Rpc.Protocols {
 	/// <summary>
 	///		Thrown if something wrong during remote method invocation.
 	/// </summary>
 #if !SILVERLIGHT
 	[Serializable]
 #endif
-	[SuppressMessage( "Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData." )]
-	[SuppressMessage( "Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData." )]
-	public class RpcMethodInvocationException : RpcException
-	{
+	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
+	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
+	public class RpcMethodInvocationException : RpcException {
 		private const string _methodNameKey = "MethodName";
-		internal static readonly MessagePackObject MethodNameKeyUtf8 = MessagePackConvert.EncodeString( _methodNameKey );
+		internal static readonly MessagePackObject MethodNameKeyUtf8 = MessagePackConvert.EncodeString(_methodNameKey);
 
 		// NOT readonly for safe deserialization
 		private string _methodName;
@@ -29,11 +26,9 @@ namespace MsgPack.Rpc.Protocols
 		/// <value>
 		///		The name of invoking method. This value will not be empty but may be <c>null</c>.
 		/// </value>
-		public string MethodName
-		{
-			get
-			{
-				Contract.Ensures( Contract.Result<string>() != null );
+		public string MethodName {
+			get {
+				Contract.Ensures(Contract.Result<string>() != null);
 				return this._methodName;
 			}
 		}
@@ -53,7 +48,7 @@ namespace MsgPack.Rpc.Protocols
 		/// <exception cref="ArgumentException">
 		///		<paramref name="methodName"/> is empty or blank.
 		/// </exception>
-		public RpcMethodInvocationException( RpcError rpcError, string methodName ) : this( rpcError, methodName, null, null, null ) { }
+		public RpcMethodInvocationException(RpcError rpcError, string methodName) : this(rpcError, methodName, null, null, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcMethodInvocationException"/> class with a specified error message.
@@ -88,8 +83,8 @@ namespace MsgPack.Rpc.Protocols
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcMethodInvocationException( RpcError rpcError, string methodName, string message, string debugInformation )
-			: this( rpcError, methodName, message, debugInformation, null ) { }
+		public RpcMethodInvocationException(RpcError rpcError, string methodName, string message, string debugInformation)
+			: this(rpcError, methodName, message, debugInformation, null) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcMethodInvocationException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
@@ -127,17 +122,14 @@ namespace MsgPack.Rpc.Protocols
 		///			So you should specify some error handler to instrument it (e.g. logging handler).
 		///		</para>
 		/// </remarks>
-		public RpcMethodInvocationException( RpcError rpcError, string methodName, string message, string debugInformation, Exception inner )
-			: base( rpcError ?? RpcError.CallError, message, debugInformation, inner )
-		{
-			if ( methodName == null )
-			{
-				throw new ArgumentNullException( "methodName" );
+		public RpcMethodInvocationException(RpcError rpcError, string methodName, string message, string debugInformation, Exception inner)
+			: base(rpcError ?? RpcError.CallError, message, debugInformation, inner) {
+			if (methodName == null) {
+				throw new ArgumentNullException("methodName");
 			}
 
-			if ( String.IsNullOrWhiteSpace( methodName ) )
-			{
-				throw new ArgumentException( "'methodName' cannot be empty nor blank.", "methodName" );
+			if (String.IsNullOrWhiteSpace(methodName)) {
+				throw new ArgumentException("'methodName' cannot be empty nor blank.", "methodName");
 			}
 
 			Contract.EndContractBlock();
@@ -157,11 +149,10 @@ namespace MsgPack.Rpc.Protocols
 		/// <exception cref="SerializationException">
 		///		Cannot deserialize instance from <paramref name="unpackedException"/>.
 		/// </exception>
-		protected internal RpcMethodInvocationException( RpcError rpcError, MessagePackObject unpackedException )
-			: base( rpcError, unpackedException )
-		{
-			this._methodName = unpackedException.GetString( MethodNameKeyUtf8 );
-			Contract.Assume( this._methodName != null, "Unpacked data does not have MethodName." );
+		protected internal RpcMethodInvocationException(RpcError rpcError, MessagePackObject unpackedException)
+			: base(rpcError, unpackedException) {
+			this._methodName = unpackedException.GetString(MethodNameKeyUtf8);
+			Contract.Assume(this._methodName != null, "Unpacked data does not have MethodName.");
 		}
 
 #if MONO
@@ -226,10 +217,9 @@ namespace MsgPack.Rpc.Protocols
 		/// <param name="includesDebugInformation">
 		///		<c>true</c>, when this method should include debug information; otherwise, <c>false</c>.
 		///	</param>
-		protected override void GetExceptionMessage( IDictionary<MessagePackObject, MessagePackObject> store, bool includesDebugInformation )
-		{
-			base.GetExceptionMessage( store, includesDebugInformation );
-			store.Add( MethodNameKeyUtf8, MessagePackConvert.EncodeString( this._methodName ) );
+		protected override void GetExceptionMessage(IDictionary<MessagePackObject, MessagePackObject> store, bool includesDebugInformation) {
+			base.GetExceptionMessage(store, includesDebugInformation);
+			store.Add(MethodNameKeyUtf8, MessagePackConvert.EncodeString(this._methodName));
 		}
 
 #if !SILVERLIGHT && !MONO
@@ -242,24 +232,20 @@ namespace MsgPack.Rpc.Protocols
 		///		The overriding method adds its internal state to this object via <see cref="M:SafeSerializationEventArgs.AddSerializedState"/>.
 		///	</param>
 		/// <seealso cref="ISafeSerializationData"/>
-		protected override void OnSerializeObjectState( object sender, SafeSerializationEventArgs e )
-		{
-			base.OnSerializeObjectState( sender, e );
+		protected override void OnSerializeObjectState(object sender, SafeSerializationEventArgs e) {
+			base.OnSerializeObjectState(sender, e);
 			e.AddSerializedState(
-				new SerializedState()
-				{
+				new SerializedState() {
 					MethodName = this._methodName
 				}
 			);
 		}
 
 		[Serializable]
-		private sealed class SerializedState : ISafeSerializationData
-		{
+		private sealed class SerializedState : ISafeSerializationData {
 			public string MethodName;
 
-			public void CompleteDeserialization( object deserialized )
-			{
+			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as RpcMethodInvocationException;
 				enclosing._methodName = this.MethodName;
 			}
