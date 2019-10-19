@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Text;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	partial class RpcException {
 		/// <summary>
 		///		Returns string representation of this exception for debugging.

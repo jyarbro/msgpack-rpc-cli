@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
 	///		Implements <see cref="ClientTransport"/> for UDP/IP protocol.
 	/// </summary>

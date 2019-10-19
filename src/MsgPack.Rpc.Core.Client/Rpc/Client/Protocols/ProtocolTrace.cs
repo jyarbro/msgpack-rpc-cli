@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
-	/// 	Defines trace for MsgPack.Rpc.Client.Protocols namespace.
+	/// 	Defines trace for MsgPack.Rpc.Core.Client.Protocols namespace.
 	/// </summary>
 	internal static partial class MsgPackRpcClientProtocolsTrace {
-		private static readonly TraceSource _source = new TraceSource("MsgPack.Rpc.Client.Protocols");
+		private static readonly TraceSource _source = new TraceSource("MsgPack.Rpc.Core.Client.Protocols");
 
 		private static readonly Dictionary<MessageId, TraceEventType> _typeTable =
 			new Dictionary<MessageId, TraceEventType>(25)

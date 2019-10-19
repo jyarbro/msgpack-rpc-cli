@@ -1,6 +1,6 @@
 using System;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Marks the method can be invoked as MessagePack-RPC method.
 	/// </summary>

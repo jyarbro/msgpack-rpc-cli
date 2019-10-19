@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace MsgPack.Rpc.StandardObjectPoolTracing {
+namespace MsgPack.Rpc.Core.StandardObjectPoolTracing {
 	/// <summary>
-	/// 	Defines trace for MsgPack.Rpc.StandardObjectPoolTracing namespace.
+	/// 	Defines trace for MsgPack.Rpc.Core.StandardObjectPoolTracing namespace.
 	/// </summary>
 	internal static partial class StandardObjectPoolTrace {
-		private static readonly TraceSource _source = new TraceSource("MsgPack.Rpc.StandardObjectPoolTracing");
+		private static readonly TraceSource _source = new TraceSource("MsgPack.Rpc.Core.StandardObjectPoolTracing");
 
 		private static readonly Dictionary<MessageId, TraceEventType> _typeTable =
 			new Dictionary<MessageId, TraceEventType>(18)

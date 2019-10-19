@@ -5,9 +5,9 @@ using System.IO;
 #if SILVERLIGHT
 using Mono.Diagnostics;
 #endif
-using MsgPack.Rpc.Protocols;
+using MsgPack.Rpc.Core.Protocols;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
 	///		Represents context information for the client side request including notification.
 	/// </summary>
@@ -43,7 +43,7 @@ namespace MsgPack.Rpc.Client.Protocols {
 		/// </remarks>
 		public MessageType MessageType {
 			get {
-				Contract.Ensures(Contract.Result<MessageType>() == Rpc.Protocols.MessageType.Request || Contract.Result<MessageType>() == Rpc.Protocols.MessageType.Notification);
+				Contract.Ensures(Contract.Result<MessageType>() == Rpc.Core.Protocols.MessageType.Request || Contract.Result<MessageType>() == Rpc.Core.Protocols.MessageType.Notification);
 
 				return this._messageType;
 			}
@@ -246,13 +246,13 @@ namespace MsgPack.Rpc.Client.Protocols {
 				throw new ArgumentNullException("completionCallback");
 			}
 
-			Contract.Ensures(this.MessageType == Rpc.Protocols.MessageType.Request);
+			Contract.Ensures(this.MessageType == Rpc.Core.Protocols.MessageType.Request);
 			Contract.Ensures(this.MessageId != null);
 			Contract.Ensures(!String.IsNullOrEmpty(this.MethodName));
 			Contract.Ensures(this.RequestCompletionCallback != null);
 			Contract.Ensures(this.NotificationCompletionCallback == null);
 
-			this._messageType = Rpc.Protocols.MessageType.Request;
+			this._messageType = Rpc.Core.Protocols.MessageType.Request;
 			this.MessageId = messageId;
 			this._methodName = methodName;
 			this._requestCompletionCallback = completionCallback;
@@ -287,13 +287,13 @@ namespace MsgPack.Rpc.Client.Protocols {
 				throw new ArgumentNullException("completionCallback");
 			}
 
-			Contract.Ensures(this.MessageType == Rpc.Protocols.MessageType.Notification);
+			Contract.Ensures(this.MessageType == Rpc.Core.Protocols.MessageType.Notification);
 			Contract.Ensures(this.MessageId == null);
 			Contract.Ensures(!String.IsNullOrEmpty(this.MethodName));
 			Contract.Ensures(this.RequestCompletionCallback == null);
 			Contract.Ensures(this.NotificationCompletionCallback != null);
 
-			this._messageType = Rpc.Protocols.MessageType.Notification;
+			this._messageType = Rpc.Core.Protocols.MessageType.Notification;
 			this.MessageId = null;
 			this._methodName = methodName;
 			this._notificationCompletionCallback = completionCallback;

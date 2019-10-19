@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	partial class MsgPackRpcClientProtocolsTrace {
 		internal static void TraceRpcError(RpcError rpcError, string format, params object[] args) {
 			_source.TraceEvent(GetTypeForRpcError(rpcError), GetIdForRpcError(rpcError), format, args);

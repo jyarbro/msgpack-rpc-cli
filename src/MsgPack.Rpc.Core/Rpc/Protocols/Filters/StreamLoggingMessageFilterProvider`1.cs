@@ -1,8 +1,8 @@
-using MsgPack.Rpc.Diagnostics;
+using MsgPack.Rpc.Core.Diagnostics;
 using System;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc.Protocols.Filters {
+namespace MsgPack.Rpc.Core.Protocols.Filters {
 	/// <summary>
 	///		Implements common functionalities of providers for <see cref="StreamLoggingMessageFilter{T}"/>.
 	/// </summary>

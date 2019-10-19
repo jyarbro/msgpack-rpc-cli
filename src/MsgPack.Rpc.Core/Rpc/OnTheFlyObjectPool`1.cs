@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		The dummy implementation of the <see cref="ObjectPool{T}"/> for mainly testing purposes.
 	/// </summary>

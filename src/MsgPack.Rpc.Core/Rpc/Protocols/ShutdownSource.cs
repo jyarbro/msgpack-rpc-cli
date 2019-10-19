@@ -1,4 +1,4 @@
-﻿namespace MsgPack.Rpc.Protocols {
+﻿namespace MsgPack.Rpc.Core.Protocols {
 	/// <summary>
 	///		Represents the source which caused transport shutdown.
 	/// </summary>

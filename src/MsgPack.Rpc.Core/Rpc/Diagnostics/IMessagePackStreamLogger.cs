@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 
-namespace MsgPack.Rpc.Diagnostics {
+namespace MsgPack.Rpc.Core.Diagnostics {
 	/// <summary>
 	///		Defines common interface of loggers for MessagePack stream.
 	/// </summary>

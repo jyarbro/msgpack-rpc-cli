@@ -5,9 +5,9 @@ using System.Net.Sockets;
 #if !WINDOWS_PHONE
 using System.Threading.Tasks;
 #endif
-using MsgPack.Rpc.Protocols;
+using MsgPack.Rpc.Core.Protocols;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
 	///		Implements <see cref="ClientTransportManager{T}"/> for <see cref="TcpClientTransport"/>.
 	/// </summary>

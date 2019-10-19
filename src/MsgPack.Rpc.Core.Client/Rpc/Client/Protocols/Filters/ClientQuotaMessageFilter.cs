@@ -1,7 +1,7 @@
-﻿using MsgPack.Rpc.Protocols.Filters;
+﻿using MsgPack.Rpc.Core.Protocols.Filters;
 using System;
 
-namespace MsgPack.Rpc.Client.Protocols.Filters {
+namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 	/// <summary>
 	///		<see cref="QuotaMessageFilter{T}"/> for <see cref="ClientResponseContext" />.
 	/// </summary>

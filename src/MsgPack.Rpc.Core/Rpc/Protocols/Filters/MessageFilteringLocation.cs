@@ -1,4 +1,4 @@
-namespace MsgPack.Rpc.Protocols.Filters {
+namespace MsgPack.Rpc.Core.Protocols.Filters {
 	/// <summary>
 	///		Represents location of the message filter is applied.
 	/// </summary>

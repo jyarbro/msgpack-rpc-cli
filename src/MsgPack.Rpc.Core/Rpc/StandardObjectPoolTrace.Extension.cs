@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc.StandardObjectPoolTracing {
+namespace MsgPack.Rpc.Core.StandardObjectPoolTracing {
 	partial class StandardObjectPoolTrace {
 		public static bool ShouldTrace(this TraceSource source, MessageId id) {
 			Contract.Assert(source != null);

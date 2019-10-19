@@ -1,4 +1,4 @@
-namespace MsgPack.Rpc.Protocols.Filters {
+namespace MsgPack.Rpc.Core.Protocols.Filters {
 
 	/// <summary>
 	///		Defines interface of filter providers.

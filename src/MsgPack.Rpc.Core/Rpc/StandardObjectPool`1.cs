@@ -11,9 +11,9 @@ using System.Threading;
 using Mono.Collections.Concurrent;
 using Mono.Threading;
 #endif
-using MsgPack.Rpc.StandardObjectPoolTracing;
+using MsgPack.Rpc.Core.StandardObjectPoolTracing;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Implements standard <see cref="ObjectPool{T}"/>.
 	/// </summary>

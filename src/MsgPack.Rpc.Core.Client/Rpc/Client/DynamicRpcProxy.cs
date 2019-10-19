@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 using System.Dynamic;
 using System.Net;
 
-namespace MsgPack.Rpc.Client {
+namespace MsgPack.Rpc.Core.Client {
 	/// <summary>
 	///		Acts as dynamic MessagePack RPC proxy object.
 	/// </summary>

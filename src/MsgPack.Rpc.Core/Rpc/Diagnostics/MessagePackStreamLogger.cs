@@ -6,7 +6,7 @@ using System.Net;
 using System.Security;
 using System.Threading;
 
-namespace MsgPack.Rpc.Diagnostics {
+namespace MsgPack.Rpc.Core.Diagnostics {
 	/// <summary>
 	///		Implements basic common features for <see cref="IMessagePackStreamLogger"/>s.
 	/// </summary>

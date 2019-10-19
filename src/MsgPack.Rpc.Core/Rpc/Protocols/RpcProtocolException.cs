@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
-namespace MsgPack.Rpc.Protocols {
+namespace MsgPack.Rpc.Core.Protocols {
 	/// <summary>
 	///		Exception ocurred when something is wrong in MessagePack-RPC protocol scheme.
 	/// </summary>

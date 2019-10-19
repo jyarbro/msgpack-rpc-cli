@@ -8,7 +8,7 @@ This library provides MessagePack-RPC for Common Language Infrastructure environ
 This package only contains core library to implement service/data contracts.</description>
   </metadata>
   <files>
-    <file src="bin\**\MsgPack.Rpc.dll" target="lib" />
-    <file src="bin\**\MsgPack.Rpc.XML" target="lib" />
+    <file src="bin\**\MsgPack.Rpc.Core.dll" target="lib" />
+    <file src="bin\**\MsgPack.Rpc.Core.XML" target="lib" />
   </files>
 </package>

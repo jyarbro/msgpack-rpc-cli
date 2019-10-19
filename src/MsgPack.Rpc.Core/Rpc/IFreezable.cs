@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Defines common interface for freezable objects.
 	/// </summary>

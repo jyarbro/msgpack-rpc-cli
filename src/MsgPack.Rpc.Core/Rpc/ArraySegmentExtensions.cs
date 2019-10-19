@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	internal static class ArraySegmentExtensions {
 		public static T Get<T>(this ArraySegment<T> source, int index) {
 			if (source.Array == null) {

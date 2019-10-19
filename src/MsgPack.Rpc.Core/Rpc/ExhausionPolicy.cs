@@ -1,4 +1,4 @@
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Defines exhausion policy of the object pool.
 	/// </summary>

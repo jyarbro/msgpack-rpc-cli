@@ -4,9 +4,9 @@ using System.Globalization;
 #if SILVERLIGHT
 using System.IO.IsolatedStorage;
 #endif
-using MsgPack.Rpc.Protocols;
+using MsgPack.Rpc.Core.Protocols;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	partial class ClientTransport {
 		/// <summary>
 		///		Unpack response message array header.

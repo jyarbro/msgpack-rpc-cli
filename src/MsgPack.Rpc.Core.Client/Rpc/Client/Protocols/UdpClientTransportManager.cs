@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 #endif
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
 	///		Implements <see cref="ClientTransportManager{T}"/> for <see cref="TcpClientTransport"/>.
 	/// </summary>

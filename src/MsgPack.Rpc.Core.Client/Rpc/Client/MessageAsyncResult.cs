@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Common <see cref="IAsyncResult"/> implementation for MsgPack-RPC async invocation.
 	/// </summary>

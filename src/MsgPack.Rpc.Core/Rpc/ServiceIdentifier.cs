@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Defines utlities related to ServiceID.
 	/// </summary>

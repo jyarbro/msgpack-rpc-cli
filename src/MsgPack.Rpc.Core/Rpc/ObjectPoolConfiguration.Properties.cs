@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Text;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	// This file generated from ObjectPoolConfiguration.tt T4Template.
 	// Do not modify this file. Edit ObjectPoolConfiguration.tt instead.
 

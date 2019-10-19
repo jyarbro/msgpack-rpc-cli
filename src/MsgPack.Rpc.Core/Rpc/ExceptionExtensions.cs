@@ -1,6 +1,6 @@
 using System;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Defines extension methods for async-RPC related features.
 	/// </summary>

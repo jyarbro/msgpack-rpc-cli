@@ -2,7 +2,7 @@
 using System.Diagnostics.Contracts;
 using System.Globalization;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Represents MsgPack-RPC error instance.
 	/// </summary>

@@ -1,9 +1,9 @@
-﻿using MsgPack.Rpc.Client.Protocols;
+﻿using MsgPack.Rpc.Core.Client.Protocols;
 using System;
 using System.Diagnostics.Contracts;
 using System.Text;
 
-namespace MsgPack.Rpc.Client {
+namespace MsgPack.Rpc.Core.Client {
 	// This file generated from RpcClientConfiguration.tt T4Template.
 	// Do not modify this file. Edit RpcClientConfiguration.tt instead.
 
@@ -347,7 +347,7 @@ namespace MsgPack.Rpc.Client {
 		/// 	The directory path the corrupt response dump file is created. To use default location, specify <c>null</c>. The default is <c>null</c>. The enviroment variable can be embeded.
 		/// </value>
 		/// <remarks>
-		/// 	The default location is <c>MsgPack\v&lt;MsgPack.Rpc.Client AssemblyVersion&lt;\Client\Dump</c> under the <c>LocalApplicationDataDirectory</c>.
+		/// 	The default location is <c>MsgPack\v&lt;MsgPack.Rpc.Core.Client AssemblyVersion&lt;\Client\Dump</c> under the <c>LocalApplicationDataDirectory</c>.
 		/// 	The <c>LocalApplicaitonDataDirectory</c> can be gotten using <see cref="Environment.GetFolderPath(Environment.SpecialFolder)" /> with <see cref="Environment.SpecialFolder.LocalApplicationData" />, which is platform dependent.
 		/// 	For example, it is <c>%UserProfile%\Application Data\Local</c> in Windows prior to Windows Vista/Server 2008, <c>%LocalAppData%</c> on recent Windows, and <c>/home/.config/share</c> in Mono on *nix.
 		/// </remarks>

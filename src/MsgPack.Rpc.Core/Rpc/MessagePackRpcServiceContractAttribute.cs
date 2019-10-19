@@ -1,6 +1,6 @@
 using System;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Marks the type represents service contract for the MessagePack-RPC.
 	/// </summary>

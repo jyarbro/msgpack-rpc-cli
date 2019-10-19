@@ -8,9 +8,9 @@ This library provides MessagePack-RPC for Common Language Infrastructure environ
 This package only contains server-side libraries.</description>
   </metadata>
   <files>
-    <file src="bin\net40-client\MsgPack.Rpc.dll" target="lib\net40-client" />
-    <file src="bin\net40-client\MsgPack.Rpc.XML" target="lib\net40-client" />
-    <file src="bin\net40-client\MsgPack.Rpc.Server.dll" target="lib\net40-client" />
-    <file src="bin\net40-client\MsgPack.Rpc.Server.XML" target="lib\net40-client" />
+    <file src="bin\net40-client\MsgPack.Rpc.Core.dll" target="lib\net40-client" />
+    <file src="bin\net40-client\MsgPack.Rpc.Core.XML" target="lib\net40-client" />
+    <file src="bin\net40-client\MsgPack.Rpc.Core.Server.dll" target="lib\net40-client" />
+    <file src="bin\net40-client\MsgPack.Rpc.Core.Server.XML" target="lib\net40-client" />
   </files>
 </package>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	internal static class MessagePackObjectExtension {
 		public static string GetString(this MessagePackObject source, MessagePackObject key) {
 			if (source.IsDictionary) {

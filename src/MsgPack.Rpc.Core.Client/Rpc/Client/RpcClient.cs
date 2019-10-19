@@ -5,10 +5,10 @@ using System.Threading;
 #if !WINDOWS_PHONE
 using System.Threading.Tasks;
 #endif
-using MsgPack.Rpc.Client.Protocols;
+using MsgPack.Rpc.Core.Client.Protocols;
 using MsgPack.Serialization;
 
-namespace MsgPack.Rpc.Client {
+namespace MsgPack.Rpc.Core.Client {
 	/// <summary>
 	///		Entry point of MessagePack-RPC client.
 	/// </summary>

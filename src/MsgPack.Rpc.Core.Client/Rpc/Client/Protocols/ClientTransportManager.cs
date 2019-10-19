@@ -7,9 +7,9 @@ using System.Threading;
 #if !WINDOWS_PHONE
 using System.Threading.Tasks;
 #endif
-using MsgPack.Rpc.Protocols;
+using MsgPack.Rpc.Core.Protocols;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
 	///		Defines non-generic interface of <see cref="ClientTransportManager{T}"/> and provides related features.
 	/// </summary>
@@ -118,7 +118,7 @@ namespace MsgPack.Rpc.Client.Protocols {
 		/// <summary>
 		///		Raises <see cref="ShutdownCompleted"/> event.
 		/// </summary>
-		/// <param name="e">The <see cref="MsgPack.Rpc.Protocols.ShutdownCompletedEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">The <see cref="MsgPack.Rpc.Core.Protocols.ShutdownCompletedEventArgs"/> instance containing the event data.</param>
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="e"/> is <c>null</c>.
 		/// </exception>		
@@ -149,7 +149,7 @@ namespace MsgPack.Rpc.Client.Protocols {
 		/// <summary>
 		///		Raises the <see cref="E:UnknownResponseReceived"/> event.
 		/// </summary>
-		/// <param name="e">The <see cref="MsgPack.Rpc.Client.Protocols.UnknownResponseReceivedEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">The <see cref="MsgPack.Rpc.Core.Client.Protocols.UnknownResponseReceivedEventArgs"/> instance containing the event data.</param>
 		protected virtual void OnUnknownResponseReceived(UnknownResponseReceivedEventArgs e) {
 			if (e == null) {
 				throw new ArgumentNullException("e");

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Security;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	partial class RpcException {
 #if !SILVERLIGHT && !MONO
 		private static readonly MethodInfo _safeGetHRFromExceptionMethod = typeof(RpcException).GetMethod("SafeGetHRFromException", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
@@ -18,7 +18,7 @@ namespace MsgPack.Rpc {
 		///		Initialize new instance with unpacked data.
 		/// </summary>
 		/// <param name="rpcError">
-		///		Metadata of error. If you specify null, <see cref="MsgPack.Rpc.RpcError.RemoteRuntimeError"/> is used.
+		///		Metadata of error. If you specify null, <see cref="MsgPack.Rpc.Core.RpcError.RemoteRuntimeError"/> is used.
 		///	</param>
 		/// <param name="unpackedException">
 		///		Exception data from remote MessagePack-RPC server.

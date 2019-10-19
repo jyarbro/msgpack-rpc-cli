@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc.Protocols {
+namespace MsgPack.Rpc.Core.Protocols {
 	/// <summary>
 	///		Contains event data for shutdown completion events both of client and server sides.
 	/// </summary>

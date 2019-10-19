@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-namespace MsgPack.Rpc.Protocols {
+namespace MsgPack.Rpc.Core.Protocols {
 	/// <summary>
 	///		Defines basic functionality for inbound message contexts.
 	/// </summary>

@@ -1,4 +1,4 @@
-﻿namespace MsgPack.Rpc.Protocols {
+﻿namespace MsgPack.Rpc.Core.Protocols {
 	/// <summary>
 	///		Define type of MsgPack-RPC message packet.
 	/// </summary>

@@ -5,7 +5,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace MsgPack.Rpc.Diagnostics {
+namespace MsgPack.Rpc.Core.Diagnostics {
 	/// <summary>
 	///		File based <see cref="MessagePackStreamLogger"/> implementation.
 	/// </summary>

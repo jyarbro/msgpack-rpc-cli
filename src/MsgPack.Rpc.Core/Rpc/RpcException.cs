@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Runtime.Serialization;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Represents MessagePack-RPC related exception.
 	/// </summary>
@@ -101,7 +101,7 @@ namespace MsgPack.Rpc {
 		///		Initializes a new instance of the <see cref="RpcException"/> class with a specified error message.
 		/// </summary>
 		/// <param name="rpcError">
-		///		The metadata of the error. If <c>null</c> is specified, the <see cref="MsgPack.Rpc.RpcError.RemoteRuntimeError"/> is used.
+		///		The metadata of the error. If <c>null</c> is specified, the <see cref="MsgPack.Rpc.Core.RpcError.RemoteRuntimeError"/> is used.
 		///	</param>
 		/// <param name="message">
 		///		The error message to desribe condition. Note that this message should not include security related information.
@@ -127,7 +127,7 @@ namespace MsgPack.Rpc {
 		///		Initializes a new instance of the <see cref="RpcException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
 		/// </summary>
 		/// <param name="rpcError">
-		///		The metadata of the error. If <c>null</c> is specified, the <see cref="MsgPack.Rpc.RpcError.RemoteRuntimeError"/> is used.
+		///		The metadata of the error. If <c>null</c> is specified, the <see cref="MsgPack.Rpc.Core.RpcError.RemoteRuntimeError"/> is used.
 		///	</param>
 		/// <param name="message">
 		///		The error message to desribe condition. Note that this message should not include security related information.
@@ -266,7 +266,7 @@ namespace MsgPack.Rpc {
 				var enclosing = deserialized as RpcException;
 				enclosing._debugInformation = this.DebugInformation;
 				enclosing._remoteExceptions = this.RemoteExceptions;
-				enclosing._rpcError = MsgPack.Rpc.RpcError.FromIdentifier(this.RpcErrorIdentifier, this.RpcErrorCode);
+				enclosing._rpcError = MsgPack.Rpc.Core.RpcError.FromIdentifier(this.RpcErrorIdentifier, this.RpcErrorCode);
 				enclosing._preservedStackTrace = this.PreservedStackTrace;
 				enclosing.RegisterSerializeObjectStateEventHandler();
 			}

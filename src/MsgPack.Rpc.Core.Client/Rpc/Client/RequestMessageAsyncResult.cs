@@ -1,8 +1,8 @@
-﻿using MsgPack.Rpc.Client.Protocols;
+﻿using MsgPack.Rpc.Core.Client.Protocols;
 using System;
 using System.Threading;
 
-namespace MsgPack.Rpc.Client {
+namespace MsgPack.Rpc.Core.Client {
 	/// <summary>
 	///		<see cref="IAsyncResult"/> implementation for async RPC.
 	/// </summary>

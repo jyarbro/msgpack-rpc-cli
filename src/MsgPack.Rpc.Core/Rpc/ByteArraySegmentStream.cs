@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	[DebuggerTypeProxy(typeof(DebuggerProxy))]
 	internal sealed class ByteArraySegmentStream : Stream {
 		private readonly IList<ArraySegment<byte>> _segments;

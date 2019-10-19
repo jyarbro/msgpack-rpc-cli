@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace MsgPack.Rpc.Protocols {
+namespace MsgPack.Rpc.Core.Protocols {
 	/// <summary>
 	///		Represents context information of asynchronous MesagePack-RPC operation.
 	/// </summary>

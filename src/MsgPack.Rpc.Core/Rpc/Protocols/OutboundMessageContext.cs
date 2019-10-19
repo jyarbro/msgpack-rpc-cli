@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.IO;
 
-namespace MsgPack.Rpc.Protocols {
+namespace MsgPack.Rpc.Core.Protocols {
 	/// <summary>
 	///		Defines basic functionality for outbound message contexts.
 	/// </summary>

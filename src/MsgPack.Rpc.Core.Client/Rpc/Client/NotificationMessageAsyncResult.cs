@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MsgPack.Rpc.Client {
+namespace MsgPack.Rpc.Core.Client {
 	internal sealed class NotificationMessageAsyncResult : MessageAsyncResult {
 		public void OnCompleted(Exception exception, bool completedSynchronously) {
 			if (exception != null) {

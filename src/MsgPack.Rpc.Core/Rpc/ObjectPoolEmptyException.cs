@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Throwsn when the object pool with <see cref="ExhausionPolicy.ThrowException"/> is empty at borrowing.
 	/// </summary>

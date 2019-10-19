@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc.Protocols.Filters {
+namespace MsgPack.Rpc.Core.Protocols.Filters {
 	/// <summary>
 	///		Defines interfaces of the message filter.
 	/// </summary>

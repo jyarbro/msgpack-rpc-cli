@@ -1,8 +1,8 @@
-using MsgPack.Rpc.Diagnostics;
-using MsgPack.Rpc.Protocols.Filters;
+using MsgPack.Rpc.Core.Diagnostics;
+using MsgPack.Rpc.Core.Protocols.Filters;
 using System;
 
-namespace MsgPack.Rpc.Client.Protocols.Filters {
+namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 	/// <summary>
 	///		<see cref="StreamLoggingMessageFilter{T}"/> for <see cref="ClientResponseContext" />.
 	/// </summary>

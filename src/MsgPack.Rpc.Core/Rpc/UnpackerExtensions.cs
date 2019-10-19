@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Defines extension methods for RPC.
 	/// </summary>

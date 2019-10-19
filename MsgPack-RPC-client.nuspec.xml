@@ -8,9 +8,9 @@ This library provides MessagePack-RPC for Common Language Infrastructure environ
 This package only contains client-side libraries.</description>
   </metadata>
   <files>
-    <file src="bin\**\MsgPack.Rpc.dll" target="lib" />
-    <file src="bin\**\MsgPack.Rpc.XML" target="lib" />
-    <file src="bin\**\MsgPack.Rpc.Client.dll" target="lib" />
-    <file src="bin\**\MsgPack.Rpc.Client.XML" target="lib" />
+    <file src="bin\**\MsgPack.Rpc.Core.dll" target="lib" />
+    <file src="bin\**\MsgPack.Rpc.Core.XML" target="lib" />
+    <file src="bin\**\MsgPack.Rpc.Core.Client.dll" target="lib" />
+    <file src="bin\**\MsgPack.Rpc.Core.Client.XML" target="lib" />
   </files>
 </package>

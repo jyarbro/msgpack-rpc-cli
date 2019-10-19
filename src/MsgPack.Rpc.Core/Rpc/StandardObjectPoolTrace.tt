@@ -9,7 +9,7 @@
  *  000x : Generic
  */
 #>
-<#= Generate( "MsgPack.Rpc.StandardObjectPoolTracing", "StandardObjectPoolTrace",
+<#= Generate( "MsgPack.Rpc.Core.StandardObjectPoolTracing", "StandardObjectPoolTrace",
 	new TraceMessage( "InitializedWithDefaultConfiguration", TraceEventType.Verbose, 1 ),
 	new TraceMessage( "InitializedWithConfiguration", TraceEventType.Verbose, 2 ),
 	new TraceMessage( "FailedToAddPoolInitially", TraceEventType.Error, 3 ),

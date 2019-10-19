@@ -1,8 +1,8 @@
-﻿using MsgPack.Rpc.Client.Protocols;
+﻿using MsgPack.Rpc.Core.Client.Protocols;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace MsgPack.Rpc.Client {
+namespace MsgPack.Rpc.Core.Client {
 	/// <summary>
 	///		Interprets error stream.
 	/// </summary>

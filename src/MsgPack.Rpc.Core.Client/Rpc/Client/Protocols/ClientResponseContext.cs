@@ -1,8 +1,8 @@
-﻿using MsgPack.Rpc.Protocols;
+﻿using MsgPack.Rpc.Core.Protocols;
 using System;
 using System.Diagnostics.Contracts;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
 	///		Represents context information for the client side response.
 	/// </summary>

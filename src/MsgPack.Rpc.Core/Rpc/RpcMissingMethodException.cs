@@ -1,9 +1,9 @@
-﻿using MsgPack.Rpc.Protocols;
+﻿using MsgPack.Rpc.Core.Protocols;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Thrown when specified method is not exist on remote server.
 	/// </summary>

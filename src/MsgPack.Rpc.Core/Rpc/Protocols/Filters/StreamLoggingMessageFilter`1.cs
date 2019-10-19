@@ -1,9 +1,9 @@
-using MsgPack.Rpc.Diagnostics;
+using MsgPack.Rpc.Core.Diagnostics;
 using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace MsgPack.Rpc.Protocols.Filters {
+namespace MsgPack.Rpc.Core.Protocols.Filters {
 	/// <summary>
 	///		Implements common functionalities of inbound message stream logging filter.
 	/// </summary>

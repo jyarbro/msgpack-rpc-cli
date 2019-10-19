@@ -5,7 +5,7 @@ using System.Threading;
 using Mono.Threading;
 #endif
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Minimal implementation of <see cref="IAsyncResult"/>.
 	/// </summary>

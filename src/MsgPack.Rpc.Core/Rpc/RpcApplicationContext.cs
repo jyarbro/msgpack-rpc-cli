@@ -6,7 +6,7 @@ using Mono;
 using Mono.Threading;
 #endif
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Provides access to RPC server application context information.
 	/// </summary>

@@ -17,7 +17,7 @@
  *  220x : Receive
  */
 #>
-<#= Generate( "MsgPack.Rpc.Client.Protocols",
+<#= Generate( "MsgPack.Rpc.Core.Client.Protocols",
 	new TraceMessage( "DetectServerShutdown", TraceEventType.Information, 11 ),
 	new TraceMessage( "OrphanError", TraceEventType.Error, 91 ),
 	new TraceMessage( "SocketError", TraceEventType.Warning, 101 ),

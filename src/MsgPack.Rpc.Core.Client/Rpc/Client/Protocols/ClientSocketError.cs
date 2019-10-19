@@ -1,8 +1,8 @@
-﻿using MsgPack.Rpc.Protocols;
+﻿using MsgPack.Rpc.Core.Protocols;
 using System;
 using System.Net.Sockets;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
 	///		Defines utility methods to handle <see cref="SocketError"/>.
 	/// </summary>

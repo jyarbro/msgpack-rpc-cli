@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Watches timeout.
 	/// </summary>

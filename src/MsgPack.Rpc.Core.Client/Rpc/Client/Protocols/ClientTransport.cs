@@ -19,10 +19,10 @@ using System.Threading;
 #if SILVERLIGHT
 using Mono.Collections.Concurrent;
 #endif
-using MsgPack.Rpc.Protocols;
-using MsgPack.Rpc.Protocols.Filters;
+using MsgPack.Rpc.Core.Protocols;
+using MsgPack.Rpc.Core.Protocols.Filters;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
 	///		Defines interface of client protocol binding.
 	/// </summary>
@@ -165,7 +165,7 @@ namespace MsgPack.Rpc.Client.Protocols {
 		/// <summary>
 		///		Raises internal shutdown completion routine.
 		/// </summary>
-		/// <param name="e">The <see cref="MsgPack.Rpc.Protocols.ShutdownCompletedEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">The <see cref="MsgPack.Rpc.Core.Protocols.ShutdownCompletedEventArgs"/> instance containing the event data.</param>
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="e"/> is <c>null</c>.
 		/// </exception>		

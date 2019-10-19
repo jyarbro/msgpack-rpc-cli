@@ -1,4 +1,4 @@
-﻿using MsgPack.Rpc.Protocols;
+﻿using MsgPack.Rpc.Core.Protocols;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -6,9 +6,9 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Reflection;
 
-[module: SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Scope = "member", Target = "MsgPack.Rpc.RpcError.#.cctor()", Justification = "Type initializer is required.")]
+[module: SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Scope = "member", Target = "MsgPack.Rpc.Core.RpcError.#.cctor()", Justification = "Type initializer is required.")]
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Represents pre-defined MsgPack-RPC error metadata.
 	/// </summary>

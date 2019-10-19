@@ -1,6 +1,6 @@
 ﻿using System.Net.Sockets;
 
-namespace MsgPack.Rpc.Protocols {
+namespace MsgPack.Rpc.Core.Protocols {
 	internal static class SocketErrorCodeExtension {
 		public static bool? IsError(this SocketError source) {
 			switch (source) {

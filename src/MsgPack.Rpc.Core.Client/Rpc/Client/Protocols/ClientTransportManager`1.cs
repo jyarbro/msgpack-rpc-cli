@@ -8,9 +8,9 @@ using System.Threading;
 #if SILVERLIGHT
 using Mono.Collections.Concurrent;
 #endif
-using MsgPack.Rpc.Protocols;
+using MsgPack.Rpc.Core.Protocols;
 
-namespace MsgPack.Rpc.Client.Protocols {
+namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
 	///		Manages <see cref="ClientTransport"/>s.
 	/// </summary>

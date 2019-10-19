@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace MsgPack.Rpc {
+namespace MsgPack.Rpc.Core {
 	partial class RpcException : IStackTracePreservable {
 		private List<string> _preservedStackTrace;
 

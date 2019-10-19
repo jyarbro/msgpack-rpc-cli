@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Net.Sockets;
 
-namespace MsgPack.Rpc.Protocols {
+namespace MsgPack.Rpc.Core.Protocols {
 	/// <summary>
 	///		Defines common interface for the transports which is bindable to the message context and async socket.
 	/// </summary>

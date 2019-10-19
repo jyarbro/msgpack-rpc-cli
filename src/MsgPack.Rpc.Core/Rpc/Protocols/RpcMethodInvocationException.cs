@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
-namespace MsgPack.Rpc.Protocols {
+namespace MsgPack.Rpc.Core.Protocols {
 	/// <summary>
 	///		Thrown if something wrong during remote method invocation.
 	/// </summary>
@@ -141,7 +141,7 @@ namespace MsgPack.Rpc.Protocols {
 		///		Initialize new instance with unpacked data.
 		/// </summary>
 		/// <param name="rpcError">
-		///		Metadata of error. If you specify null, <see cref="MsgPack.Rpc.RpcError.RemoteRuntimeError"/> is used.
+		///		Metadata of error. If you specify null, <see cref="MsgPack.Rpc.Core.RpcError.RemoteRuntimeError"/> is used.
 		///	</param>
 		/// <param name="unpackedException">
 		///		Exception data from remote MessagePack-RPC server.
