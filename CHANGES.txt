@@ -9,3 +9,5 @@ Release 0.1 - 2011/1/4
   * Unbuffered Unpacker APIs (Unpacking class) are implemented.
 
 See project wiki for roadmap.
+
+See GitHub commit history for further changes.
