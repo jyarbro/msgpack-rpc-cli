@@ -1,1 +1,0 @@
-﻿Some codes are copy from Mono 2.10.
