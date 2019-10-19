@@ -40,6 +40,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{E7C896
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsgPack.Rpc.Core", "src\MsgPack.Rpc.Core\MsgPack.Rpc.Core.csproj", "{5C691396-9BC9-483F-9CA9-781AC7F1A246}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD20ACFE-9A60-4C5C-AAEF-951B23B8C55D}"
+	ProjectSection(SolutionItems) = preProject
+		AUTHORS.txt = AUTHORS.txt
+		CHANGES.txt = CHANGES.txt
+		LICENSE.md = LICENSE.md
+		LICENSE.txt = LICENSE.txt
+		Pack.ps1 = Pack.ps1
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuspec", "nuspec", "{FAF91C65-B352-43C4-8271-400CC9BF54B3}"
+	ProjectSection(SolutionItems) = preProject
+		MsgPack-RPC-client.nuspec.xml = MsgPack-RPC-client.nuspec.xml
+		MsgPack-RPC-core.nuspec.xml = MsgPack-RPC-core.nuspec.xml
+		MsgPack-RPC-full.nuspec.xml = MsgPack-RPC-full.nuspec.xml
+		MsgPack-RPC-server.nuspec.xml = MsgPack-RPC-server.nuspec.xml
+		MsgPack-RPC.nuspec.xml = MsgPack-RPC.nuspec.xml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeAnalysis|Any CPU = CodeAnalysis|Any CPU
@@ -88,6 +109,12 @@ Global
 		{99672076-5AE7-448A-A827-0BD37F182AD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99672076-5AE7-448A-A827-0BD37F182AD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99672076-5AE7-448A-A827-0BD37F182AD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C691396-9BC9-483F-9CA9-781AC7F1A246}.CodeAnalysis|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C691396-9BC9-483F-9CA9-781AC7F1A246}.CodeAnalysis|Any CPU.Build.0 = Debug|Any CPU
+		{5C691396-9BC9-483F-9CA9-781AC7F1A246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C691396-9BC9-483F-9CA9-781AC7F1A246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C691396-9BC9-483F-9CA9-781AC7F1A246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C691396-9BC9-483F-9CA9-781AC7F1A246}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +129,8 @@ Global
 		{25D5A3B3-14B4-4BD3-836A-EC212CC21648} = {CA8385D4-1A20-497E-B385-9BF6BB2F6FBA}
 		{99672076-5AE7-448A-A827-0BD37F182AD9} = {CA8385D4-1A20-497E-B385-9BF6BB2F6FBA}
 		{CA8385D4-1A20-497E-B385-9BF6BB2F6FBA} = {A0E70261-EF10-47D6-9C6D-AB0DCA95DBB7}
+		{5C691396-9BC9-483F-9CA9-781AC7F1A246} = {0DDF2CFF-41EF-4A84-BB80-7C86FDD0C551}
+		{FAF91C65-B352-43C4-8271-400CC9BF54B3} = {FD20ACFE-9A60-4C5C-AAEF-951B23B8C55D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C419840-211F-4615-B3C9-A81618061975}
