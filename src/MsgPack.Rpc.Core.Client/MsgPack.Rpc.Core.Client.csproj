@@ -9,5 +9,9 @@
   <ItemGroup>
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MsgPack.Rpc.Core\MsgPack.Rpc.Core.csproj" />
+  </ItemGroup>
   
 </Project>
