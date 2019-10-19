@@ -30,7 +30,7 @@ namespace MsgPack.Rpc.Core {
 		public string ParameterName {
 			get {
 				Contract.Ensures(Contract.Result<string>() != null);
-				return this._parameterName ?? String.Empty;
+				return _parameterName ?? string.Empty;
 			}
 		}
 
@@ -130,13 +130,13 @@ namespace MsgPack.Rpc.Core {
 				throw new ArgumentNullException("parameterName");
 			}
 
-			if (String.IsNullOrWhiteSpace(parameterName)) {
+			if (string.IsNullOrWhiteSpace(parameterName)) {
 				throw new ArgumentException("'parameterName' cannot be empty.", "parameterName");
 			}
 
 			Contract.EndContractBlock();
 
-			this._parameterName = parameterName;
+			_parameterName = parameterName;
 		}
 
 		/// <summary>
@@ -150,8 +150,8 @@ namespace MsgPack.Rpc.Core {
 		/// </exception>
 		internal RpcArgumentException(MessagePackObject unpackedException)
 			: base(RpcError.ArgumentError, unpackedException) {
-			this._parameterName = unpackedException.GetString(ParameterNameKeyUtf8);
-			Contract.Assume(this._parameterName != null, "Unpacked data does not have ParameterName.");
+			_parameterName = unpackedException.GetString(ParameterNameKeyUtf8);
+			Contract.Assume(_parameterName != null, "Unpacked data does not have ParameterName.");
 		}
 
 #if MONO
@@ -220,7 +220,7 @@ namespace MsgPack.Rpc.Core {
 		///	</param>
 		protected sealed override void GetExceptionMessage(IDictionary<MessagePackObject, MessagePackObject> store, bool includesDebugInformation) {
 			base.GetExceptionMessage(store, includesDebugInformation);
-			store.Add(ParameterNameKeyUtf8, MessagePackConvert.EncodeString(this._parameterName));
+			store.Add(ParameterNameKeyUtf8, MessagePackConvert.EncodeString(_parameterName));
 		}
 
 #if !SILVERLIGHT && !MONO
@@ -237,7 +237,7 @@ namespace MsgPack.Rpc.Core {
 			base.OnSerializeObjectState(sender, e);
 			e.AddSerializedState(
 				new SerializedState() {
-					ParameterName = this._parameterName
+					ParameterName = _parameterName
 				}
 			);
 		}
@@ -248,7 +248,7 @@ namespace MsgPack.Rpc.Core {
 
 			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as RpcArgumentException;
-				enclosing._parameterName = this.ParameterName;
+				enclosing._parameterName = ParameterName;
 			}
 		}
 #endif

@@ -6,17 +6,13 @@ namespace MsgPack.Rpc.Core.Protocols {
 	///		Contains event data for shutdown completion events both of client and server sides.
 	/// </summary>
 	public class ShutdownCompletedEventArgs : EventArgs {
-		private readonly ShutdownSource _source;
-
 		/// <summary>
 		///		Gets a <see cref="ShutdownSource"/> value which indicates shutdown source.
 		/// </summary>
 		/// <value>
 		///		A <see cref="ShutdownSource"/> value which indicates shutdown source.
 		/// </value>
-		public ShutdownSource Source {
-			get { return this._source; }
-		}
+		public ShutdownSource Source { get; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ShutdownCompletedEventArgs"/> class.
@@ -40,7 +36,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 
 			Contract.EndContractBlock();
 
-			this._source = source;
+			Source = source;
 		}
 	}
 }

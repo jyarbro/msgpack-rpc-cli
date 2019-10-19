@@ -27,7 +27,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			get {
 				Contract.Ensures(Contract.Result<ObjectPool<ClientRequestContext>>() != null);
 
-				return this._requestContextPool;
+				return _requestContextPool;
 			}
 		}
 
@@ -44,7 +44,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			get {
 				Contract.Ensures(Contract.Result<ObjectPool<ClientResponseContext>>() != null);
 
-				return this._responseContextPool;
+				return _responseContextPool;
 			}
 		}
 
@@ -61,7 +61,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			get {
 				Contract.Ensures(Contract.Result<RpcClientConfiguration>() != null);
 
-				return this._configuration;
+				return _configuration;
 			}
 		}
 
@@ -73,9 +73,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <value>
 		/// 	<c>true</c> if this instance is disposed; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsDisposed {
-			get { return Interlocked.CompareExchange(ref this._isDisposed, 0, 0) != 0; }
-		}
+		public bool IsDisposed => Interlocked.CompareExchange(ref _isDisposed, 0, 0) != 0;
 
 		private int _isInShutdown;
 
@@ -85,9 +83,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <value>
 		/// 	<c>true</c> if this instance is in shutdown; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsInShutdown {
-			get { return Interlocked.CompareExchange(ref this._isInShutdown, 0, 0) != 0; }
-		}
+		public bool IsInShutdown => Interlocked.CompareExchange(ref _isInShutdown, 0, 0) != 0;
 
 		private EventHandler<ShutdownCompletedEventArgs> _shutdownCompleted;
 
@@ -97,20 +93,20 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		public event EventHandler<ShutdownCompletedEventArgs> ShutdownCompleted {
 			add {
 				EventHandler<ShutdownCompletedEventArgs> oldHandler;
-				EventHandler<ShutdownCompletedEventArgs> currentHandler = this._shutdownCompleted;
+				var currentHandler = _shutdownCompleted;
 				do {
 					oldHandler = currentHandler;
 					var newHandler = Delegate.Combine(oldHandler, value) as EventHandler<ShutdownCompletedEventArgs>;
-					currentHandler = Interlocked.CompareExchange(ref this._shutdownCompleted, newHandler, oldHandler);
+					currentHandler = Interlocked.CompareExchange(ref _shutdownCompleted, newHandler, oldHandler);
 				} while (oldHandler != currentHandler);
 			}
 			remove {
 				EventHandler<ShutdownCompletedEventArgs> oldHandler;
-				EventHandler<ShutdownCompletedEventArgs> currentHandler = this._shutdownCompleted;
+				var currentHandler = _shutdownCompleted;
 				do {
 					oldHandler = currentHandler;
 					var newHandler = Delegate.Remove(oldHandler, value) as EventHandler<ShutdownCompletedEventArgs>;
-					currentHandler = Interlocked.CompareExchange(ref this._shutdownCompleted, newHandler, oldHandler);
+					currentHandler = Interlocked.CompareExchange(ref _shutdownCompleted, newHandler, oldHandler);
 				} while (oldHandler != currentHandler);
 			}
 		}
@@ -129,12 +125,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			Contract.EndContractBlock();
 
-			var handler = Interlocked.CompareExchange(ref this._shutdownCompleted, null, null);
+			var handler = Interlocked.CompareExchange(ref _shutdownCompleted, null, null);
 			if (handler != null) {
 				handler(this, e);
 			}
 
-			Interlocked.Exchange(ref this._isInShutdown, 0);
+			Interlocked.Exchange(ref _isInShutdown, 0);
 		}
 
 		/// <summary>
@@ -157,7 +153,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			Contract.EndContractBlock();
 
-			var handler = Interlocked.CompareExchange(ref this.UnknownResponseReceived, null, null);
+			var handler = Interlocked.CompareExchange(ref UnknownResponseReceived, null, null);
 			if (handler != null) {
 				handler(this, e);
 			}
@@ -179,9 +175,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			Contract.EndContractBlock();
 
-			this._configuration = configuration;
-			this._requestContextPool = configuration.RequestContextPoolProvider(() => new ClientRequestContext(configuration), configuration.CreateRequestContextPoolConfiguration());
-			this._responseContextPool = configuration.ResponseContextPoolProvider(() => new ClientResponseContext(configuration), configuration.CreateResponseContextPoolConfiguration());
+			_configuration = configuration;
+			_requestContextPool = configuration.RequestContextPoolProvider(() => new ClientRequestContext(configuration), configuration.CreateRequestContextPoolConfiguration());
+			_responseContextPool = configuration.ResponseContextPoolProvider(() => new ClientResponseContext(configuration), configuration.CreateResponseContextPoolConfiguration());
 		}
 
 		/// <summary>
@@ -189,7 +185,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </summary>
 		[SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "Must ensure exactly once.")]
 		public void Dispose() {
-			this.DisposeOnce(true);
+			DisposeOnce(true);
 			GC.SuppressFinalize(this);
 		}
 
@@ -198,8 +194,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </summary>
 		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
 		private void DisposeOnce(bool disposing) {
-			if (Interlocked.CompareExchange(ref this._isDisposed, 1, 0) == 0) {
-				this.Dispose(disposing);
+			if (Interlocked.CompareExchange(ref _isDisposed, 1, 0) == 0) {
+				Dispose(disposing);
 			}
 		}
 
@@ -222,8 +218,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		If shutdown is already initiated or completed, then <c>false</c>.
 		/// </returns>
 		public bool BeginShutdown() {
-			if (Interlocked.Exchange(ref this._isInShutdown, 1) == 0) {
-				this.BeginShutdownCore();
+			if (Interlocked.Exchange(ref _isInShutdown, 1) == 0) {
+				BeginShutdownCore();
 				return true;
 			}
 			else {
@@ -257,7 +253,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			Contract.Ensures(Contract.Result<Task<ClientTransport>>() != null);
 
-			return this.ConnectAsyncCore(targetEndPoint);
+			return ConnectAsyncCore(targetEndPoint);
 		}
 
 		/// <summary>
@@ -307,14 +303,14 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		internal abstract void ReturnTransport(ClientTransport transport);
 
 		internal void HandleOrphan(int? messageId, RpcErrorMessage rpcError, MessagePackObject? returnValue) {
-			this.OnUnknownResponseReceived(new UnknownResponseReceivedEventArgs(messageId, rpcError, returnValue));
+			OnUnknownResponseReceived(new UnknownResponseReceivedEventArgs(messageId, rpcError, returnValue));
 		}
 
 		internal ClientRequestContext GetRequestContext(ClientTransport transport) {
 			Contract.Requires(transport != null);
 			Contract.Ensures(Contract.Result<ClientRequestContext>() != null);
 
-			var result = this.RequestContextPool.Borrow();
+			var result = RequestContextPool.Borrow();
 			result.SetTransport(transport);
 			result.RenewSessionId();
 			return result;
@@ -325,7 +321,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			Contract.Requires(remoteEndPoint != null);
 			Contract.Ensures(Contract.Result<ClientResponseContext>() != null);
 
-			var result = this.ResponseContextPool.Borrow();
+			var result = ResponseContextPool.Borrow();
 			result.RenewSessionId();
 			result.SetTransport(transport);
 			result.RemoteEndPoint = remoteEndPoint;
@@ -348,7 +344,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			context.Clear();
 			context.UnboundTransport();
-			this.RequestContextPool.Return(context);
+			RequestContextPool.Return(context);
 		}
 
 		/// <summary>
@@ -367,7 +363,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			context.Clear();
 			context.UnboundTransport();
-			this.ResponseContextPool.Return(context);
+			ResponseContextPool.Return(context);
 		}
 
 		/// <summary>
@@ -385,11 +381,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			Contract.Ensures(Contract.Result<ConnectTimeoutWatcher>() != null);
 
-			if (this._configuration.ConnectTimeout == null) {
+			if (_configuration.ConnectTimeout == null) {
 				return NullConnectTimeoutWatcher.Instance;
 			}
 			else {
-				return new DefaultConnectTimeoutWatcher(this._configuration.ConnectTimeout.Value, onTimeout);
+				return new DefaultConnectTimeoutWatcher(_configuration.ConnectTimeout.Value, onTimeout);
 			}
 		}
 
@@ -421,7 +417,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			///		Stops watching and release internal resources.
 			/// </summary>
 			public void Dispose() {
-				this.Dispose(true);
+				Dispose(true);
 				GC.SuppressFinalize(this);
 			}
 
@@ -446,14 +442,14 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			public DefaultConnectTimeoutWatcher(TimeSpan timeout, Action onTimeout) {
 				var watcher = new TimeoutWatcher();
 				watcher.Timeout += (sender, e) => onTimeout();
-				Interlocked.Exchange(ref this._watcher, watcher);
+				Interlocked.Exchange(ref _watcher, watcher);
 				watcher.Start(timeout);
 			}
 
 			protected override void Dispose(bool disposing) {
 				if (disposing) {
-					this._watcher.Stop();
-					this._watcher.Dispose();
+					_watcher.Stop();
+					_watcher.Dispose();
 				}
 
 				base.Dispose(disposing);

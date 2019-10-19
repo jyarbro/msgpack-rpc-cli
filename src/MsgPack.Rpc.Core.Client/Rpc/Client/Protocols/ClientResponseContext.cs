@@ -41,29 +41,29 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </param>
 		public ClientResponseContext(RpcClientConfiguration configuration)
 			: base((configuration ?? RpcClientConfiguration.Default).InitialReceiveBufferLength) {
-			this.ErrorStartAt = -1;
-			this.ResultStartAt = -1;
+			ErrorStartAt = -1;
+			ResultStartAt = -1;
 		}
 
 		internal long? SkipResultSegment() {
 #if DEBUG
-			Contract.Assert(this.ResultStartAt > -1);
+			Contract.Assert(ResultStartAt > -1);
 #endif
-			return this.SkipHeader(this.ResultStartAt);
+			return SkipHeader(ResultStartAt);
 		}
 
 		internal long? SkipErrorSegment() {
 #if DEBUG
-			Contract.Assert(this.ErrorStartAt > -1);
+			Contract.Assert(ErrorStartAt > -1);
 #endif
-			return this.SkipHeader(this.ErrorStartAt);
+			return SkipHeader(ErrorStartAt);
 		}
 
 		private long? SkipHeader(long origin) {
-			long? result = this.HeaderUnpacker.Skip();
+			var result = HeaderUnpacker.Skip();
 			if (result == null) {
 				// Revert buffer position to handle next attempt.
-				this.UnpackingBuffer.Position = origin;
+				UnpackingBuffer.Position = origin;
 			}
 
 			return result;
@@ -76,7 +76,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		internal void SetTransport(ClientTransport transport) {
 			Contract.Requires(transport != null);
 
-			this.NextProcess = transport.UnpackResponseHeader;
+			NextProcess = transport.UnpackResponseHeader;
 			base.SetTransport(transport);
 		}
 
@@ -88,8 +88,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		Clears this instance internal buffers for reuse.
 		/// </summary>
 		internal sealed override void Clear() {
-			this.ClearBuffers();
-			this.NextProcess = InvalidFlow;
+			ClearBuffers();
+			NextProcess = InvalidFlow;
 			base.Clear();
 		}
 
@@ -97,18 +97,18 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		Clears the buffers to deserialize message.
 		/// </summary>
 		internal override void ClearBuffers() {
-			if (this.ErrorBuffer != null) {
-				this.ErrorBuffer.Dispose();
-				this.ErrorBuffer = null;
+			if (ErrorBuffer != null) {
+				ErrorBuffer.Dispose();
+				ErrorBuffer = null;
 			}
 
-			if (this.ResultBuffer != null) {
-				this.ResultBuffer.Dispose();
-				this.ResultBuffer = null;
+			if (ResultBuffer != null) {
+				ResultBuffer.Dispose();
+				ResultBuffer = null;
 			}
 
-			this.ErrorStartAt = -1;
-			this.ResultStartAt = -1;
+			ErrorStartAt = -1;
+			ResultStartAt = -1;
 
 			base.ClearBuffers();
 		}

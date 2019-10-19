@@ -6,8 +6,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// 	Defines trace for MsgPack.Rpc.Core.Client.Protocols namespace.
 	/// </summary>
 	internal static partial class MsgPackRpcClientProtocolsTrace {
-		private static readonly TraceSource _source = new TraceSource("MsgPack.Rpc.Core.Client.Protocols");
-
 		private static readonly Dictionary<MessageId, TraceEventType> _typeTable =
 			new Dictionary<MessageId, TraceEventType>(25)
 			{
@@ -44,9 +42,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <value>
 		/// 	The <see cref="TraceSource" />.
 		/// </value>
-		public static TraceSource Source {
-			get { return _source; }
-		}
+		public static TraceSource Source { get; } = new TraceSource("MsgPack.Rpc.Core.Client.Protocols");
 
 		/// <summary>
 		/// 	Returns the value whether the specified message should be traced in current configuration.
@@ -58,7 +54,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// 	<c>true</c> if the specified message should be traced; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool ShouldTrace(MessageId id) {
-			return _source.Switch.ShouldTrace(_typeTable[id]);
+			return Source.Switch.ShouldTrace(_typeTable[id]);
 		}
 
 		/// <summary>
@@ -75,10 +71,10 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </param>
 		public static void TraceEvent(MessageId id, string format, params object[] args) {
 			if (args == null || args.Length == 0) {
-				_source.TraceEvent(_typeTable[id], (int)id, format);
+				Source.TraceEvent(_typeTable[id], (int)id, format);
 			}
 			else {
-				_source.TraceEvent(_typeTable[id], (int)id, format, args);
+				Source.TraceEvent(_typeTable[id], (int)id, format, args);
 			}
 		}
 
@@ -92,7 +88,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// 	The raw data for this event.
 		/// </param>
 		public static void TraceData(MessageId id, params object[] data) {
-			_source.TraceData(_typeTable[id], (int)id, data);
+			Source.TraceData(_typeTable[id], (int)id, data);
 		}
 
 		/// <summary>

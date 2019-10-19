@@ -12,7 +12,6 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 	/// </summary>
 	public abstract class MessagePackStreamLogger : IMessagePackStreamLogger, IDisposable {
 		private static readonly ThreadLocal<TraceEventCache> _traceEventCache = new ThreadLocal<TraceEventCache>(() => new TraceEventCache());
-		private static readonly DateTime _processStartTimeUtc = GetProcessStartTimeUtc();
 		private static readonly string _processName = GetProcessName();
 
 		private static DateTime GetProcessStartTimeUtc() {
@@ -48,10 +47,10 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 				return PrivilegedGetProcessName();
 			}
 			catch (SecurityException) {
-				return String.Empty;
+				return string.Empty;
 			}
 			catch (MemberAccessException) {
-				return String.Empty;
+				return string.Empty;
 			}
 #else
 			return String.Empty;
@@ -73,9 +72,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		/// <value>
 		///		The current process id.
 		/// </value>
-		protected static int ProcessId {
-			get { return _traceEventCache.Value.ProcessId; }
-		}
+		protected static int ProcessId => _traceEventCache.Value.ProcessId;
 
 		/// <summary>
 		///		Gets the current process start time in UTC.
@@ -83,9 +80,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		/// <value>
 		///		The current process start time in UTC. 
 		/// </value>
-		protected static DateTime ProcessStartTimeUtc {
-			get { return _processStartTimeUtc; }
-		}
+		protected static DateTime ProcessStartTimeUtc { get; } = GetProcessStartTimeUtc();
 
 		/// <summary>
 		///		Gets the name of the current process.
@@ -93,9 +88,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		/// <value>
 		///		The name of the current process.
 		/// </value>
-		protected static string ProcessName {
-			get { return _processName; }
-		}
+		protected static string ProcessName => _processName;
 
 		/// <summary>
 		///		Gets the managed thread identifier.
@@ -103,9 +96,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		/// <value>
 		///		The managed thread identifier.
 		/// </value>
-		protected static string ThreadId {
-			get { return _traceEventCache.Value.ThreadId; }
-		}
+		protected static string ThreadId => _traceEventCache.Value.ThreadId;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MessagePackStreamLogger"/> class.
@@ -116,7 +107,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose() {
-			this.Dispose(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 

@@ -32,11 +32,11 @@ namespace MsgPack.Rpc.Core {
 		///		Normalized identifier.
 		/// </returns>
 		public static string EnsureValidIdentifier(string identifier, string parameterName) {
-			if (String.IsNullOrEmpty(identifier)) {
+			if (string.IsNullOrEmpty(identifier)) {
 				return identifier;
 			}
 
-			string normalized =
+			var normalized =
 #if !SILVERLIGHT
 				identifier.Normalize(NormalizationForm.FormC);
 #else
@@ -44,7 +44,7 @@ namespace MsgPack.Rpc.Core {
 #endif
 			if (!_validIdentififerPattern.IsMatch(normalized)) {
 				throw new ArgumentException(
-					String.Format(
+					string.Format(
 						CultureInfo.CurrentCulture,
 						"'{0}' is not valid identifier.",
 						Escape(identifier)

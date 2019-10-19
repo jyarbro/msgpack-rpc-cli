@@ -31,14 +31,14 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 
 			if (!context.RootUnpacker.IsArrayHeader) {
-				this.HandleDeserializationError(context, "Invalid response message stream. Message must be array.", () => context.UnpackingBuffer.ToArray());
+				HandleDeserializationError(context, "Invalid response message stream. Message must be array.", () => context.UnpackingBuffer.ToArray());
 				return context.NextProcess(context);
 			}
 
 			if (context.RootUnpacker.ItemsCount != 4) {
-				this.HandleDeserializationError(
+				HandleDeserializationError(
 					context,
-					String.Format(
+					string.Format(
 						CultureInfo.CurrentCulture,
 						"Invalid response message stream. Message must be valid size array. Actual size is {0}.",
 						context.RootUnpacker.ItemsCount
@@ -72,21 +72,21 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				numericType = context.HeaderUnpacker.LastReadData.AsInt32();
 			}
 			catch (InvalidOperationException) {
-				this.HandleDeserializationError(context, "Invalid response message stream. Message Type must be Int32 compatible integer.", () => context.UnpackingBuffer.ToArray());
+				HandleDeserializationError(context, "Invalid response message stream. Message Type must be Int32 compatible integer.", () => context.UnpackingBuffer.ToArray());
 				return context.NextProcess(context);
 			}
 
-			MessageType type = (MessageType)numericType;
+			var type = (MessageType)numericType;
 			if (type != MessageType.Response) {
-				this.HandleDeserializationError(
+				HandleDeserializationError(
 					context,
-					String.Format(CultureInfo.CurrentCulture, "Unknown message type '{0:x8}'", numericType),
+					string.Format(CultureInfo.CurrentCulture, "Unknown message type '{0:x8}'", numericType),
 					() => context.UnpackingBuffer.ToArray()
 				);
 				return context.NextProcess(context);
 			}
 
-			context.NextProcess = this.UnpackMessageId;
+			context.NextProcess = UnpackMessageId;
 
 			return context.NextProcess(context);
 		}
@@ -109,7 +109,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				context.MessageId = unchecked((int)context.HeaderUnpacker.LastReadData.AsUInt32());
 			}
 			catch (InvalidOperationException) {
-				this.HandleDeserializationError(
+				HandleDeserializationError(
 					context,
 					"Invalid response message stream. ID must be UInt32 compatible integer.",
 					() => context.UnpackingBuffer.ToArray()
@@ -117,7 +117,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				return context.NextProcess(context);
 			}
 
-			context.NextProcess = this.UnpackError;
+			context.NextProcess = UnpackError;
 			return context.NextProcess(context);
 		}
 
@@ -142,7 +142,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 
 			context.ErrorBuffer = new ByteArraySegmentStream(context.UnpackingBuffer.GetBuffer(context.ErrorStartAt, context.UnpackingBuffer.Position - context.ErrorStartAt));
-			context.NextProcess = this.UnpackResult;
+			context.NextProcess = UnpackResult;
 
 			return context.NextProcess(context);
 		}
@@ -168,7 +168,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 
 			context.ResultBuffer = new ByteArraySegmentStream(context.UnpackingBuffer.GetBuffer(context.ResultStartAt, context.UnpackingBuffer.Position - context.ResultStartAt));
-			context.NextProcess = this.Dispatch;
+			context.NextProcess = Dispatch;
 
 			return context.NextProcess(context);
 		}
@@ -187,7 +187,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			try {
 				Action<ClientResponseContext, Exception, bool> handler = null;
 				try {
-					this._pendingRequestTable.TryRemove(context.MessageId.Value, out handler);
+					_pendingRequestTable.TryRemove(context.MessageId.Value, out handler);
 				}
 				finally {
 					// Best effort to rescue from ThreadAbortException...
@@ -195,18 +195,18 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 						handler(context, null, context.CompletedSynchronously);
 					}
 					else {
-						this.HandleOrphan(context);
+						HandleOrphan(context);
 					}
 				}
 			}
 			finally {
 				context.ClearBuffers();
-				this.OnProcessFinished();
+				OnProcessFinished();
 			}
 
 			if (context.UnpackingBuffer.Length > 0) {
 				// Subsequent request is already arrived.
-				context.NextProcess = this.UnpackResponseHeader;
+				context.NextProcess = UnpackResponseHeader;
 				return context.NextProcess(context);
 			}
 			else {
@@ -221,7 +221,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				return false;
 			}
 
-			if (this.Manager.Configuration.DumpCorruptResponse) {
+			if (Manager.Configuration.DumpCorruptResponse) {
 #if !SILVERLIGHT
 				using (var dumpStream = OpenDumpStream(context.SessionStartedAt, context.RemoteEndPoint, context.SessionId, MessageType.Response, context.MessageId))
 #else

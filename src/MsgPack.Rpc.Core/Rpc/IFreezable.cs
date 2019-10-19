@@ -35,14 +35,12 @@ namespace MsgPack.Rpc.Core {
 
 	[ContractClassFor(typeof(IFreezable))]
 	internal abstract class IFreezableContract : IFreezable {
-		public bool IsFrozen {
-			get { return false; }
-		}
+		public bool IsFrozen => false;
 
 		public IFreezable Freeze() {
 			Contract.Ensures(Contract.Result<IFreezable>() != null);
 			Contract.Ensures(Contract.ReferenceEquals(Contract.Result<IFreezable>(), this));
-			Contract.Ensures(this.IsFrozen);
+			Contract.Ensures(IsFrozen);
 
 			return null;
 		}
@@ -51,7 +49,7 @@ namespace MsgPack.Rpc.Core {
 			Contract.Ensures(Contract.Result<IFreezable>() != null);
 			Contract.Ensures(!Object.ReferenceEquals(Contract.Result<IFreezable>(), this));
 			Contract.Ensures(Contract.Result<IFreezable>().IsFrozen);
-			Contract.Ensures(this.IsFrozen == Contract.OldValue(this.IsFrozen));
+			Contract.Ensures(IsFrozen == Contract.OldValue(IsFrozen));
 
 			throw new NotImplementedException();
 		}

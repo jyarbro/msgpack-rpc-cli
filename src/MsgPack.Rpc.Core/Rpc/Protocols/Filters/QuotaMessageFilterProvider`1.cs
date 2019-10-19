@@ -8,17 +8,13 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 	/// <typeparam name="T">The type of <see cref="InboundMessageContext"/>.</typeparam>
 	public abstract class QuotaMessageFilterProvider<T> : MessageFilterProvider<T>
 		where T : InboundMessageContext {
-		private readonly long _quota;
-
 		/// <summary>
 		///		Gets the quota.
 		/// </summary>
 		/// <value>
 		///		The quota.
 		/// </value>
-		public long Quota {
-			get { return this._quota; }
-		}
+		public long Quota { get; }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="QuotaMessageFilter&lt;T&gt;"/> class.
@@ -34,7 +30,7 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 
 			Contract.EndContractBlock();
 
-			this._quota = quota;
+			Quota = quota;
 		}
 	}
 }

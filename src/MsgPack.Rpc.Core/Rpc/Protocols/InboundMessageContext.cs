@@ -18,11 +18,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///		This value wlll not be <c>null</c>.
 		/// </value>
 		[SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "Follwing SocketAsyncEventArgs signature.")]
-		public IList<ArraySegment<byte>> ReceivedData {
-			get { return this._receivedData; }
-		}
-
-		private byte[] _currentReceivingBuffer;
+		public IList<ArraySegment<byte>> ReceivedData => _receivedData;
 
 		/// <summary>
 		///		Gets the buffer to receive data.
@@ -32,11 +28,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///		This value will not be <c>null</c>.
 		///		Available section is started with _receivingBufferOffset.
 		/// </value>
-		internal byte[] CurrentReceivingBuffer {
-			get { return this._currentReceivingBuffer; }
-		}
-
-		private int _currentReceivingBufferOffset;
+		internal byte[] CurrentReceivingBuffer { get; private set; }
 
 		/// <summary>
 		///		Gets the current offset of the <see cref="CurrentReceivingBuffer"/>.
@@ -44,9 +36,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		/// <value>
 		///		The current offset of the <see cref="CurrentReceivingBuffer"/>.
 		/// </value>
-		internal int CurrentReceivingBufferOffset {
-			get { return _currentReceivingBufferOffset; }
-		}
+		internal int CurrentReceivingBufferOffset { get; private set; }
 
 		/// <summary>
 		///		Buffer that stores unpacking binaries received.
@@ -77,17 +67,17 @@ namespace MsgPack.Rpc.Core.Protocols {
 		/// </param>
 		protected InboundMessageContext(int initialReceivingBufferSize)
 			: base() {
-			this._currentReceivingBuffer = new byte[initialReceivingBufferSize];
+			CurrentReceivingBuffer = new byte[initialReceivingBufferSize];
 			// TODO: ArrayDeque is preferred.
-			this._receivedData = new List<ArraySegment<byte>>(1);
+			_receivedData = new List<ArraySegment<byte>>(1);
 		}
 
 		internal bool ReadFromRootUnpacker() {
-			return this.RootUnpacker.TryRead(this.UnpackingBuffer);
+			return RootUnpacker.TryRead(UnpackingBuffer);
 		}
 
 		internal bool ReadFromHeaderUnpacker() {
-			return this.HeaderUnpacker.TryRead(this.UnpackingBuffer);
+			return HeaderUnpacker.TryRead(UnpackingBuffer);
 		}
 
 		/// <summary>
@@ -95,8 +85,8 @@ namespace MsgPack.Rpc.Core.Protocols {
 		/// </summary>
 		/// <param name="data">Data to be set.</param>
 		internal void SetReceivedData(IList<ArraySegment<byte>> data) {
-			this._receivedData.Clear();
-			this._receivedData.AddRange(data);
+			_receivedData.Clear();
+			_receivedData.AddRange(data);
 		}
 
 		/// <summary>
@@ -104,7 +94,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		/// </summary>
 		/// <param name="data">Data to be set.</param>
 		internal void SetReceivingBuffer(byte[] data) {
-			this.SocketContext.SetBuffer(data, 0, data.Length);
+			SocketContext.SetBuffer(data, 0, data.Length);
 		}
 
 		/// <summary>
@@ -112,60 +102,60 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///		and reallocates buffer for receiving if necessary.
 		/// </summary>
 		internal void ShiftCurrentReceivingBuffer() {
-			int shift = this.BytesTransferred;
-			this._receivedData.Add(new ArraySegment<byte>(this._currentReceivingBuffer, this.SocketContext.Offset, shift));
-			this._currentReceivingBufferOffset += shift;
-			if (this._currentReceivingBufferOffset == this._currentReceivingBuffer.Length) {
+			var shift = BytesTransferred;
+			_receivedData.Add(new ArraySegment<byte>(CurrentReceivingBuffer, SocketContext.Offset, shift));
+			CurrentReceivingBufferOffset += shift;
+			if (CurrentReceivingBufferOffset == CurrentReceivingBuffer.Length) {
 				// Replace with new buffer.
-				this._currentReceivingBuffer = new byte[this._currentReceivingBuffer.Length];
-				this._currentReceivingBufferOffset = 0;
+				CurrentReceivingBuffer = new byte[CurrentReceivingBuffer.Length];
+				CurrentReceivingBufferOffset = 0;
 			}
 
 			// Set new offset and length.
-			this.SocketContext.SetBuffer(this._currentReceivingBuffer, this._currentReceivingBufferOffset, this._currentReceivingBuffer.Length - this._currentReceivingBufferOffset);
+			SocketContext.SetBuffer(CurrentReceivingBuffer, CurrentReceivingBufferOffset, CurrentReceivingBuffer.Length - CurrentReceivingBufferOffset);
 		}
 
 		/// <summary>
 		///		Prepares socket context array buffer with <see cref="CurrentReceivingBuffer"/>
 		/// </summary>
 		internal void PrepareReceivingBuffer() {
-			this.SocketContext.SetBuffer(this.CurrentReceivingBuffer, 0, this.CurrentReceivingBuffer.Length);
+			SocketContext.SetBuffer(CurrentReceivingBuffer, 0, CurrentReceivingBuffer.Length);
 		}
 
 		internal override void Clear() {
-			if (this.UnpackingBuffer != null) {
-				this.UnpackingBuffer.Dispose();
-				this.UnpackingBuffer = null;
+			if (UnpackingBuffer != null) {
+				UnpackingBuffer.Dispose();
+				UnpackingBuffer = null;
 			}
 
 			base.Clear();
 		}
 
 		internal virtual void ClearBuffers() {
-			if (this.HeaderUnpacker != null) {
+			if (HeaderUnpacker != null) {
 				try {
-					this.HeaderUnpacker.Dispose();
+					HeaderUnpacker.Dispose();
 				}
 				catch (InvalidMessagePackStreamException) {
 					// Handles cleanup for corruppted stream.
 				}
 
-				this.HeaderUnpacker = null;
+				HeaderUnpacker = null;
 			}
 
-			if (this.RootUnpacker != null) {
+			if (RootUnpacker != null) {
 				try {
-					this.RootUnpacker.Dispose();
+					RootUnpacker.Dispose();
 				}
 				catch (InvalidMessagePackStreamException) {
 					// Handles cleanup for corruppted stream.
 				}
 
-				this.RootUnpacker = null;
+				RootUnpacker = null;
 			}
 
-			if (this.UnpackingBuffer != null) {
-				this.TruncateUsedReceivedData();
+			if (UnpackingBuffer != null) {
+				TruncateUsedReceivedData();
 			}
 		}
 
@@ -173,16 +163,16 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///		Truncates the used segments from the received data.
 		/// </summary>
 		private void TruncateUsedReceivedData() {
-			long removals = this.UnpackingBuffer.Position;
-			var segments = this.UnpackingBuffer.GetBuffer();
+			var removals = UnpackingBuffer.Position;
+			var segments = UnpackingBuffer.GetBuffer();
 			while (segments.Any() && 0 < removals) {
 				if (segments[0].Count <= removals) {
 					removals -= segments[0].Count;
 					segments.RemoveAt(0);
 				}
 				else {
-					int newCount = segments[0].Count - unchecked((int)removals);
-					int newOffset = segments[0].Offset + unchecked((int)removals);
+					var newCount = segments[0].Count - unchecked((int)removals);
+					var newOffset = segments[0].Offset + unchecked((int)removals);
 					segments[0] = new ArraySegment<byte>(segments[0].Array, newOffset, newCount);
 					removals = 0;
 				}

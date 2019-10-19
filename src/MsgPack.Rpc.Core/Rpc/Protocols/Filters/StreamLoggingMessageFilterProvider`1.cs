@@ -9,17 +9,13 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 	/// <typeparam name="T">The type of <see cref="InboundMessageContext"/>.</typeparam>
 	public abstract class StreamLoggingMessageFilterProvider<T> : MessageFilterProvider<T>
 		where T : InboundMessageContext {
-		private readonly IMessagePackStreamLogger _logger;
-
 		/// <summary>
 		///		Gets the logger which is the <see cref="IMessagePackStreamLogger"/> which will be log sink.
 		/// </summary>
 		/// <value>
 		///		The logger which is the <see cref="IMessagePackStreamLogger"/> which will be log sink.
 		/// </value>
-		protected IMessagePackStreamLogger Logger {
-			get { return this._logger; }
-		}
+		protected IMessagePackStreamLogger Logger { get; }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="StreamLoggingMessageFilter&lt;T&gt;"/> class.
@@ -35,7 +31,7 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 
 			Contract.EndContractBlock();
 
-			this._logger = logger;
+			Logger = logger;
 		}
 	}
 }

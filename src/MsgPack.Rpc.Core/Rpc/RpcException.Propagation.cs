@@ -32,22 +32,22 @@ namespace MsgPack.Rpc.Core {
 				MessagePackObject mayBeArray;
 				if (unpackedException.AsDictionary().TryGetValue(_remoteExceptionsUtf8, out mayBeArray) && mayBeArray.IsArray) {
 					var array = mayBeArray.AsList();
-					this._remoteExceptions = new RemoteExceptionInformation[array.Count];
-					for (int i = 0; i < this._remoteExceptions.Length; i++) {
+					_remoteExceptions = new RemoteExceptionInformation[array.Count];
+					for (var i = 0; i < _remoteExceptions.Length; i++) {
 						if (array[i].IsList) {
-							this._remoteExceptions[i] = new RemoteExceptionInformation(array[i].AsList());
+							_remoteExceptions[i] = new RemoteExceptionInformation(array[i].AsList());
 						}
 						else {
 							// Unexpected type.
 							Debug.WriteLine("Unexepcted ExceptionInformation at {0}, type: {1}, value: \"{2}\".", i, array[i].UnderlyingType, array[i]);
-							this._remoteExceptions[i] = new RemoteExceptionInformation(new MessagePackObject[] { array[i] });
+							_remoteExceptions[i] = new RemoteExceptionInformation(new MessagePackObject[] { array[i] });
 						}
 					}
 				}
 			}
 
 #if !SILVERLIGHT && !MONO
-			this.RegisterSerializeObjectStateEventHandler();
+			RegisterSerializeObjectStateEventHandler();
 #endif
 		}
 
@@ -70,12 +70,12 @@ namespace MsgPack.Rpc.Core {
 					throw new SerializationException("Count of remote exception information must be 6.");
 				}
 
-				this.Hop = unpacked[0].AsInt32();
-				this.TypeName = unpacked[1].AsString();
-				this.HResult = unpacked[2].AsInt32();
-				this.Message = unpacked[3].AsString();
-				this.StackTrace = unpacked[4].AsList().Select(item => new RemoteStackFrame(item.AsList())).ToArray();
-				this.Data = unpacked[5].AsDictionary();
+				Hop = unpacked[0].AsInt32();
+				TypeName = unpacked[1].AsString();
+				HResult = unpacked[2].AsInt32();
+				Message = unpacked[3].AsString();
+				StackTrace = unpacked[4].AsList().Select(item => new RemoteStackFrame(item.AsList())).ToArray();
+				Data = unpacked[5].AsDictionary();
 			}
 		}
 
@@ -93,21 +93,21 @@ namespace MsgPack.Rpc.Core {
 			public RemoteStackFrame(IList<MessagePackObject> unpacked) {
 				switch (unpacked.Count) {
 					case 3: {
-						this.MethodSignature = unpacked[0].AsString();
-						this.ILOffset = unpacked[1].AsInt32();
-						this.NativeOffset = unpacked[2].AsInt32();
-						this.FileName = null;
-						this.FileLineNumber = 0;
-						this.FileColumnNumber = 0;
+						MethodSignature = unpacked[0].AsString();
+						ILOffset = unpacked[1].AsInt32();
+						NativeOffset = unpacked[2].AsInt32();
+						FileName = null;
+						FileLineNumber = 0;
+						FileColumnNumber = 0;
 						break;
 					}
 					case 6: {
-						this.MethodSignature = unpacked[0].AsString();
-						this.ILOffset = unpacked[1].AsInt32();
-						this.NativeOffset = unpacked[2].AsInt32();
-						this.FileName = unpacked[3].AsString();
-						this.FileLineNumber = unpacked[4].AsInt32();
-						this.FileColumnNumber = unpacked[5].AsInt32();
+						MethodSignature = unpacked[0].AsString();
+						ILOffset = unpacked[1].AsInt32();
+						NativeOffset = unpacked[2].AsInt32();
+						FileName = unpacked[3].AsString();
+						FileLineNumber = unpacked[4].AsInt32();
+						FileColumnNumber = unpacked[5].AsInt32();
 						break;
 					}
 					default: {
@@ -133,9 +133,9 @@ namespace MsgPack.Rpc.Core {
 		/// </returns>
 		public MessagePackObject GetExceptionMessage(bool isDebugMode) {
 			var store = new MessagePackObjectDictionary(2);
-			store.Add(_errorCodeUtf8, this.RpcError.ErrorCode);
-			store.Add(MessageKeyUtf8, isDebugMode ? this.Message : this.RpcError.DefaultMessageInvariant);
-			this.GetExceptionMessage(store, isDebugMode);
+			store.Add(_errorCodeUtf8, RpcError.ErrorCode);
+			store.Add(MessageKeyUtf8, isDebugMode ? Message : RpcError.DefaultMessageInvariant);
+			GetExceptionMessage(store, isDebugMode);
 
 			return new MessagePackObject(store);
 		}
@@ -156,11 +156,11 @@ namespace MsgPack.Rpc.Core {
 				return;
 			}
 
-			if (this.InnerException != null || this._remoteExceptions != null) {
+			if (InnerException != null || _remoteExceptions != null) {
 				var innerList = new List<MessagePackObject>();
-				if (this._remoteExceptions != null) {
-					foreach (var remoteException in this._remoteExceptions) {
-						MessagePackObject[] properties = new MessagePackObject[6];
+				if (_remoteExceptions != null) {
+					foreach (var remoteException in _remoteExceptions) {
+						var properties = new MessagePackObject[6];
 						properties[0] = remoteException.Hop + 1;
 						properties[1] = MessagePackConvert.EncodeString(remoteException.TypeName);
 						// HResult is significant for some exception (e.g. IOException).
@@ -183,8 +183,8 @@ namespace MsgPack.Rpc.Core {
 					}
 				}
 
-				for (var inner = this.InnerException; inner != null; inner = inner.InnerException) {
-					MessagePackObject[] properties = new MessagePackObject[6];
+				for (var inner = InnerException; inner != null; inner = inner.InnerException) {
+					var properties = new MessagePackObject[6];
 					properties[0] = 0;
 					properties[1] = MessagePackConvert.EncodeString(inner.GetType().FullName);
 					// HResult is significant for some exception (e.g. IOException).
@@ -199,7 +199,7 @@ namespace MsgPack.Rpc.Core {
 						new StackTrace( inner );
 #endif
 					var frames = new MessagePackObject[innerStackTrace.FrameCount];
-					for (int i = 0; i < frames.Length; i++) {
+					for (var i = 0; i < frames.Length; i++) {
 						var frame = innerStackTrace.GetFrame(innerStackTrace.FrameCount - (i + 1));
 #if !SILVERLIGHT
 						if (frame.GetFileName() == null) {
@@ -230,18 +230,17 @@ namespace MsgPack.Rpc.Core {
 				store.Add(_remoteExceptionsUtf8, new MessagePackObject(innerList));
 			}
 
-			store.Add(DebugInformationKeyUtf8, this.DebugInformation);
+			store.Add(DebugInformationKeyUtf8, DebugInformation);
 
 		}
 
 		private static MessagePackObject ToStackFrameMethodSignature(MethodBase methodBase) {
-			return String.Concat(methodBase.DeclaringType.FullName, ".", methodBase.Name, "(", String.Join(", ", methodBase.GetParameters().Select(p => p.ParameterType.FullName)), ")");
+			return string.Concat(methodBase.DeclaringType.FullName, ".", methodBase.Name, "(", string.Join(", ", methodBase.GetParameters().Select(p => p.ParameterType.FullName)), ")");
 		}
 
 		[SecuritySafeCritical]
 		private static int SafeGetHRFromException(Exception exception) {
-			var asExternalException = exception as ExternalException;
-			if (asExternalException != null) {
+			if (exception is ExternalException asExternalException) {
 				// ExternalException.ErrorCode is SecuritySafeCritical and its assembly must be fully trusted.
 				return asExternalException.ErrorCode;
 			}

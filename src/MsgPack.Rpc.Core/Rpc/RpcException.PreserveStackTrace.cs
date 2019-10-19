@@ -9,11 +9,11 @@ namespace MsgPack.Rpc.Core {
 
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Infrastracture.")]
 		void IStackTracePreservable.PreserveStackTrace() {
-			if (this._preservedStackTrace == null) {
-				this._preservedStackTrace = new List<string>();
+			if (_preservedStackTrace == null) {
+				_preservedStackTrace = new List<string>();
 			}
 
-			this._preservedStackTrace.Add(
+			_preservedStackTrace.Add(
 #if !SILVERLIGHT
 				new StackTrace(this, true)
 #else
@@ -28,12 +28,12 @@ namespace MsgPack.Rpc.Core {
 		/// <returns>A string that describes the immediate frames of the call stack.</returns>
 		public override string StackTrace {
 			get {
-				if (this._preservedStackTrace == null || this._preservedStackTrace.Count == 0) {
+				if (_preservedStackTrace == null || _preservedStackTrace.Count == 0) {
 					return base.StackTrace;
 				}
 
 				var buffer = new StringBuilder();
-				foreach (var preserved in this._preservedStackTrace) {
+				foreach (var preserved in _preservedStackTrace) {
 					buffer.Append(preserved);
 					buffer.AppendLine("   --- End of preserved stack trace ---");
 				}

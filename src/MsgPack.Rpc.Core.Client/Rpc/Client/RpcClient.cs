@@ -18,23 +18,13 @@ namespace MsgPack.Rpc.Core.Client {
 			return Interlocked.Increment(ref _messageIdGenerator);
 		}
 
-		private readonly SerializationContext _serializationContext;
+		internal SerializationContext SerializationContext { get; }
 
-		internal SerializationContext SerializationContext {
-			get { return this._serializationContext; }
-		}
-
-		private readonly ClientTransportManager _transportManager;
-
-		internal ClientTransportManager TransportManager {
-			get { return this._transportManager; }
-		}
+		internal ClientTransportManager TransportManager { get; }
 
 		private ClientTransport _transport;
 
-		internal ClientTransport Transport {
-			get { return this._transport; }
-		}
+		internal ClientTransport Transport => _transport;
 
 		private TaskCompletionSource<object> _transportShutdownCompletionSource;
 
@@ -44,17 +34,15 @@ namespace MsgPack.Rpc.Core.Client {
 		/// <value>
 		/// 	<c>true</c> if this instance is connected to the server; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsConnected {
-			get { return Interlocked.CompareExchange(ref this._transport, null, null) != null; }
-		}
+		public bool IsConnected => Interlocked.CompareExchange(ref _transport, null, null) != null;
 
 		private Task<ClientTransport> _connectTask;
 
 		internal void EnsureConnected() {
-			var task = Interlocked.CompareExchange(ref this._connectTask, null, null);
+			var task = Interlocked.CompareExchange(ref _connectTask, null, null);
 			if (task != null) {
-				Interlocked.Exchange(ref this._transport, task.Result);
-				Interlocked.Exchange(ref this._connectTask, null);
+				Interlocked.Exchange(ref _transport, task.Result);
+				Interlocked.Exchange(ref _connectTask, null);
 				task.Dispose();
 			}
 		}
@@ -124,27 +112,27 @@ namespace MsgPack.Rpc.Core.Client {
 
 			var safeConfiguration = configuration ?? RpcClientConfiguration.Default;
 
-			this._transportManager = safeConfiguration.TransportManagerProvider(safeConfiguration);
-			this._serializationContext = serializationContext ?? new SerializationContext();
-			Interlocked.Exchange(ref this._connectTask, this._transportManager.ConnectAsync(targetEndPoint));
+			TransportManager = safeConfiguration.TransportManagerProvider(safeConfiguration);
+			SerializationContext = serializationContext ?? new SerializationContext();
+			Interlocked.Exchange(ref _connectTask, TransportManager.ConnectAsync(targetEndPoint));
 		}
 
 		/// <summary>
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose() {
-			this._isDisposed = true;
-			var transport = Interlocked.CompareExchange(ref this._transport, null, null);
+			_isDisposed = true;
+			var transport = Interlocked.CompareExchange(ref _transport, null, null);
 			if (transport != null) {
 				transport.Dispose();
 			}
 
-			this._transportManager.Dispose();
+			TransportManager.Dispose();
 		}
 
 		private void VerifyIsNotDisposed() {
-			if (this._isDisposed) {
-				throw new ObjectDisposedException(this.ToString());
+			if (_isDisposed) {
+				throw new ObjectDisposedException(ToString());
 			}
 		}
 
@@ -152,7 +140,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		Initiates shutdown of current connection and wait to complete it.
 		/// </summary>
 		public void Shutdown() {
-			using (var task = this.ShutdownAsync()) {
+			using (var task = ShutdownAsync()) {
 				if (task != null) {
 					task.Wait();
 				}
@@ -167,27 +155,27 @@ namespace MsgPack.Rpc.Core.Client {
 		///		This value will be <c>null</c> when there is not the active connection.
 		/// </returns>
 		public Task ShutdownAsync() {
-			this.VerifyIsNotDisposed();
+			VerifyIsNotDisposed();
 
-			if (this._transportShutdownCompletionSource != null) {
+			if (_transportShutdownCompletionSource != null) {
 				return null;
 			}
 
 			var taskCompletionSource = new TaskCompletionSource<object>();
-			if (Interlocked.CompareExchange(ref this._transportShutdownCompletionSource, taskCompletionSource, null) != null) {
+			if (Interlocked.CompareExchange(ref _transportShutdownCompletionSource, taskCompletionSource, null) != null) {
 				return null;
 			}
 
-			this._transport.ShutdownCompleted += this.OnTranportShutdownComplete;
-			this._transport.BeginShutdown();
+			_transport.ShutdownCompleted += OnTranportShutdownComplete;
+			_transport.BeginShutdown();
 			return taskCompletionSource.Task;
 		}
 
 		private void OnTranportShutdownComplete(object sender, EventArgs e) {
-			var taskCompletionSource = Interlocked.CompareExchange(ref this._transportShutdownCompletionSource, null, this._transportShutdownCompletionSource);
+			var taskCompletionSource = Interlocked.CompareExchange(ref _transportShutdownCompletionSource, null, _transportShutdownCompletionSource);
 			if (taskCompletionSource != null) {
 				var transport = sender as ClientTransport;
-				transport.ShutdownCompleted -= this.OnTranportShutdownComplete;
+				transport.ShutdownCompleted -= OnTranportShutdownComplete;
 				taskCompletionSource.SetResult(null);
 			}
 		}
@@ -216,7 +204,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		Failed to execute specified remote method.
 		/// </exception>
 		public MessagePackObject Call(string methodName, params object[] arguments) {
-			return this.EndCall(this.BeginCall(methodName, arguments, null, null));
+			return EndCall(BeginCall(methodName, arguments, null, null));
 		}
 
 #if !WINDOWS_PHONE
@@ -251,7 +239,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		You can <see cref="BeginCall"/> and <see cref="EndCall"/> to get appropriate exception directly.
 		/// </remarks>
 		public Task<MessagePackObject> CallAsync(string methodName, object[] arguments, object asyncState) {
-			return Task.Factory.FromAsync<string, object[], MessagePackObject>(this.BeginCall, this.EndCall, methodName, arguments, asyncState, TaskCreationOptions.None);
+			return Task.Factory.FromAsync<string, object[], MessagePackObject>(BeginCall, EndCall, methodName, arguments, asyncState, TaskCreationOptions.None);
 		}
 #endif
 
@@ -285,14 +273,14 @@ namespace MsgPack.Rpc.Core.Client {
 		///		<paramref name="methodName"/> is not valid.
 		/// </exception>
 		public IAsyncResult BeginCall(string methodName, object[] arguments, AsyncCallback asyncCallback, object asyncState) {
-			this.VerifyIsNotDisposed();
-			this.EnsureConnected();
+			VerifyIsNotDisposed();
+			EnsureConnected();
 
 			var messageId = NextId();
 			var asyncResult = new RequestMessageAsyncResult(this, messageId, asyncCallback, asyncState);
 
-			bool isSucceeded = false;
-			var context = this._transport.GetClientRequestContext();
+			var isSucceeded = false;
+			var context = _transport.GetClientRequestContext();
 			try {
 				context.SetRequest(messageId, methodName, asyncResult.OnCompleted);
 				if (arguments == null) {
@@ -305,17 +293,17 @@ namespace MsgPack.Rpc.Core.Client {
 							context.ArgumentsPacker.PackNull();
 						}
 						else {
-							this._serializationContext.GetSerializer(arg.GetType()).PackTo(context.ArgumentsPacker, arg);
+							SerializationContext.GetSerializer(arg.GetType()).PackTo(context.ArgumentsPacker, arg);
 						}
 					}
 				}
 
-				this._transport.Send(context);
+				_transport.Send(context);
 				isSucceeded = true;
 			}
 			finally {
 				if (!isSucceeded) {
-					this._transport.ReturnContext(context);
+					_transport.ReturnContext(context);
 				}
 			}
 
@@ -351,7 +339,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		even if the remote method returns <c>void</c>.
 		/// </remarks>
 		public MessagePackObject EndCall(IAsyncResult asyncResult) {
-			this.VerifyIsNotDisposed();
+			VerifyIsNotDisposed();
 
 			var requestAsyncResult = AsyncResult.Verify<RequestMessageAsyncResult>(asyncResult, this);
 			requestAsyncResult.WaitForCompletion();
@@ -381,7 +369,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		Failed to send notification message.
 		/// </exception>
 		public void Notify(string methodName, params object[] arguments) {
-			this.EndNotify(this.BeginNotify(methodName, arguments, null, null));
+			EndNotify(BeginNotify(methodName, arguments, null, null));
 		}
 
 #if !WINDOWS_PHONE
@@ -414,7 +402,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		You can <see cref="BeginNotify"/> and <see cref="EndNotify"/> to get appropriate exception directly.
 		/// </remarks>
 		public Task NotifyAsync(string methodName, object[] arguments, object asyncState) {
-			return Task.Factory.FromAsync<string, object[]>(this.BeginNotify, this.EndNotify, methodName, arguments, asyncState, TaskCreationOptions.None);
+			return Task.Factory.FromAsync<string, object[]>(BeginNotify, EndNotify, methodName, arguments, asyncState, TaskCreationOptions.None);
 		}
 #endif
 
@@ -448,13 +436,13 @@ namespace MsgPack.Rpc.Core.Client {
 		///		<paramref name="methodName"/> is not valid.
 		/// </exception>
 		public IAsyncResult BeginNotify(string methodName, object[] arguments, AsyncCallback asyncCallback, object asyncState) {
-			this.VerifyIsNotDisposed();
-			this.EnsureConnected();
+			VerifyIsNotDisposed();
+			EnsureConnected();
 
 			var asyncResult = new NotificationMessageAsyncResult(this, asyncCallback, asyncState);
 
-			bool isSucceeded = false;
-			var context = this._transport.GetClientRequestContext();
+			var isSucceeded = false;
+			var context = _transport.GetClientRequestContext();
 			try {
 				context.SetNotification(methodName, asyncResult.OnCompleted);
 				if (arguments == null) {
@@ -467,17 +455,17 @@ namespace MsgPack.Rpc.Core.Client {
 							context.ArgumentsPacker.PackNull();
 						}
 						else {
-							this._serializationContext.GetSerializer(arg.GetType()).PackTo(context.ArgumentsPacker, arg);
+							SerializationContext.GetSerializer(arg.GetType()).PackTo(context.ArgumentsPacker, arg);
 						}
 					}
 				}
 
-				this._transport.Send(context);
+				_transport.Send(context);
 				isSucceeded = true;
 			}
 			finally {
 				if (!isSucceeded) {
-					this._transport.ReturnContext(context);
+					_transport.ReturnContext(context);
 				}
 			}
 
@@ -508,7 +496,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		handles communication error.
 		/// </remarks>
 		public void EndNotify(IAsyncResult asyncResult) {
-			this.VerifyIsNotDisposed();
+			VerifyIsNotDisposed();
 
 			var notificationAsyncResult = AsyncResult.Verify<MessageAsyncResult>(asyncResult, this);
 			notificationAsyncResult.WaitForCompletion();

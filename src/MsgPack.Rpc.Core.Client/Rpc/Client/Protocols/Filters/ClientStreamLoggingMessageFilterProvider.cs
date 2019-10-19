@@ -18,7 +18,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 		/// </exception>
 		public ClientStreamLoggingMessageFilterProvider(IMessagePackStreamLogger logger)
 			: base(logger) {
-			this._filterInstance = new ClientStreamLoggingMessageFilter(this.Logger);
+			_filterInstance = new ClientStreamLoggingMessageFilter(Logger);
 		}
 
 		/// <summary>
@@ -31,7 +31,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 				return null;
 			}
 			else {
-				return this._filterInstance;
+				return _filterInstance;
 			}
 		}
 	}

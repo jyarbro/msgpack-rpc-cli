@@ -7,8 +7,6 @@ namespace MsgPack.Rpc.Core {
 	///		Represents configuratin of the <see cref="ObjectPool{T}"/>.
 	/// </summary>
 	public sealed partial class ObjectPoolConfiguration : FreezableObject {
-		private static readonly ObjectPoolConfiguration _default = new ObjectPoolConfiguration().AsFrozen();
-
 		/// <summary>
 		///		Gets the default frozen instance.
 		/// </summary>
@@ -16,9 +14,7 @@ namespace MsgPack.Rpc.Core {
 		///		The default frozen instance.
 		///		This value will not be <c>null</c>.
 		/// </value>
-		public static ObjectPoolConfiguration Default {
-			get { return _default; }
-		}
+		public static ObjectPoolConfiguration Default { get; } = new ObjectPoolConfiguration().AsFrozen();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ObjectPoolConfiguration"/> class.
@@ -32,7 +28,7 @@ namespace MsgPack.Rpc.Core {
 		///		The shallow copy of this instance.
 		/// </returns>
 		public ObjectPoolConfiguration Clone() {
-			return this.CloneCore() as ObjectPoolConfiguration;
+			return CloneCore() as ObjectPoolConfiguration;
 		}
 
 		/// <summary>
@@ -42,7 +38,7 @@ namespace MsgPack.Rpc.Core {
 		///		This instance.
 		/// </returns>
 		public ObjectPoolConfiguration Freeze() {
-			return this.FreezeCore() as ObjectPoolConfiguration;
+			return FreezeCore() as ObjectPoolConfiguration;
 		}
 
 		/// <summary>
@@ -53,7 +49,7 @@ namespace MsgPack.Rpc.Core {
 		/// Otherwise, frozen copy of this instance.
 		/// </returns>
 		public ObjectPoolConfiguration AsFrozen() {
-			return this.AsFrozenCore() as ObjectPoolConfiguration;
+			return AsFrozenCore() as ObjectPoolConfiguration;
 		}
 	}
 }

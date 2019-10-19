@@ -23,14 +23,14 @@ namespace MsgPack.Rpc.Core {
 	///				<item>
 	///					<term>ErrorCode</term>
 	///					<description>
-	///						<para><strong>Type:</strong><see cref="Int32"/></para>
+	///						<para><strong>Type:</strong><see cref="int"/></para>
 	///						<para><strong>Value:</strong>
 	///						Error code to identify error type.
 	///						</para>
 	///					</description>
 	///					<term>Description</term>
 	///					<description>
-	///						<para><strong>Type:</strong><see cref="String"/></para>
+	///						<para><strong>Type:</strong><see cref="string"/></para>
 	///						<para><strong>Value:</strong>
 	///						Description of message.
 	///						<note>
@@ -42,7 +42,7 @@ namespace MsgPack.Rpc.Core {
 	///					</description>
 	///					<term>DebugInformation</term>
 	///					<description>
-	///						<para><strong>Type:</strong><see cref="String"/></para>
+	///						<para><strong>Type:</strong><see cref="string"/></para>
 	///						<para><strong>Value:</strong>
 	///						Detailed information to debug.
 	///						This value is optional.
@@ -78,8 +78,8 @@ namespace MsgPack.Rpc.Core {
 		public RpcError RpcError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				Contract.Assert(this._rpcError != null);
-				return this._rpcError;
+				Contract.Assert(_rpcError != null);
+				return _rpcError;
 			}
 		}
 
@@ -93,9 +93,7 @@ namespace MsgPack.Rpc.Core {
 		///		The debug information of the error.
 		///		This value will not be <c>null</c> but may be empty for security reason, and its contents are for developers, not end users.
 		/// </value>
-		public string DebugInformation {
-			get { return this._debugInformation ?? String.Empty; }
-		}
+		public string DebugInformation => _debugInformation ?? string.Empty;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcException"/> class with a specified error message.
@@ -152,10 +150,10 @@ namespace MsgPack.Rpc.Core {
 		/// </remarks>
 		public RpcException(RpcError rpcError, string message, string debugInformation, Exception inner)
 			: base(message ?? (rpcError ?? RpcError.RemoteRuntimeError).DefaultMessage, inner) {
-			this._rpcError = rpcError ?? RpcError.RemoteRuntimeError;
-			this._debugInformation = debugInformation;
+			_rpcError = rpcError ?? RpcError.RemoteRuntimeError;
+			_debugInformation = debugInformation;
 #if !SILVERLIGHT && !MONO
-			this.RegisterSerializeObjectStateEventHandler();
+			RegisterSerializeObjectStateEventHandler();
 #endif
 		}
 
@@ -222,7 +220,7 @@ namespace MsgPack.Rpc.Core {
 				return getter(entry);
 			}
 			catch (InvalidCastException ex) {
-				throw new SerializationException(String.Format(CultureInfo.CurrentCulture, "Invalid '{0}' value.", name), ex);
+				throw new SerializationException(string.Format(CultureInfo.CurrentCulture, "Invalid '{0}' value.", name), ex);
 			}
 		}
 
@@ -241,17 +239,17 @@ namespace MsgPack.Rpc.Core {
 		protected virtual void OnSerializeObjectState(object sender, SafeSerializationEventArgs e) {
 			e.AddSerializedState(
 				new SerializedState() {
-					DebugInformation = this._debugInformation,
-					RemoteExceptions = this._remoteExceptions,
-					RpcErrorIdentifier = this._rpcError.Identifier,
-					RpcErrorCode = this._rpcError.ErrorCode,
-					PreservedStackTrace = this._preservedStackTrace
+					DebugInformation = _debugInformation,
+					RemoteExceptions = _remoteExceptions,
+					RpcErrorIdentifier = _rpcError.Identifier,
+					RpcErrorCode = _rpcError.ErrorCode,
+					PreservedStackTrace = _preservedStackTrace
 				}
 			);
 		}
 
 		private void RegisterSerializeObjectStateEventHandler() {
-			this.SerializeObjectState += this.OnSerializeObjectState;
+			SerializeObjectState += OnSerializeObjectState;
 		}
 
 		[Serializable]
@@ -264,10 +262,10 @@ namespace MsgPack.Rpc.Core {
 
 			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as RpcException;
-				enclosing._debugInformation = this.DebugInformation;
-				enclosing._remoteExceptions = this.RemoteExceptions;
-				enclosing._rpcError = MsgPack.Rpc.Core.RpcError.FromIdentifier(this.RpcErrorIdentifier, this.RpcErrorCode);
-				enclosing._preservedStackTrace = this.PreservedStackTrace;
+				enclosing._debugInformation = DebugInformation;
+				enclosing._remoteExceptions = RemoteExceptions;
+				enclosing._rpcError = MsgPack.Rpc.Core.RpcError.FromIdentifier(RpcErrorIdentifier, RpcErrorCode);
+				enclosing._preservedStackTrace = PreservedStackTrace;
 				enclosing.RegisterSerializeObjectStateEventHandler();
 			}
 		}

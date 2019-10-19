@@ -3,7 +3,7 @@
 namespace MsgPack.Rpc.Core.Client.Protocols {
 	partial class MsgPackRpcClientProtocolsTrace {
 		internal static void TraceRpcError(RpcError rpcError, string format, params object[] args) {
-			_source.TraceEvent(GetTypeForRpcError(rpcError), GetIdForRpcError(rpcError), format, args);
+			Source.TraceEvent(GetTypeForRpcError(rpcError), GetIdForRpcError(rpcError), format, args);
 		}
 
 		private static TraceEventType GetTypeForRpcError(RpcError rpcError) {

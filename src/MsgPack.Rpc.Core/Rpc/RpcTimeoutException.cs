@@ -17,16 +17,11 @@ namespace MsgPack.Rpc.Core {
 		private const string _clientTimeoutKey = "ClientTimeout";
 		internal static readonly MessagePackObject ClientTimeoutKeyUtf8 = MessagePackConvert.EncodeString(_clientTimeoutKey);
 
-		// NOT readonly for safe deserialization
-		private TimeSpan? _clientTimeout;
-
 		/// <summary>
 		///		Gets the timeout value which was expired in client.
 		/// </summary>
 		/// <value>The timeout value in client. This value may be <c>null</c> when the server turnes</value>
-		public TimeSpan? ClientTimeout {
-			get { return this._clientTimeout; }
-		}
+		public TimeSpan? ClientTimeout { get; private set; }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcTimeoutException"/> class with the default error message.
@@ -86,7 +81,7 @@ namespace MsgPack.Rpc.Core {
 		/// </remarks>
 		public RpcTimeoutException(TimeSpan timeout, string message, string debugInformation, Exception inner)
 			: base(RpcError.TimeoutError, message, debugInformation, inner) {
-			this._clientTimeout = timeout;
+			ClientTimeout = timeout;
 		}
 
 		/// <summary>
@@ -100,8 +95,8 @@ namespace MsgPack.Rpc.Core {
 		/// </exception>
 		internal RpcTimeoutException(MessagePackObject unpackedException)
 			: base(RpcError.TimeoutError, unpackedException) {
-			this._clientTimeout = unpackedException.GetTimeSpan(ClientTimeoutKeyUtf8);
-			Contract.Assume(this._clientTimeout != null, "Unpacked data does not have ClientTimeout.");
+			ClientTimeout = unpackedException.GetTimeSpan(ClientTimeoutKeyUtf8);
+			Contract.Assume(ClientTimeout != null, "Unpacked data does not have ClientTimeout.");
 		}
 
 #if MONO
@@ -169,7 +164,7 @@ namespace MsgPack.Rpc.Core {
 		///	</param>
 		protected sealed override void GetExceptionMessage(IDictionary<MessagePackObject, MessagePackObject> store, bool includesDebugInformation) {
 			base.GetExceptionMessage(store, includesDebugInformation);
-			store.Add(ClientTimeoutKeyUtf8, this._clientTimeout == null ? MessagePackObject.Nil : this._clientTimeout.Value.Ticks);
+			store.Add(ClientTimeoutKeyUtf8, ClientTimeout == null ? MessagePackObject.Nil : ClientTimeout.Value.Ticks);
 		}
 
 #if !SILVERLIGHT && !MONO
@@ -186,7 +181,7 @@ namespace MsgPack.Rpc.Core {
 			base.OnSerializeObjectState(sender, e);
 			e.AddSerializedState(
 				new SerializedState() {
-					ClientTimeout = this._clientTimeout
+					ClientTimeout = ClientTimeout
 				}
 			);
 		}
@@ -197,7 +192,7 @@ namespace MsgPack.Rpc.Core {
 
 			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as RpcTimeoutException;
-				enclosing._clientTimeout = this.ClientTimeout;
+				enclosing.ClientTimeout = ClientTimeout;
 			}
 		}
 #endif

@@ -40,8 +40,8 @@ namespace MsgPack.Rpc.Core {
 
 			Contract.EndContractBlock();
 
-			this._factory = factory;
-			this._configuration = configuration;
+			_factory = factory;
+			_configuration = configuration;
 		}
 
 		/// <summary>
@@ -52,7 +52,7 @@ namespace MsgPack.Rpc.Core {
 		///		This value cannot be <c>null</c>.
 		/// </returns>
 		protected sealed override T BorrowCore() {
-			var result = this._factory(this._configuration);
+			var result = _factory(_configuration);
 			Contract.Assume(result != null);
 			return result;
 		}

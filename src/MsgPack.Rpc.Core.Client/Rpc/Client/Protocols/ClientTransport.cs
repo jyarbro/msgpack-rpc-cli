@@ -37,13 +37,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		This value might be <c>null</c> when any sockets have not been bound, or underlying protocol does not rely socket.
 		/// </value>
 		public Socket BoundSocket {
-			get { return Interlocked.CompareExchange(ref this._boundSocket, null, null); }
-			internal set { Interlocked.Exchange(ref this._boundSocket, value); }
+			get { return Interlocked.CompareExchange(ref _boundSocket, null, null); }
+			internal set { Interlocked.Exchange(ref _boundSocket, value); }
 		}
 
-		Socket IContextBoundableTransport.BoundSocket {
-			get { return this._boundSocket; }
-		}
+		Socket IContextBoundableTransport.BoundSocket => _boundSocket;
 
 		private int _isDisposed;
 
@@ -53,9 +51,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <value>
 		/// 	<c>true</c> if this instance is disposed; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsDisposed {
-			get { return Interlocked.CompareExchange(ref this._isDisposed, 0, 0) != 0; }
-		}
+		public bool IsDisposed => Interlocked.CompareExchange(ref _isDisposed, 0, 0) != 0;
 
 		private readonly ConcurrentDictionary<int, Action<ClientResponseContext, Exception, bool>> _pendingRequestTable;
 		private readonly ConcurrentDictionary<long, Action<Exception, bool>> _pendingNotificationTable;
@@ -73,7 +69,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			get {
 				Contract.Ensures(Contract.Result<ClientTransportManager>() != null);
 
-				return this._manager;
+				return _manager;
 			}
 		}
 
@@ -95,9 +91,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <value>
 		/// 	<c>true</c> if this instance is in shutdown; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsClientShutdown {
-			get { return Interlocked.CompareExchange(ref this._shutdownSource, 0, 0) == (int)ShutdownSource.Client; }
-		}
+		public bool IsClientShutdown => Interlocked.CompareExchange(ref _shutdownSource, 0, 0) == (int)ShutdownSource.Client;
 
 		/// <summary>
 		///		Gets a value indicating whether this instance detectes server shutdown.
@@ -105,13 +99,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <value>
 		/// 	<c>true</c> if this instance detects server shutdown; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsServerShutdown {
-			get { return Interlocked.CompareExchange(ref this._shutdownSource, 0, 0) == (int)ShutdownSource.Server; }
-		}
+		public bool IsServerShutdown => Interlocked.CompareExchange(ref _shutdownSource, 0, 0) == (int)ShutdownSource.Server;
 
-		private bool IsInAnyShutdown {
-			get { return Interlocked.CompareExchange(ref this._shutdownSource, 0, 0) != 0; }
-		}
+		private bool IsInAnyShutdown => Interlocked.CompareExchange(ref _shutdownSource, 0, 0) != 0;
 
 		/// <summary>
 		///		Gets a value indicating whether the underlying transport used by this instance can accept chunked buffer.
@@ -120,21 +110,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// 	<c>true</c> if the underlying transport can use chunked buffer; otherwise, <c>false</c>.
 		/// 	This implementation returns <c>true</c>.
 		/// </value>
-		protected virtual bool CanUseChunkedBuffer {
-			get { return true; }
-		}
+		protected virtual bool CanUseChunkedBuffer => true;
 
-		private readonly IList<MessageFilter<ClientRequestContext>> _afterSerializationFilters;
+		internal IList<MessageFilter<ClientRequestContext>> AfterSerializationFilters { get; }
 
-		internal IList<MessageFilter<ClientRequestContext>> AfterSerializationFilters {
-			get { return this._afterSerializationFilters; }
-		}
-
-		private readonly IList<MessageFilter<ClientResponseContext>> _beforeDeserializationFilters;
-
-		internal IList<MessageFilter<ClientResponseContext>> BeforeDeserializationFilters {
-			get { return this._beforeDeserializationFilters; }
-		}
+		internal IList<MessageFilter<ClientResponseContext>> BeforeDeserializationFilters { get; }
 
 		private EventHandler<ShutdownCompletedEventArgs> _shutdownCompleted;
 
@@ -144,20 +124,20 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		internal event EventHandler<ShutdownCompletedEventArgs> ShutdownCompleted {
 			add {
 				EventHandler<ShutdownCompletedEventArgs> oldHandler;
-				EventHandler<ShutdownCompletedEventArgs> currentHandler = this._shutdownCompleted;
+				var currentHandler = _shutdownCompleted;
 				do {
 					oldHandler = currentHandler;
 					var newHandler = Delegate.Combine(oldHandler, value) as EventHandler<ShutdownCompletedEventArgs>;
-					currentHandler = Interlocked.CompareExchange(ref this._shutdownCompleted, newHandler, oldHandler);
+					currentHandler = Interlocked.CompareExchange(ref _shutdownCompleted, newHandler, oldHandler);
 				} while (oldHandler != currentHandler);
 			}
 			remove {
 				EventHandler<ShutdownCompletedEventArgs> oldHandler;
-				EventHandler<ShutdownCompletedEventArgs> currentHandler = this._shutdownCompleted;
+				var currentHandler = _shutdownCompleted;
 				do {
 					oldHandler = currentHandler;
 					var newHandler = Delegate.Remove(oldHandler, value) as EventHandler<ShutdownCompletedEventArgs>;
-					currentHandler = Interlocked.CompareExchange(ref this._shutdownCompleted, newHandler, oldHandler);
+					currentHandler = Interlocked.CompareExchange(ref _shutdownCompleted, newHandler, oldHandler);
 				} while (oldHandler != currentHandler);
 			}
 		}
@@ -176,7 +156,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			Contract.EndContractBlock();
 
-			var socket = Interlocked.Exchange(ref this._boundSocket, null);
+			var socket = Interlocked.Exchange(ref _boundSocket, null);
 			MsgPackRpcClientProtocolsTrace.TraceEvent(
 				MsgPackRpcClientProtocolsTrace.TransportShutdownCompleted,
 				"Transport shutdown is completed. {{ \"Socket\" : 0x{0:X}, \"RemoteEndPoint\" : \"{1}\", \"LocalEndPoint\" : \"{2}\" }}",
@@ -191,19 +171,19 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			// Notify shutdown to waiting clients.
 			// Note that it is OK from concurrency point of view because additional modifications are guarded via shutdown flag.
-			var errorMessage = new RpcErrorMessage(RpcError.TransportError, String.Format(CultureInfo.CurrentCulture, "Transport is shutdown. Shutdown source is: {0}", e.Source), null);
-			foreach (var entry in this._pendingRequestTable) {
+			var errorMessage = new RpcErrorMessage(RpcError.TransportError, string.Format(CultureInfo.CurrentCulture, "Transport is shutdown. Shutdown source is: {0}", e.Source), null);
+			foreach (var entry in _pendingRequestTable) {
 				entry.Value(null, errorMessage.ToException(), false);
 			}
 
-			foreach (var entry in this._pendingNotificationTable) {
+			foreach (var entry in _pendingNotificationTable) {
 				entry.Value(errorMessage.ToException(), false);
 			}
 
-			this._pendingRequestTable.Clear();
-			this._pendingNotificationTable.Clear();
+			_pendingRequestTable.Clear();
+			_pendingNotificationTable.Clear();
 
-			var handler = Interlocked.CompareExchange(ref this._shutdownCompleted, null, null);
+			var handler = Interlocked.CompareExchange(ref _shutdownCompleted, null, null);
 			if (handler != null) {
 				handler(this, e);
 			}
@@ -223,11 +203,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			Contract.EndContractBlock();
 
-			this._manager = manager;
-			this._pendingRequestTable = new ConcurrentDictionary<int, Action<ClientResponseContext, Exception, bool>>();
-			this._pendingNotificationTable = new ConcurrentDictionary<long, Action<Exception, bool>>();
+			_manager = manager;
+			_pendingRequestTable = new ConcurrentDictionary<int, Action<ClientResponseContext, Exception, bool>>();
+			_pendingNotificationTable = new ConcurrentDictionary<long, Action<Exception, bool>>();
 
-			this._afterSerializationFilters =
+			AfterSerializationFilters =
 				new ReadOnlyCollection<MessageFilter<ClientRequestContext>>(
 					manager.Configuration.FilterProviders
 					.OfType<MessageFilterProvider<ClientRequestContext>>()
@@ -235,7 +215,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					.Where(filter => filter != null)
 					.ToArray()
 				);
-			this._beforeDeserializationFilters =
+			BeforeDeserializationFilters =
 				new ReadOnlyCollection<MessageFilter<ClientResponseContext>>(
 					manager.Configuration.FilterProviders
 					.OfType<MessageFilterProvider<ClientResponseContext>>()
@@ -250,7 +230,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose() {
-			this.Dispose(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
@@ -260,9 +240,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
 		protected virtual void Dispose(bool disposing) {
 			if (disposing) {
-				if (Interlocked.Exchange(ref this._isDisposed, 1) == 0) {
+				if (Interlocked.Exchange(ref _isDisposed, 1) == 0) {
 					try {
-						var socket = this.BoundSocket;
+						var socket = BoundSocket;
 
 						MsgPackRpcClientProtocolsTrace.TraceEvent(
 							MsgPackRpcClientProtocolsTrace.DisposeTransport,
@@ -272,8 +252,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 							GetLocalEndPoint(socket)
 						);
 
-						if (Interlocked.CompareExchange(ref this._shutdownSource, (int)ShutdownSource.Disposing, 0) == 0) {
-							var closingSocket = Interlocked.Exchange(ref this._boundSocket, null);
+						if (Interlocked.CompareExchange(ref _shutdownSource, (int)ShutdownSource.Disposing, 0) == 0) {
+							var closingSocket = Interlocked.Exchange(ref _boundSocket, null);
 							if (closingSocket != null) {
 								closingSocket.Close();
 							}
@@ -290,8 +270,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		}
 
 		private void VerifyIsNotDisposed() {
-			if (this.IsDisposed) {
-				throw new ObjectDisposedException(this.ToString());
+			if (IsDisposed) {
+				throw new ObjectDisposedException(ToString());
 			}
 		}
 
@@ -303,11 +283,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		If shutdown is already initiated or completed, then <c>false</c>.
 		/// </returns>
 		public bool BeginShutdown() {
-			if (Interlocked.CompareExchange(ref this._shutdownSource, (int)ShutdownSource.Client, 0) == 0) {
-				this.ShutdownSending();
+			if (Interlocked.CompareExchange(ref _shutdownSource, (int)ShutdownSource.Client, 0) == 0) {
+				ShutdownSending();
 
-				if (this._pendingNotificationTable.Count == 0 && this._pendingRequestTable.Count == 0) {
-					this.ShutdownReceiving();
+				if (_pendingNotificationTable.Count == 0 && _pendingRequestTable.Count == 0) {
+					ShutdownReceiving();
 				}
 
 				return true;
@@ -321,7 +301,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		When overridden in the derived class, shutdowns the sending.
 		/// </summary>
 		protected virtual void ShutdownSending() {
-			var socket = this.BoundSocket;
+			var socket = BoundSocket;
 			MsgPackRpcClientProtocolsTrace.TraceEvent(
 				MsgPackRpcClientProtocolsTrace.ShutdownSending,
 				"Shutdown sending. {{ \"Socket\" : 0x{0:X}, \"RemoteEndPoint\" : \"{1}\", \"LocalEndPoint\" : \"{2}\" }}",
@@ -335,7 +315,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		When overridden in the derived class, shutdowns the receiving.
 		/// </summary>
 		protected virtual void ShutdownReceiving() {
-			var socket = this.BoundSocket;
+			var socket = BoundSocket;
 			MsgPackRpcClientProtocolsTrace.TraceEvent(
 				MsgPackRpcClientProtocolsTrace.ShutdownReceiving,
 				"Shutdown receiving. {{ \"Socket\" : 0x{0:X}, \"RemoteEndPoint\" : \"{1}\", \"LocalEndPoint\" : \"{2}\" }}",
@@ -344,14 +324,14 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				GetLocalEndPoint(socket)
 			);
 
-			this.OnShutdownCompleted(new ShutdownCompletedEventArgs((ShutdownSource)this._shutdownSource));
+			OnShutdownCompleted(new ShutdownCompletedEventArgs((ShutdownSource)_shutdownSource));
 		}
 
 		/// <summary>
 		///		Resets the connection.
 		/// </summary>
 		protected virtual void ResetConnection() {
-			var socket = this.BoundSocket;
+			var socket = BoundSocket;
 			if (socket != null) {
 				// Reset immediately.
 				socket.Close(0);
@@ -359,9 +339,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		}
 
 		private void OnProcessFinished() {
-			if (this.IsInAnyShutdown) {
-				if (this._pendingNotificationTable.Count == 0 && this._pendingRequestTable.Count == 0) {
-					this.ShutdownReceiving();
+			if (IsInAnyShutdown) {
+				if (_pendingNotificationTable.Count == 0 && _pendingRequestTable.Count == 0) {
+					ShutdownReceiving();
 				}
 			}
 		}
@@ -370,7 +350,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			var socket = sender as Socket;
 			var context = e.GetContext();
 
-			if (!this.HandleSocketError(socket, context)) {
+			if (!HandleSocketError(socket, context)) {
 				return;
 			}
 
@@ -383,7 +363,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				{
 					var requestContext = context as ClientRequestContext;
 					Contract.Assert(requestContext != null);
-					this.OnSent(requestContext);
+					OnSent(requestContext);
 					break;
 				}
 				case SocketAsyncOperation.Receive:
@@ -394,7 +374,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				{
 					var responseContext = context as ClientResponseContext;
 					Contract.Assert(responseContext != null);
-					this.OnReceived(responseContext);
+					OnReceived(responseContext);
 					break;
 				}
 				default: {
@@ -412,16 +392,16 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		}
 
 		void IContextBoundableTransport.OnSocketOperationCompleted(object sender, SocketAsyncEventArgs e) {
-			this.OnSocketOperationCompleted(sender, e);
+			OnSocketOperationCompleted(sender, e);
 		}
 
 
 		private void OnSendTimeout(object sender, EventArgs e) {
-			this.OnWaitTimeout(sender as ClientRequestContext);
+			OnWaitTimeout(sender as ClientRequestContext);
 		}
 
 		private void OnReceiveTimeout(object sender, EventArgs e) {
-			this.OnWaitTimeout(sender as ClientResponseContext);
+			OnWaitTimeout(sender as ClientResponseContext);
 		}
 
 		private void OnWaitTimeout(MessageContext context) {
@@ -429,7 +409,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			var asClientRequestContext = context as ClientRequestContext;
 
-			var socket = this.BoundSocket;
+			var socket = BoundSocket;
 			MsgPackRpcClientProtocolsTrace.TraceEvent(
 				MsgPackRpcClientProtocolsTrace.WaitTimeout,
 					"Wait timeout. {{  \"Socket\" : 0x{0:X}, \"RemoteEndPoint\" : \"{1}\", \"LocalEndPoint\" : \"{2}\", \"Operation\" : \"{3}\", \"MessageType\" : \"{4}\"  \"MessageId\" : {5}, \"BytesTransferred\" : {6}, \"Timeout\" : \"{7}\" }}",
@@ -440,7 +420,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					asClientRequestContext == null ? MessageType.Response : asClientRequestContext.MessageType,
 					context.MessageId,
 					context.BytesTransferred,
-					this._manager.Configuration.WaitTimeout
+					_manager.Configuration.WaitTimeout
 			);
 
 			var rpcError =
@@ -450,15 +430,15 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 						new MessagePackObjectDictionary(3)
 						{
 							{ RpcException.MessageKeyUtf8, asClientRequestContext != null ? "Wait timeout on sending." : "Wait timeout on receiving." },
-							{ RpcException.DebugInformationKeyUtf8, String.Empty },
-							{ RpcTimeoutException.ClientTimeoutKeyUtf8, this.Manager.Configuration.WaitTimeout.Value.Ticks }
+							{ RpcException.DebugInformationKeyUtf8, string.Empty },
+							{ RpcTimeoutException.ClientTimeoutKeyUtf8, Manager.Configuration.WaitTimeout.Value.Ticks }
 						},
 						true
 					)
 				);
 
-			this.RaiseError(context.MessageId, context.SessionId, GetRemoteEndPoint(socket, context), rpcError, false);
-			this.ResetConnection();
+			RaiseError(context.MessageId, context.SessionId, GetRemoteEndPoint(socket, context), rpcError, false);
+			ResetConnection();
 		}
 
 		internal bool HandleSocketError(Socket socket, MessageContext context) {
@@ -466,16 +446,16 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				return false;
 			}
 
-			var rpcError = this.Manager.HandleSocketError(socket, context.SocketContext);
+			var rpcError = Manager.HandleSocketError(socket, context.SocketContext);
 			if (rpcError != null) {
-				this.RaiseError(context.MessageId, context.SessionId, GetRemoteEndPoint(socket, context), rpcError.Value, context.CompletedSynchronously);
+				RaiseError(context.MessageId, context.SessionId, GetRemoteEndPoint(socket, context), rpcError.Value, context.CompletedSynchronously);
 			}
 
 			return rpcError == null;
 		}
 
 		private void HandleDeserializationError(ClientResponseContext context, string message, Func<byte[]> invalidRequestHeaderProvider) {
-			this.HandleDeserializationError(context, context.MessageId, new RpcErrorMessage(RpcError.RemoteRuntimeError, "Invalid stream.", message), message, invalidRequestHeaderProvider);
+			HandleDeserializationError(context, context.MessageId, new RpcErrorMessage(RpcError.RemoteRuntimeError, "Invalid stream.", message), message, invalidRequestHeaderProvider);
 		}
 
 		private void HandleDeserializationError(ClientResponseContext context, int? messageId, RpcErrorMessage rpcError, string message, Func<byte[]> invalidRequestHeaderProvider) {
@@ -492,20 +472,20 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				MsgPackRpcClientProtocolsTrace.TraceData(MsgPackRpcClientProtocolsTrace.DumpInvalidResponseHeader, BitConverter.ToString(array), array);
 			}
 
-			this.RaiseError(messageId, context.SessionId, GetRemoteEndPoint(this.BoundSocket, context), rpcError, context.CompletedSynchronously);
+			RaiseError(messageId, context.SessionId, GetRemoteEndPoint(BoundSocket, context), rpcError, context.CompletedSynchronously);
 
-			context.NextProcess = this.DumpCorrupttedData;
+			context.NextProcess = DumpCorrupttedData;
 		}
 
 		private void RaiseError(int? messageId, long sessionId, EndPoint remoteEndPoint, RpcErrorMessage rpcError, bool completedSynchronously) {
 			if (messageId != null) {
 				Action<ClientResponseContext, Exception, bool> handler = null;
 				try {
-					this._pendingRequestTable.TryRemove(messageId.Value, out handler);
+					_pendingRequestTable.TryRemove(messageId.Value, out handler);
 				}
 				finally {
 					if (handler == null) {
-						this.HandleOrphan(messageId, sessionId, remoteEndPoint, rpcError, null);
+						HandleOrphan(messageId, sessionId, remoteEndPoint, rpcError, null);
 					}
 					else {
 						handler(null, rpcError.ToException(), completedSynchronously);
@@ -515,11 +495,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			else {
 				Action<Exception, bool> handler = null;
 				try {
-					this._pendingNotificationTable.TryRemove(sessionId, out handler);
+					_pendingNotificationTable.TryRemove(sessionId, out handler);
 				}
 				finally {
 					if (handler == null) {
-						this.HandleOrphan(messageId, sessionId, remoteEndPoint, rpcError, null);
+						HandleOrphan(messageId, sessionId, remoteEndPoint, rpcError, null);
 					}
 					else {
 						handler(rpcError.ToException(), completedSynchronously);
@@ -536,11 +516,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				returnValue = Unpacking.UnpackObject(context.ResultBuffer);
 			}
 
-			this.HandleOrphan(context.MessageId, context.SessionId, GetRemoteEndPoint(this.BoundSocket, context), error, returnValue);
+			HandleOrphan(context.MessageId, context.SessionId, GetRemoteEndPoint(BoundSocket, context), error, returnValue);
 		}
 
 		private void HandleOrphan(int? messageId, long sessionId, EndPoint remoteEndPoint, RpcErrorMessage rpcError, MessagePackObject? returnValue) {
-			var socket = this.BoundSocket;
+			var socket = BoundSocket;
 			MsgPackRpcClientProtocolsTrace.TraceEvent(
 				MsgPackRpcClientProtocolsTrace.OrphanError,
 				"There are no handlers to handle message which has MessageID:{0}, SessionID:{1}. This may indicate runtime problem or due to client recycling. {{ \"Socket\" : 0x{2:X}, \"RemoteEndPoint\" : \"{3}\", \"LocalEndPoint\" : \"{4}\", \"SessionID\" :{1}, \"MessageID\" : {0}, \"Error\" : {5}, \"ReturnValue\" : {6}, \"CallStack\" : \"{7}\" }}",
@@ -558,13 +538,13 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 #endif
  );
 
-			this._manager.HandleOrphan(messageId, rpcError, returnValue);
+			_manager.HandleOrphan(messageId, rpcError, returnValue);
 		}
 
 #if !SILVERLIGHT
 		private Stream OpenDumpStream(DateTimeOffset sessionStartedAt, EndPoint destination, long sessionId, MessageType type, int? messageId) {
 			var directoryPath =
-				String.IsNullOrWhiteSpace(this.Manager.Configuration.CorruptResponseDumpOutputDirectory)
+				string.IsNullOrWhiteSpace(Manager.Configuration.CorruptResponseDumpOutputDirectory)
 				? Path.Combine(
 					Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
 					"MsgPack",
@@ -572,12 +552,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					"Client",
 					"Dump"
 				)
-				: Environment.ExpandEnvironmentVariables(this.Manager.Configuration.CorruptResponseDumpOutputDirectory);
+				: Environment.ExpandEnvironmentVariables(Manager.Configuration.CorruptResponseDumpOutputDirectory);
 
 			var filePath =
 				Path.Combine(
 					directoryPath,
-					String.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd_HH-mm-ss}-{1}-{2}-{3}{4}.dat", sessionStartedAt, destination == null ? String.Empty : FileSystem.EscapeInvalidPathChars(destination.ToString(), "_"), sessionId, type, messageId == null ? String.Empty : "-" + messageId)
+					string.Format(CultureInfo.InvariantCulture, "{0:yyyy-MM-dd_HH-mm-ss}-{1}-{2}-{3}{4}.dat", sessionStartedAt, destination == null ? string.Empty : FileSystem.EscapeInvalidPathChars(destination.ToString(), "_"), sessionId, type, messageId == null ? string.Empty : "-" + messageId)
 				);
 
 			if (!Directory.Exists(directoryPath)) {
@@ -625,7 +605,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </exception>
 		[SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "Keep symmetric for ReturnContext.")]
 		public virtual ClientRequestContext GetClientRequestContext() {
-			var context = this.Manager.GetRequestContext(this);
+			var context = Manager.GetRequestContext(this);
 			return context;
 		}
 
@@ -658,33 +638,33 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				throw new ArgumentException("Context is not bound to this object.", "context");
 			}
 
-			this.VerifyIsNotDisposed();
+			VerifyIsNotDisposed();
 
-			if (this.IsClientShutdown) {
+			if (IsClientShutdown) {
 				throw new InvalidOperationException("This transport is in shutdown.");
 			}
 
 			Contract.EndContractBlock();
 
-			if (this.IsServerShutdown) {
+			if (IsServerShutdown) {
 				throw new RpcErrorMessage(RpcError.TransportError, "Server did shutdown socket.", null).ToException();
 			}
 
-			context.Prepare(this.CanUseChunkedBuffer);
+			context.Prepare(CanUseChunkedBuffer);
 
 			if (context.MessageType == MessageType.Request) {
-				if (!this._pendingRequestTable.TryAdd(context.MessageId.Value, context.RequestCompletionCallback)) {
-					throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "Message ID '{0}' is already used.", context.MessageId));
+				if (!_pendingRequestTable.TryAdd(context.MessageId.Value, context.RequestCompletionCallback)) {
+					throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Message ID '{0}' is already used.", context.MessageId));
 				}
 			}
 			else {
-				if (!this._pendingNotificationTable.TryAdd(context.SessionId, context.NotificationCompletionCallback)) {
-					throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "Session ID '{0}' is already used.", context.MessageId));
+				if (!_pendingNotificationTable.TryAdd(context.SessionId, context.NotificationCompletionCallback)) {
+					throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Session ID '{0}' is already used.", context.MessageId));
 				}
 			}
 
 			if (MsgPackRpcClientProtocolsTrace.ShouldTrace(MsgPackRpcClientProtocolsTrace.SendOutboundData)) {
-				var socket = this.BoundSocket;
+				var socket = BoundSocket;
 				MsgPackRpcClientProtocolsTrace.TraceEvent(
 					MsgPackRpcClientProtocolsTrace.SendOutboundData,
 					"Send request/notification. {{ \"SessionID\" : {0}, \"Socket\" : 0x{1:X}, \"RemoteEndPoint\" : \"{2}\", \"LocalEndPoint\" : \"{3}\", \"Type\" : \"{4}\", \"MessageID\" : {5}, \"Method\" : \"{6}\", \"BytesTransferring\" : {7} }}",
@@ -701,14 +681,14 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			// Because exceptions here means client error, it should be handled like other client error.
 			// Therefore, no catch clauses here.
-			ApplyFilters(this._afterSerializationFilters, context);
+			ApplyFilters(AfterSerializationFilters, context);
 
-			if (this.Manager.Configuration.WaitTimeout != null) {
-				context.Timeout += this.OnSendTimeout;
-				context.StartWatchTimeout(this.Manager.Configuration.WaitTimeout.Value);
+			if (Manager.Configuration.WaitTimeout != null) {
+				context.Timeout += OnSendTimeout;
+				context.StartWatchTimeout(Manager.Configuration.WaitTimeout.Value);
 			}
 
-			this.SendCore(context);
+			SendCore(context);
 		}
 
 		/// <summary>
@@ -733,7 +713,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///	</exception>
 		protected virtual void OnSent(ClientRequestContext context) {
 			if (MsgPackRpcClientProtocolsTrace.ShouldTrace(MsgPackRpcClientProtocolsTrace.SentOutboundData)) {
-				var socket = this.BoundSocket;
+				var socket = BoundSocket;
 				MsgPackRpcClientProtocolsTrace.TraceEvent(
 					MsgPackRpcClientProtocolsTrace.SentOutboundData,
 						"Sent request/notification. {{ \"SessionID\" : {0}, \"Socket\" : 0x{1:X}, \"RemoteEndPoint\" : \"{2}\", \"LocalEndPoint\" : \"{3}\", \"Type\" : \"{4}\", \"MessageID\" : {5}, \"Method\" : \"{6}\", \"BytesTransferred\" : {7} }}",
@@ -749,7 +729,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 
 			context.StopWatchTimeout();
-			context.Timeout -= this.OnSendTimeout;
+			context.Timeout -= OnSendTimeout;
 
 			context.ClearBuffers();
 
@@ -757,7 +737,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				try {
 					Action<Exception, bool> handler = null;
 					try {
-						this._pendingNotificationTable.TryRemove(context.SessionId, out handler);
+						_pendingNotificationTable.TryRemove(context.SessionId, out handler);
 					}
 					finally {
 						var rpcError = context.SocketError.ToClientRpcError();
@@ -767,29 +747,29 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					}
 				}
 				finally {
-					this.Manager.ReturnRequestContext(context);
-					this.OnProcessFinished();
-					this.Manager.ReturnTransport(this);
+					Manager.ReturnRequestContext(context);
+					OnProcessFinished();
+					Manager.ReturnTransport(this);
 				}
 			}
 			else {
-				if (this.Manager.Configuration.WaitTimeout != null
-					&& (this.Manager.Configuration.WaitTimeout.Value - context.ElapsedTime).TotalMilliseconds < 1.0) {
-					this.OnWaitTimeout(context);
-					this.Manager.ReturnRequestContext(context);
-					this.Manager.ReturnTransport(this);
+				if (Manager.Configuration.WaitTimeout != null
+					&& (Manager.Configuration.WaitTimeout.Value - context.ElapsedTime).TotalMilliseconds < 1.0) {
+					OnWaitTimeout(context);
+					Manager.ReturnRequestContext(context);
+					Manager.ReturnTransport(this);
 					return;
 				}
 
-				var responseContext = this.Manager.GetResponseContext(this, context.RemoteEndPoint);
+				var responseContext = Manager.GetResponseContext(this, context.RemoteEndPoint);
 
-				if (this.Manager.Configuration.WaitTimeout != null) {
-					responseContext.Timeout += this.OnReceiveTimeout;
-					responseContext.StartWatchTimeout(this.Manager.Configuration.WaitTimeout.Value - context.ElapsedTime);
+				if (Manager.Configuration.WaitTimeout != null) {
+					responseContext.Timeout += OnReceiveTimeout;
+					responseContext.StartWatchTimeout(Manager.Configuration.WaitTimeout.Value - context.ElapsedTime);
 				}
 
-				this.Manager.ReturnRequestContext(context);
-				this.Receive(responseContext);
+				Manager.ReturnRequestContext(context);
+				Receive(responseContext);
 			}
 		}
 
@@ -810,7 +790,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			// First, drain last received request.
 			if (context.ReceivedData.Any(segment => 0 < segment.Count)) {
-				this.DrainRemainingReceivedData(context);
+				DrainRemainingReceivedData(context);
 			}
 			else {
 				// There might be dirty data due to client shutdown.
@@ -819,7 +799,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 				context.PrepareReceivingBuffer();
 
-				var socket = this.BoundSocket;
+				var socket = BoundSocket;
 				MsgPackRpcClientProtocolsTrace.TraceEvent(
 					MsgPackRpcClientProtocolsTrace.BeginReceive,
 					"Receive inbound data. {{  \"Socket\" : 0x{0:X}, \"RemoteEndPoint\" : \"{1}\", \"LocalEndPoint\" : \"{2}\" }}",
@@ -827,7 +807,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					GetRemoteEndPoint(socket, context),
 					GetLocalEndPoint(socket)
 				);
-				this.ReceiveCore(context);
+				ReceiveCore(context);
 			}
 		}
 
@@ -835,7 +815,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			// Process remaining binaries. This pipeline recursively call this method on other thread.
 			if (!context.NextProcess(context)) {
 				// Draining was not ended. Try to take next bytes.
-				this.Receive(context);
+				Receive(context);
 			}
 
 			// This method must be called on other thread on the above pipeline, so exit this thread.
@@ -865,7 +845,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			Contract.EndContractBlock();
 
 			if (MsgPackRpcClientProtocolsTrace.ShouldTrace(MsgPackRpcClientProtocolsTrace.ReceiveInboundData)) {
-				var socket = this.BoundSocket;
+				var socket = BoundSocket;
 				MsgPackRpcClientProtocolsTrace.TraceEvent(
 					MsgPackRpcClientProtocolsTrace.ReceiveInboundData,
 					"Receive response. {{ \"SessionID\" : {0}, \"Socket\" : 0x{1:X}, \"RemoteEndPoint\" : \"{2}\", \"LocalEndPoint\" : \"{3}\", \"BytesTransfered\" : {4} }}",
@@ -878,12 +858,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 
 			if (context.BytesTransferred == 0) {
-				if (Interlocked.CompareExchange(ref this._shutdownSource, (int)ShutdownSource.Server, 0) == 0) {
+				if (Interlocked.CompareExchange(ref _shutdownSource, (int)ShutdownSource.Server, 0) == 0) {
 					// Server sent shutdown response.
-					this.ShutdownReceiving();
+					ShutdownReceiving();
 
 					// recv() returns 0 when the server socket shutdown gracefully.
-					var socket = this.BoundSocket;
+					var socket = BoundSocket;
 					MsgPackRpcClientProtocolsTrace.TraceEvent(
 						MsgPackRpcClientProtocolsTrace.DetectServerShutdown,
 						"Server shutdown current socket. {{ \"Socket\" : 0x{0:X}, \"RemoteEndPoint\" : \"{1}\", \"LocalEndPoint\" : \"{2}\" }}",
@@ -892,14 +872,14 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 						GetLocalEndPoint(socket)
 					);
 				}
-				else if (this.IsClientShutdown) {
+				else if (IsClientShutdown) {
 					// Client was started shutdown.
-					this.ShutdownReceiving();
+					ShutdownReceiving();
 				}
 
 				if (!context.ReceivedData.Any(segment => 0 < segment.Count)) {
 					// There are no data to handle.
-					this.FinishReceiving(context);
+					FinishReceiving(context);
 					return;
 				}
 			}
@@ -920,21 +900,21 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			// Exceptions here means message error.
 			try {
-				ApplyFilters(this._beforeDeserializationFilters, context);
+				ApplyFilters(BeforeDeserializationFilters, context);
 			}
 			catch (RpcException ex) {
-				this.HandleDeserializationError(context, TryDetectMessageId(context), new RpcErrorMessage(ex.RpcError, ex.Message, ex.DebugInformation), "Filter rejects message.", () => context.ReceivedData.SelectMany(s => s.AsEnumerable()).ToArray());
-				this.FinishReceiving(context);
+				HandleDeserializationError(context, TryDetectMessageId(context), new RpcErrorMessage(ex.RpcError, ex.Message, ex.DebugInformation), "Filter rejects message.", () => context.ReceivedData.SelectMany(s => s.AsEnumerable()).ToArray());
+				FinishReceiving(context);
 				return;
 			}
 
 			if (!context.NextProcess(context)) {
-				if (this.IsServerShutdown) {
-					this.ShutdownReceiving();
+				if (IsServerShutdown) {
+					ShutdownReceiving();
 				}
-				else if (this.CanResumeReceiving) {
+				else if (CanResumeReceiving) {
 					// Wait to arrive more data from server.
-					this.ReceiveCore(context);
+					ReceiveCore(context);
 					return;
 				}
 
@@ -942,13 +922,13 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				//return;
 			}
 
-			this.FinishReceiving(context);
+			FinishReceiving(context);
 		}
 
 		private void FinishReceiving(ClientResponseContext context) {
 			context.StopWatchTimeout();
-			context.Timeout -= this.OnReceiveTimeout;
-			this.Manager.ReturnResponseContext(context);
+			context.Timeout -= OnReceiveTimeout;
+			Manager.ReturnResponseContext(context);
 			//this.Manager.ReturnTransport( this );
 		}
 
@@ -964,12 +944,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					return null;
 				}
 
-				if (!unpacker.Read() || !unpacker.LastReadData.IsTypeOf<Int32>().GetValueOrDefault() || unpacker.LastReadData != (int)MessageType.Response) {
+				if (!unpacker.Read() || !unpacker.LastReadData.IsTypeOf<int>().GetValueOrDefault() || unpacker.LastReadData != (int)MessageType.Response) {
 					// Not a response message or invalid message type
 					return null;
 				}
 
-				if (!unpacker.Read() || !unpacker.LastReadData.IsTypeOf<Int32>().GetValueOrDefault()) {
+				if (!unpacker.Read() || !unpacker.LastReadData.IsTypeOf<int>().GetValueOrDefault()) {
 					// Invalid message ID.
 					return null;
 				}
@@ -999,7 +979,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			Contract.EndContractBlock();
 
-			this.Manager.ReturnRequestContext(context);
+			Manager.ReturnRequestContext(context);
 		}
 
 		/// <summary>
@@ -1023,7 +1003,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			Contract.EndContractBlock();
 
-			this.Manager.ReturnResponseContext(context);
+			Manager.ReturnResponseContext(context);
 		}
 
 

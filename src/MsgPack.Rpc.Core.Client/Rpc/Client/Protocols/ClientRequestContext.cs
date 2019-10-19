@@ -25,7 +25,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			new ArraySegment<byte>(new byte[] { 0x94, 0x02 }); // [FixArray4], [Notification:2]
 
 		/// <summary>
-		///		Empty array of <see cref="ArraySegment{T}"/> of <see cref="Byte"/>.
+		///		Empty array of <see cref="ArraySegment{T}"/> of <see cref="byte"/>.
 		/// </summary>
 		private static readonly ArraySegment<byte> _emptyBuffer =
 			new ArraySegment<byte>(new byte[0], 0, 0);
@@ -45,7 +45,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			get {
 				Contract.Ensures(Contract.Result<MessageType>() == Rpc.Core.Protocols.MessageType.Request || Contract.Result<MessageType>() == Rpc.Core.Protocols.MessageType.Notification);
 
-				return this._messageType;
+				return _messageType;
 			}
 		}
 
@@ -62,11 +62,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			get {
 				Contract.Ensures(Contract.Result<Packer>() != null);
 
-				return this._argumentsPacker;
+				return _argumentsPacker;
 			}
 		}
-
-		private string _methodName;
 
 		/// <summary>
 		///		Gets the name of the calling method.
@@ -78,9 +76,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <remarks>
 		///		This value can be set via <see cref="SetRequest"/> or <see cref="SetNotification"/> method.
 		/// </remarks>
-		public string MethodName {
-			get { return this._methodName; }
-		}
+		public string MethodName { get; private set; }
 
 		/// <summary>
 		///		The reusable buffer to pack method name.
@@ -137,7 +133,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		private readonly MemoryStream _unifiedSendingBuffer;
 #endif
 
-		private Action<Exception, bool> _notificationCompletionCallback;
 
 		/// <summary>
 		///		Gets the callback delegate which will be called when the notification is sent.
@@ -151,11 +146,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <remarks>
 		///		This value can be set via <see cref="SetNotification"/> method.
 		/// </remarks>
-		public Action<Exception, bool> NotificationCompletionCallback {
-			get { return this._notificationCompletionCallback; }
-		}
-
-		private Action<ClientResponseContext, Exception, bool> _requestCompletionCallback;
+		public Action<Exception, bool> NotificationCompletionCallback { get; private set; }
 
 		/// <summary>
 		///		Gets the callback delegate which will be called when the response is received.
@@ -170,15 +161,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <remarks>
 		///		This value can be set via <see cref="SetRequest"/> method.
 		/// </remarks>
-		public Action<ClientResponseContext, Exception, bool> RequestCompletionCallback {
-			get { return this._requestCompletionCallback; }
-		}
+		public Action<ClientResponseContext, Exception, bool> RequestCompletionCallback { get; private set; }
 
 		private readonly Stopwatch _stopwatch;
 
-		internal TimeSpan ElapsedTime {
-			get { return this._stopwatch.Elapsed; }
-		}
+		internal TimeSpan ElapsedTime => _stopwatch.Elapsed;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ClientRequestContext"/> class with default settings.
@@ -194,26 +181,26 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		An <see cref="RpcClientConfiguration"/> to tweak this instance initial state.
 		/// </param>
 		public ClientRequestContext(RpcClientConfiguration configuration) {
-			this._methodNameBuffer =
+			_methodNameBuffer =
 				new MemoryStream((configuration ?? RpcClientConfiguration.Default).InitialMethodNameBufferLength);
-			this._argumentsBuffer =
+			_argumentsBuffer =
 				new MemoryStream((configuration ?? RpcClientConfiguration.Default).InitialArgumentsBufferLength);
-			this.SendingBuffer = new ArraySegment<byte>[4];
+			SendingBuffer = new ArraySegment<byte>[4];
 #if MONO
 			this._unifiedSendingBuffer = new MemoryStream( ( configuration ?? RpcClientConfiguration.Default ).InitialReceiveBufferLength );
 #endif
-			this._argumentsPacker = Packer.Create(this._argumentsBuffer, false);
-			this._messageType = MessageType.Response;
-			this._stopwatch = new Stopwatch();
+			_argumentsPacker = Packer.Create(_argumentsBuffer, false);
+			_messageType = MessageType.Response;
+			_stopwatch = new Stopwatch();
 		}
 
 		internal override void StartWatchTimeout(TimeSpan timeout) {
 			base.StartWatchTimeout(timeout);
-			this._stopwatch.Restart();
+			_stopwatch.Restart();
 		}
 
 		internal override void StopWatchTimeout() {
-			this._stopwatch.Stop();
+			_stopwatch.Stop();
 			base.StopWatchTimeout();
 		}
 
@@ -246,17 +233,17 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				throw new ArgumentNullException("completionCallback");
 			}
 
-			Contract.Ensures(this.MessageType == Rpc.Core.Protocols.MessageType.Request);
-			Contract.Ensures(this.MessageId != null);
-			Contract.Ensures(!String.IsNullOrEmpty(this.MethodName));
-			Contract.Ensures(this.RequestCompletionCallback != null);
-			Contract.Ensures(this.NotificationCompletionCallback == null);
+			Contract.Ensures(MessageType == Rpc.Core.Protocols.MessageType.Request);
+			Contract.Ensures(MessageId != null);
+			Contract.Ensures(!string.IsNullOrEmpty(MethodName));
+			Contract.Ensures(RequestCompletionCallback != null);
+			Contract.Ensures(NotificationCompletionCallback == null);
 
-			this._messageType = Rpc.Core.Protocols.MessageType.Request;
-			this.MessageId = messageId;
-			this._methodName = methodName;
-			this._requestCompletionCallback = completionCallback;
-			this._notificationCompletionCallback = null;
+			_messageType = Rpc.Core.Protocols.MessageType.Request;
+			MessageId = messageId;
+			MethodName = methodName;
+			RequestCompletionCallback = completionCallback;
+			NotificationCompletionCallback = null;
 		}
 
 		/// <summary>
@@ -287,49 +274,49 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				throw new ArgumentNullException("completionCallback");
 			}
 
-			Contract.Ensures(this.MessageType == Rpc.Core.Protocols.MessageType.Notification);
-			Contract.Ensures(this.MessageId == null);
-			Contract.Ensures(!String.IsNullOrEmpty(this.MethodName));
-			Contract.Ensures(this.RequestCompletionCallback == null);
-			Contract.Ensures(this.NotificationCompletionCallback != null);
+			Contract.Ensures(MessageType == Rpc.Core.Protocols.MessageType.Notification);
+			Contract.Ensures(MessageId == null);
+			Contract.Ensures(!string.IsNullOrEmpty(MethodName));
+			Contract.Ensures(RequestCompletionCallback == null);
+			Contract.Ensures(NotificationCompletionCallback != null);
 
-			this._messageType = Rpc.Core.Protocols.MessageType.Notification;
-			this.MessageId = null;
-			this._methodName = methodName;
-			this._notificationCompletionCallback = completionCallback;
-			this._requestCompletionCallback = null;
+			_messageType = Rpc.Core.Protocols.MessageType.Notification;
+			MessageId = null;
+			MethodName = methodName;
+			NotificationCompletionCallback = completionCallback;
+			RequestCompletionCallback = null;
 		}
 
 		/// <summary>
 		///		Prepares this instance to send request or notification message.
 		/// </summary>
 		internal void Prepare(bool canUseChunkedBuffer) {
-			if (this._messageType == MessageType.Response) {
+			if (_messageType == MessageType.Response) {
 				throw new InvalidOperationException("MessageType is not set.");
 			}
 
-			Contract.Assert(this._methodName != null);
+			Contract.Assert(MethodName != null);
 
-			using (var packer = Packer.Create(this._methodNameBuffer, false)) {
-				packer.Pack(this._methodName);
+			using (var packer = Packer.Create(_methodNameBuffer, false)) {
+				packer.Pack(MethodName);
 			}
 
-			if (this._messageType == MessageType.Request) {
-				Contract.Assert(this.MessageId != null);
-				Contract.Assert(this._requestCompletionCallback != null);
+			if (_messageType == MessageType.Request) {
+				Contract.Assert(MessageId != null);
+				Contract.Assert(RequestCompletionCallback != null);
 
-				this.SendingBuffer[0] = _requestHeader;
-				this.SendingBuffer[1] = this.GetPackedMessageId();
-				this.SendingBuffer[2] = new ArraySegment<byte>(this._methodNameBuffer.GetBuffer(), 0, unchecked((int)this._methodNameBuffer.Length));
-				this.SendingBuffer[3] = new ArraySegment<byte>(this._argumentsBuffer.GetBuffer(), 0, unchecked((int)this._argumentsBuffer.Length));
+				SendingBuffer[0] = _requestHeader;
+				SendingBuffer[1] = GetPackedMessageId();
+				SendingBuffer[2] = new ArraySegment<byte>(_methodNameBuffer.GetBuffer(), 0, unchecked((int)_methodNameBuffer.Length));
+				SendingBuffer[3] = new ArraySegment<byte>(_argumentsBuffer.GetBuffer(), 0, unchecked((int)_argumentsBuffer.Length));
 			}
 			else {
-				Contract.Assert(this._notificationCompletionCallback != null);
+				Contract.Assert(NotificationCompletionCallback != null);
 
-				this.SendingBuffer[0] = _notificationHeader;
-				this.SendingBuffer[1] = new ArraySegment<byte>(this._methodNameBuffer.GetBuffer(), 0, unchecked((int)this._methodNameBuffer.Length));
-				this.SendingBuffer[2] = new ArraySegment<byte>(this._argumentsBuffer.GetBuffer(), 0, unchecked((int)this._argumentsBuffer.Length));
-				this.SendingBuffer[3] = _emptyBuffer;
+				SendingBuffer[0] = _notificationHeader;
+				SendingBuffer[1] = new ArraySegment<byte>(_methodNameBuffer.GetBuffer(), 0, unchecked((int)_methodNameBuffer.Length));
+				SendingBuffer[2] = new ArraySegment<byte>(_argumentsBuffer.GetBuffer(), 0, unchecked((int)_argumentsBuffer.Length));
+				SendingBuffer[3] = _emptyBuffer;
 			}
 
 #if MONO
@@ -346,20 +333,20 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				return;
 			}
 #endif
-			this.SocketContext.SetBuffer(null, 0, 0);
-			this.SocketContext.BufferList = this.SendingBuffer;
+			SocketContext.SetBuffer(null, 0, 0);
+			SocketContext.BufferList = SendingBuffer;
 		}
 
 		internal override void ClearBuffers() {
-			this._methodNameBuffer.SetLength(0);
-			this._argumentsBuffer.SetLength(0);
-			this.SocketContext.BufferList = null;
-			this._argumentsPacker.Dispose();
-			this._argumentsPacker = Packer.Create(this._argumentsBuffer, false);
-			this.SendingBuffer[0] = new ArraySegment<byte>();
-			this.SendingBuffer[1] = new ArraySegment<byte>();
-			this.SendingBuffer[2] = new ArraySegment<byte>();
-			this.SendingBuffer[3] = new ArraySegment<byte>();
+			_methodNameBuffer.SetLength(0);
+			_argumentsBuffer.SetLength(0);
+			SocketContext.BufferList = null;
+			_argumentsPacker.Dispose();
+			_argumentsPacker = Packer.Create(_argumentsBuffer, false);
+			SendingBuffer[0] = new ArraySegment<byte>();
+			SendingBuffer[1] = new ArraySegment<byte>();
+			SendingBuffer[2] = new ArraySegment<byte>();
+			SendingBuffer[3] = new ArraySegment<byte>();
 			base.ClearBuffers();
 		}
 
@@ -367,11 +354,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		Clears this instance internal buffers for reuse.
 		/// </summary>
 		internal sealed override void Clear() {
-			this.ClearBuffers();
-			this._methodName = null;
-			this._messageType = MessageType.Response; // Invalid.
-			this._requestCompletionCallback = null;
-			this._notificationCompletionCallback = null;
+			ClearBuffers();
+			MethodName = null;
+			_messageType = MessageType.Response; // Invalid.
+			RequestCompletionCallback = null;
+			NotificationCompletionCallback = null;
 			base.Clear();
 		}
 	}

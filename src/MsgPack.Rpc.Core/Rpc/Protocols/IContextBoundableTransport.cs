@@ -22,9 +22,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 
 	[ContractClassFor(typeof(IContextBoundableTransport))]
 	internal abstract class IContextBoundableTransportContract : IContextBoundableTransport {
-		public Socket BoundSocket {
-			get { return null; } // No contract
-		}
+		public Socket BoundSocket => null;
 
 		public void OnSocketOperationCompleted(object sender, SocketAsyncEventArgs e) {
 			Contract.Requires(sender != null);

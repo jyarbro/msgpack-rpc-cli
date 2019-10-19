@@ -28,9 +28,7 @@ namespace MsgPack.Rpc.Core {
 		///		Value of error field of response.
 		///		This value is not nil, but its content is arbitary.
 		/// </value>
-		public MessagePackObject Error {
-			get { return this._error; }
-		}
+		public MessagePackObject Error => _error;
 
 		// NOT readonly for safe deserialization
 		private MessagePackObject _errorDetail;
@@ -42,9 +40,7 @@ namespace MsgPack.Rpc.Core {
 		///		Value of return field of response in error.
 		///		This value may be nil, but server can set any value.
 		/// </value>
-		public MessagePackObject ErrorDetail {
-			get { return this._errorDetail; }
-		}
+		public MessagePackObject ErrorDetail => _errorDetail;
 
 		/// <summary>
 		///		Initialize new instance.
@@ -59,8 +55,8 @@ namespace MsgPack.Rpc.Core {
 		/// </param>
 		public UnexpectedRpcException(MessagePackObject error, MessagePackObject errorDetail)
 			: base(RpcError.Unexpected, RpcError.Unexpected.DefaultMessage, null) {
-			this._error = error;
-			this._errorDetail = errorDetail;
+			_error = error;
+			_errorDetail = errorDetail;
 		}
 
 #if MONO
@@ -128,8 +124,8 @@ namespace MsgPack.Rpc.Core {
 			base.OnSerializeObjectState(sender, e);
 			e.AddSerializedState(
 				new SerializedState() {
-					Error = this._error,
-					ErrorDetail = this._errorDetail
+					Error = _error,
+					ErrorDetail = _errorDetail
 				}
 			);
 		}
@@ -141,8 +137,8 @@ namespace MsgPack.Rpc.Core {
 
 			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as UnexpectedRpcException;
-				enclosing._error = this.Error;
-				enclosing._errorDetail = this.ErrorDetail;
+				enclosing._error = Error;
+				enclosing._errorDetail = ErrorDetail;
 			}
 		}
 #endif

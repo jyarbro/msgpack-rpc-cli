@@ -29,7 +29,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		public string MethodName {
 			get {
 				Contract.Ensures(Contract.Result<string>() != null);
-				return this._methodName;
+				return _methodName;
 			}
 		}
 
@@ -128,13 +128,13 @@ namespace MsgPack.Rpc.Core.Protocols {
 				throw new ArgumentNullException("methodName");
 			}
 
-			if (String.IsNullOrWhiteSpace(methodName)) {
+			if (string.IsNullOrWhiteSpace(methodName)) {
 				throw new ArgumentException("'methodName' cannot be empty nor blank.", "methodName");
 			}
 
 			Contract.EndContractBlock();
 
-			this._methodName = methodName;
+			_methodName = methodName;
 		}
 
 		/// <summary>
@@ -151,8 +151,8 @@ namespace MsgPack.Rpc.Core.Protocols {
 		/// </exception>
 		protected internal RpcMethodInvocationException(RpcError rpcError, MessagePackObject unpackedException)
 			: base(rpcError, unpackedException) {
-			this._methodName = unpackedException.GetString(MethodNameKeyUtf8);
-			Contract.Assume(this._methodName != null, "Unpacked data does not have MethodName.");
+			_methodName = unpackedException.GetString(MethodNameKeyUtf8);
+			Contract.Assume(_methodName != null, "Unpacked data does not have MethodName.");
 		}
 
 #if MONO
@@ -219,7 +219,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///	</param>
 		protected override void GetExceptionMessage(IDictionary<MessagePackObject, MessagePackObject> store, bool includesDebugInformation) {
 			base.GetExceptionMessage(store, includesDebugInformation);
-			store.Add(MethodNameKeyUtf8, MessagePackConvert.EncodeString(this._methodName));
+			store.Add(MethodNameKeyUtf8, MessagePackConvert.EncodeString(_methodName));
 		}
 
 #if !SILVERLIGHT && !MONO
@@ -236,7 +236,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 			base.OnSerializeObjectState(sender, e);
 			e.AddSerializedState(
 				new SerializedState() {
-					MethodName = this._methodName
+					MethodName = _methodName
 				}
 			);
 		}
@@ -247,7 +247,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 
 			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as RpcMethodInvocationException;
-				enclosing._methodName = this.MethodName;
+				enclosing._methodName = MethodName;
 			}
 		}
 #endif

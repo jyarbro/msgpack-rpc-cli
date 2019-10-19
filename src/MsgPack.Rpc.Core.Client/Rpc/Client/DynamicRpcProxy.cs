@@ -87,7 +87,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 			Contract.EndContractBlock();
 
-			this._client = client;
+			_client = client;
 		}
 
 		/// <summary>
@@ -154,7 +154,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose() {
-			this._client.Dispose();
+			_client.Dispose();
 		}
 
 		/// <summary>
@@ -187,23 +187,21 @@ namespace MsgPack.Rpc.Core.Client {
 				&& binder.Name.Length > "Begin".Length
 				&& args.Length >= 2) {
 				var asAsyncCallback = args[args.Length - 2] as AsyncCallback;
-				var asAction = args[args.Length - 2] as Action<IAsyncResult>;
 				if (args[args.Length - 2] == null || asAsyncCallback != null || asAsyncCallback != null) {
 					var realArgs = new object[args.Length - 2];
 					Array.ConstrainedCopy(args, 0, realArgs, 0, args.Length - 2);
-					if (asAsyncCallback == null && asAction != null) {
+					if (asAsyncCallback == null && args[args.Length - 2] is Action<IAsyncResult> asAction) {
 						asAsyncCallback = ar => asAction(ar);
 					}
-					result = this._client.BeginCall(binder.Name.Substring("Begin".Length), realArgs, asAsyncCallback, args[args.Length - 1]);
+					result = _client.BeginCall(binder.Name.Substring("Begin".Length), realArgs, asAsyncCallback, args[args.Length - 1]);
 					return true;
 				}
 			}
 			else if (binder.Name.StartsWith("End", binder.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)
 				&& binder.Name.Length > "End".Length
 				&& args.Length == 1) {
-				var ar = args[0] as IAsyncResult;
-				if (ar != null) {
-					result = this._client.EndCall(ar);
+				if (args[0] is IAsyncResult ar) {
+					result = _client.EndCall(ar);
 					return true;
 				}
 			}
@@ -212,11 +210,11 @@ namespace MsgPack.Rpc.Core.Client {
 				&& args.Length >= 1) {
 				var realArgs = new object[args.Length - 1];
 				Array.ConstrainedCopy(args, 0, realArgs, 0, args.Length - 1);
-				result = this._client.CallAsync(binder.Name.Remove(binder.Name.Length - "Async".Length), realArgs, args[args.Length - 1]);
+				result = _client.CallAsync(binder.Name.Remove(binder.Name.Length - "Async".Length), realArgs, args[args.Length - 1]);
 				return true;
 			}
 
-			result = this._client.Call(binder.Name, args);
+			result = _client.Call(binder.Name, args);
 			return true;
 		}
 	}

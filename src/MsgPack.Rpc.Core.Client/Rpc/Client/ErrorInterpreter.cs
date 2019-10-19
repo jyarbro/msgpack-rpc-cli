@@ -31,7 +31,7 @@ namespace MsgPack.Rpc.Core.Client {
 				return RpcErrorMessage.Success;
 			}
 
-			bool isUnknown = false;
+			var isUnknown = false;
 			RpcError errorIdentifier;
 			if (error.IsTypeOf<string>().GetValueOrDefault()) {
 				var asString = error.AsString();

@@ -17,7 +17,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 		/// </exception>
 		public ClientQuotaMessageFilterProvider(long quota)
 			: base(quota) {
-			this._filterInstance = new ClientQuotaMessageFilter(this.Quota);
+			_filterInstance = new ClientQuotaMessageFilter(Quota);
 		}
 
 		/// <summary>
@@ -30,7 +30,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 				return null;
 			}
 			else {
-				return this._filterInstance;
+				return _filterInstance;
 			}
 		}
 	}

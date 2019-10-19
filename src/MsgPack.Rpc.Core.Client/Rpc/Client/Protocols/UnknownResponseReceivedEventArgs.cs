@@ -7,19 +7,13 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 	///		Represents event data of <see cref="E:ClientTransportManager.UnknownResponseReceived"/> event.
 	/// </summary>
 	public sealed class UnknownResponseReceivedEventArgs : EventArgs {
-		private readonly int? _messageId;
-
 		/// <summary>
 		///		Gets the message ID.
 		/// </summary>
 		/// <value>
 		///		The received message ID.
 		/// </value>
-		public int? MessageId {
-			get { return this._messageId; }
-		}
-
-		private readonly RpcErrorMessage _error;
+		public int? MessageId { get; }
 
 		/// <summary>
 		///		Gets the received error.
@@ -28,11 +22,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		The received error.
 		///		This value will not be <c>null</c>, will be <see cref="RpcErrorMessage.IsSuccess"/> is <c>true</c> when no error.
 		/// </value>
-		public RpcErrorMessage Error {
-			get { return this._error; }
-		}
-
-		private readonly MessagePackObject? _returnValue;
+		public RpcErrorMessage Error { get; }
 
 		/// <summary>
 		///		Gets the received return value.
@@ -41,22 +31,20 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		The received return value.
 		///		Note that this value will be <c>null</c> when <see cref="RpcErrorMessage.IsSuccess"/> property of <see cref="Error"/> is <c>true</c>.
 		/// </value>
-		public MessagePackObject? ReturnValue {
-			get { return this._returnValue; }
-		}
+		public MessagePackObject? ReturnValue { get; }
 
 		internal UnknownResponseReceivedEventArgs(int? messageId, RpcErrorMessage error, MessagePackObject? returnValue) {
-			this._messageId = messageId;
-			this._error = error;
-			this._returnValue = returnValue;
+			MessageId = messageId;
+			Error = error;
+			ReturnValue = returnValue;
 		}
 
 		[ContractInvariantMethod]
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "ObjectInvariant.")]
 		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "ObjectInvariant.")]
 		private void ObjectInvariant() {
-			Contract.Invariant((this.Error.IsSuccess && Contract.Result<MessagePackObject?>() != null)
-				|| (!this.Error.IsSuccess && Contract.Result<MessagePackObject?>() == null));
+			Contract.Invariant((Error.IsSuccess && Contract.Result<MessagePackObject?>() != null)
+				|| (!Error.IsSuccess && Contract.Result<MessagePackObject?>() == null));
 		}
 	}
 }

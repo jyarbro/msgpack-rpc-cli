@@ -20,9 +20,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <value>
 		/// 	<c>true</c> if this instance can resume receiving; otherwise, <c>false</c>.
 		/// </value>
-		protected override bool CanResumeReceiving {
-			get { return false; }
-		}
+		protected override bool CanResumeReceiving => false;
 
 #if MONO
 		/// <summary>
@@ -60,12 +58,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		This object is not ready to invoke this method.
 		/// </exception>
 		public sealed override ClientRequestContext GetClientRequestContext() {
-			if (this.RemoteEndPoint == null) {
+			if (RemoteEndPoint == null) {
 				throw new InvalidOperationException("RemoteEndPoint must be set. UdpClientTransport must be retrieved from UdpTClientransportManager.GetTransport.");
 			}
 
 			var result = base.GetClientRequestContext();
-			result.RemoteEndPoint = this.RemoteEndPoint;
+			result.RemoteEndPoint = RemoteEndPoint;
 			return result;
 		}
 
@@ -74,9 +72,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </summary>
 		/// <param name="context">Context information.</param>
 		protected sealed override void SendCore(ClientRequestContext context) {
-			if (!this.BoundSocket.SendToAsync(context.SocketContext)) {
+			if (!BoundSocket.SendToAsync(context.SocketContext)) {
 				context.SetCompletedSynchronously();
-				this.OnSent(context);
+				OnSent(context);
 			}
 		}
 
@@ -85,9 +83,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </summary>
 		/// <param name="context">Context information.</param>
 		protected sealed override void ReceiveCore(ClientResponseContext context) {
-			if (!this.BoundSocket.ReceiveFromAsync(context.SocketContext)) {
+			if (!BoundSocket.ReceiveFromAsync(context.SocketContext)) {
 				context.SetCompletedSynchronously();
-				this.OnReceived(context);
+				OnReceived(context);
 			}
 		}
 	}

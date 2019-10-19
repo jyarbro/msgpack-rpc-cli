@@ -15,9 +15,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// <value>
 		///		A response data.
 		/// </value>
-		public ResultHolder Result {
-			get { return this._result; }
-		}
+		public ResultHolder Result => _result;
 
 		/// <summary>
 		///		Processes asynchronous operation completion logic.
@@ -35,12 +33,12 @@ namespace MsgPack.Rpc.Core.Client {
 					base.OnError(error.ToException(), completedSynchronously);
 				}
 				else {
-					Interlocked.CompareExchange(ref this._result, new ResultHolder(Unpacking.UnpackObject(context.ResultBuffer)), null);
+					Interlocked.CompareExchange(ref _result, new ResultHolder(Unpacking.UnpackObject(context.ResultBuffer)), null);
 					base.Complete(completedSynchronously);
 				}
 			}
 
-			var callback = this.AsyncCallback;
+			var callback = AsyncCallback;
 			if (callback != null) {
 				callback(this);
 			}
@@ -64,18 +62,14 @@ namespace MsgPack.Rpc.Core.Client {
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="owner"/> is null.
 		/// </exception>
-		public RequestMessageAsyncResult(Object owner, int messageId, AsyncCallback asyncCallback, object asyncState)
+		public RequestMessageAsyncResult(object owner, int messageId, AsyncCallback asyncCallback, object asyncState)
 			: base(owner, messageId, asyncCallback, asyncState) { }
 
 		public sealed class ResultHolder {
-			private readonly MessagePackObject _value;
-
-			public MessagePackObject Value {
-				get { return this._value; }
-			}
+			public MessagePackObject Value { get; }
 
 			public ResultHolder(MessagePackObject value) {
-				this._value = value;
+				Value = value;
 			}
 		}
 	}

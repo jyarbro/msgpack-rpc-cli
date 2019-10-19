@@ -31,7 +31,7 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 
 			Contract.EndContractBlock();
 
-			this.ProcessMessageCore(context);
+			ProcessMessageCore(context);
 		}
 
 		/// <summary>

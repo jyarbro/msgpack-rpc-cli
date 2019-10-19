@@ -7,7 +7,7 @@ namespace MsgPack.Rpc.Core.Client {
 	internal static class FileSystem {
 		private static readonly Regex _invalidPathChars =
 			new Regex(
-				"[" + Regex.Escape(String.Join(String.Empty, Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).Distinct())) + "]",
+				"[" + Regex.Escape(string.Join(string.Empty, Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).Distinct())) + "]",
 #if !SILVERLIGHT
 				 RegexOptions.Compiled |
 #endif
@@ -20,7 +20,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 
 #if !SILVERIGHT
-			return _invalidPathChars.Replace(value, replacement ?? String.Empty);
+			return _invalidPathChars.Replace(value, replacement ?? string.Empty);
 #else
 			return "." + Path.DirectorySepartorChar + _invalidPathChars.Replace( value, replacement ?? String.Empty );
 #endif

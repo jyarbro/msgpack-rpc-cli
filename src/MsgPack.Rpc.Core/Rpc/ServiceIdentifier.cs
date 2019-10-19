@@ -14,10 +14,10 @@ namespace MsgPack.Rpc.Core {
 		/// <param name="version">The version.</param>
 		/// <returns>The service ID.</returns>
 		public static string CreateServiceId(string name, int version) {
-			Contract.Requires(!String.IsNullOrWhiteSpace(name));
+			Contract.Requires(!string.IsNullOrWhiteSpace(name));
 			Contract.Ensures(Contract.Result<string>() != null);
 
-			return String.Format(CultureInfo.InvariantCulture, "{0}:{1}", name, version);
+			return string.Format(CultureInfo.InvariantCulture, "{0}:{1}", name, version);
 		}
 
 		/// <summary>
@@ -29,7 +29,7 @@ namespace MsgPack.Rpc.Core {
 			Contract.Requires(typeName != null);
 			Contract.Ensures(Contract.Result<string>() != null);
 
-			int positionOfBackQuote = typeName.IndexOf('`');
+			var positionOfBackQuote = typeName.IndexOf('`');
 			return positionOfBackQuote < 0 ? typeName : typeName.Remove(positionOfBackQuote);
 		}
 	}

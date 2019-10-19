@@ -19,9 +19,7 @@ namespace MsgPack.Rpc.Core {
 		/// <value>
 		///   <c>true</c> if this instance is frozen; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsFrozen {
-			get { return Interlocked.CompareExchange(ref this._isFrozen, 0, 0) != 0; }
-		}
+		public bool IsFrozen => Interlocked.CompareExchange(ref _isFrozen, 0, 0) != 0;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FreezableObject"/> class.
@@ -35,7 +33,7 @@ namespace MsgPack.Rpc.Core {
 		///		This instance is already frozen.
 		/// </exception>
 		protected void VerifyIsNotFrozen() {
-			if (this.IsFrozen) {
+			if (IsFrozen) {
 				throw new InvalidOperationException("This instance is frozen.");
 			}
 		}
@@ -47,7 +45,7 @@ namespace MsgPack.Rpc.Core {
 		///		The shallow copy of this instance. Returned instance always is not frozen.
 		/// </returns>
 		protected virtual FreezableObject CloneCore() {
-			var clone = this.MemberwiseClone() as FreezableObject;
+			var clone = MemberwiseClone() as FreezableObject;
 			Interlocked.Exchange(ref clone._isFrozen, 0);
 			return clone;
 		}
@@ -59,7 +57,7 @@ namespace MsgPack.Rpc.Core {
 		///		This instance.
 		/// </returns>
 		protected virtual FreezableObject FreezeCore() {
-			Interlocked.Exchange(ref this._isFrozen, 1);
+			Interlocked.Exchange(ref _isFrozen, 1);
 
 			return this;
 		}
@@ -72,17 +70,17 @@ namespace MsgPack.Rpc.Core {
 		/// Otherwise, frozen copy of this instance.
 		/// </returns>
 		protected virtual FreezableObject AsFrozenCore() {
-			if (this.IsFrozen) {
+			if (IsFrozen) {
 				return this;
 			}
 
-			return this.CloneCore().FreezeCore();
+			return CloneCore().FreezeCore();
 		}
 
 #if !SILVERLIGHT
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via CloneCore().")]
 		object ICloneable.Clone() {
-			return this.CloneCore();
+			return CloneCore();
 		}
 #endif
 
@@ -95,12 +93,12 @@ namespace MsgPack.Rpc.Core {
 		/// </returns>
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via AsFrozenCore().")]
 		IFreezable IFreezable.AsFrozen() {
-			return this.AsFrozenCore();
+			return AsFrozenCore();
 		}
 
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via FreezeCore().")]
 		IFreezable IFreezable.Freeze() {
-			return this.FreezeCore();
+			return FreezeCore();
 		}
 	}
 }

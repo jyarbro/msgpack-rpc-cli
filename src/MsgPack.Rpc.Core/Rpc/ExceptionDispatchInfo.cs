@@ -27,9 +27,8 @@ namespace MsgPack.Rpc.Core {
 
 			Contract.EndContractBlock();
 
-			this._source = source;
-			var preservable = source as IStackTracePreservable;
-			if (preservable != null) {
+			_source = source;
+			if (source is IStackTracePreservable preservable) {
 				preservable.PreserveStackTrace();
 			}
 		}
@@ -37,15 +36,15 @@ namespace MsgPack.Rpc.Core {
 		[ContractInvariantMethod]
 		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "ContractInvariantMethod")]
 		private void ObjectInvariant() {
-			Contract.Invariant(this._source != null);
+			Contract.Invariant(_source != null);
 		}
 
 		public void Throw() {
-			if (this._source is IStackTracePreservable) {
-				throw this._source;
+			if (_source is IStackTracePreservable) {
+				throw _source;
 			}
 			else {
-				throw CreateMatroshika(this._source);
+				throw CreateMatroshika(_source);
 			}
 		}
 
@@ -53,7 +52,7 @@ namespace MsgPack.Rpc.Core {
 			Contract.Requires(inner != null);
 			Contract.Ensures(Contract.Result<Exception>() != null);
 
-			Exception result = HandleKnownWin32Exception(inner);
+			var result = HandleKnownWin32Exception(inner);
 			if (result != null) {
 				return result;
 			}
@@ -71,31 +70,25 @@ namespace MsgPack.Rpc.Core {
 			return GetMatroshika(inner) ?? new TargetInvocationException(inner.Message, inner);
 		}
 		private static Exception HandleKnownWin32Exception(Exception inner) {
-			// These do not have .ctor with innerException, so we must always create wrapper to preserve stack trace.
-			SocketException asSocketException;
-			HttpListenerException asHttpListenerException;
-			NetworkInformationException asNetworkInformationException;
-			Win32Exception asWin32Exception;
-
-			if ((asSocketException = inner as SocketException) != null) {
+			if (inner is SocketException asSocketException) {
 				var result = new WrapperSocketException(asSocketException);
 				SetMatroshika(inner);
 				return result;
 			}
 
-			if ((asHttpListenerException = inner as HttpListenerException) != null) {
+			if (inner is HttpListenerException asHttpListenerException) {
 				var result = new WrapperHttpListenerException(asHttpListenerException);
 				SetMatroshika(inner);
 				return result;
 			}
 
-			if ((asNetworkInformationException = inner as NetworkInformationException) != null) {
+			if (inner is NetworkInformationException asNetworkInformationException) {
 				var result = new WrapperNetworkInformationException(asNetworkInformationException);
 				SetMatroshika(inner);
 				return result;
 			}
 
-			if ((asWin32Exception = inner as Win32Exception) != null) {
+			if (inner is Win32Exception asWin32Exception) {
 				if (_safeCreateWrapperWin32ExceptionMethod.IsSecuritySafeCritical) {
 					var result = SafeCreateWrapperWin32Exception(asWin32Exception);
 					return result;
@@ -111,8 +104,7 @@ namespace MsgPack.Rpc.Core {
 		private static Exception TryCreateMatroshikaWithExternalExceptionMatroshka(Exception inner) {
 			// Try matroshika with HResult setting(requires full trust).
 			if (_safeCreateMatroshikaMethod.IsSecuritySafeCritical) {
-				ExternalException asExternalException;
-				if ((asExternalException = inner as ExternalException) != null) {
+				if (inner is ExternalException asExternalException) {
 					var matroshika = SafeCreateMatroshika(asExternalException);
 					if (matroshika != null) {
 						return matroshika;
@@ -128,24 +120,19 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		private static Exception HandleExternalExceptionInPartialTrust(Exception inner) {
-			// Partial trust fallback.
-			COMException asCOMException;
-			SEHException asSEHException;
-			ExternalException asExternalException;
-
-			if ((asCOMException = inner as COMException) != null) {
+			if (inner is COMException asCOMException) {
 				var result = new WrapperCOMException(asCOMException.Message, asCOMException);
 				SetMatroshika(inner);
 				return result;
 			}
 
-			if ((asSEHException = inner as SEHException) != null) {
+			if (inner is SEHException asSEHException) {
 				var result = new WrapperSEHException(asSEHException.Message, asSEHException);
 				SetMatroshika(inner);
 				return result;
 			}
 
-			if ((asExternalException = inner as ExternalException) != null) {
+			if (inner is ExternalException asExternalException) {
 				var result = new WrapperExternalException(asExternalException.Message, asExternalException);
 				SetMatroshika(inner);
 				return result;
@@ -193,7 +180,7 @@ namespace MsgPack.Rpc.Core {
 		private sealed class WrapperExternalException : ExternalException {
 			public WrapperExternalException(string message, ExternalException inner)
 				: base(message, inner) {
-				this.HResult = inner.ErrorCode;
+				HResult = inner.ErrorCode;
 			}
 
 			private WrapperExternalException(SerializationInfo info, StreamingContext context) : base(info, context) { }
@@ -203,7 +190,7 @@ namespace MsgPack.Rpc.Core {
 		private sealed class WrapperCOMException : COMException {
 			public WrapperCOMException(string message, COMException inner)
 				: base(message, inner) {
-				this.HResult = inner.ErrorCode;
+				HResult = inner.ErrorCode;
 			}
 
 			private WrapperCOMException(SerializationInfo info, StreamingContext context) : base(info, context) { }
@@ -213,7 +200,7 @@ namespace MsgPack.Rpc.Core {
 		private sealed class WrapperSEHException : SEHException {
 			public WrapperSEHException(string message, SEHException inner)
 				: base(message, inner) {
-				this.HResult = inner.ErrorCode;
+				HResult = inner.ErrorCode;
 			}
 
 			private WrapperSEHException(SerializationInfo info, StreamingContext context) : base(info, context) { }
@@ -224,7 +211,7 @@ namespace MsgPack.Rpc.Core {
 		private sealed class WrapperWin32Exception : Win32Exception {
 			public WrapperWin32Exception(string message, Win32Exception inner)
 				: base(message, inner) {
-				this.HResult = inner.ErrorCode;
+				HResult = inner.ErrorCode;
 			}
 
 			private WrapperWin32Exception(SerializationInfo info, StreamingContext context) : base(info, context) { }
@@ -234,21 +221,16 @@ namespace MsgPack.Rpc.Core {
 		private sealed class WrapperHttpListenerException : HttpListenerException {
 			private readonly string _innerStackTrace;
 
-			public sealed override string StackTrace {
-				get {
-					return
-						String.Join(
-							this._innerStackTrace,
+			public sealed override string StackTrace => string.Join(
+							_innerStackTrace,
 							"   --- End of preserved stack trace ---",
 							Environment.NewLine,
 							base.StackTrace
 						);
-				}
-			}
 
 			public WrapperHttpListenerException(HttpListenerException inner)
 				: base(inner.ErrorCode) {
-				this._innerStackTrace = inner.StackTrace;
+				_innerStackTrace = inner.StackTrace;
 			}
 
 			private WrapperHttpListenerException(SerializationInfo info, StreamingContext context) : base(info, context) { }
@@ -258,21 +240,16 @@ namespace MsgPack.Rpc.Core {
 		private sealed class WrapperNetworkInformationException : NetworkInformationException {
 			private readonly string _innerStackTrace;
 
-			public sealed override string StackTrace {
-				get {
-					return
-						String.Join(
-							this._innerStackTrace,
+			public sealed override string StackTrace => string.Join(
+							_innerStackTrace,
 							"   --- End of preserved stack trace ---",
 							Environment.NewLine,
 							base.StackTrace
 						);
-				}
-			}
 
 			public WrapperNetworkInformationException(NetworkInformationException inner)
 				: base(inner.ErrorCode) {
-				this._innerStackTrace = inner.StackTrace;
+				_innerStackTrace = inner.StackTrace;
 			}
 
 			private WrapperNetworkInformationException(SerializationInfo info, StreamingContext context) : base(info, context) { }
@@ -282,21 +259,16 @@ namespace MsgPack.Rpc.Core {
 		private sealed class WrapperSocketException : SocketException {
 			private readonly string _innerStackTrace;
 
-			public sealed override string StackTrace {
-				get {
-					return
-						String.Join(
-							this._innerStackTrace,
+			public sealed override string StackTrace => string.Join(
+							_innerStackTrace,
 							"   --- End of preserved stack trace ---",
 							Environment.NewLine,
 							base.StackTrace
 						);
-				}
-			}
 
 			public WrapperSocketException(SocketException inner)
 				: base(inner.ErrorCode) {
-				this._innerStackTrace = inner.StackTrace;
+				_innerStackTrace = inner.StackTrace;
 			}
 
 			private WrapperSocketException(SerializationInfo info, StreamingContext context) : base(info, context) { }

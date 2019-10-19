@@ -16,7 +16,7 @@ namespace MsgPack.Rpc.Core {
 		public static TimeSpan? GetTimeSpan(this MessagePackObject source, MessagePackObject key) {
 			if (source.IsDictionary) {
 				MessagePackObject value;
-				if (source.AsDictionary().TryGetValue(key, out value) && value.IsTypeOf<Int64>().GetValueOrDefault()) {
+				if (source.AsDictionary().TryGetValue(key, out value) && value.IsTypeOf<long>().GetValueOrDefault()) {
 					return new TimeSpan(value.AsInt64());
 				}
 			}

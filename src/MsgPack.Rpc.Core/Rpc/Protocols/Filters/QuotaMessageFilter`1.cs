@@ -9,17 +9,13 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 	/// <typeparam name="T">The type of <see cref="InboundMessageContext"/>.</typeparam>
 	public abstract class QuotaMessageFilter<T> : MessageFilter<T>
 			where T : InboundMessageContext {
-		private readonly long _quota;
-
 		/// <summary>
 		///		Gets the quota.
 		/// </summary>
 		/// <value>
 		///		The quota.
 		/// </value>
-		public long Quota {
-			get { return this._quota; }
-		}
+		public long Quota { get; }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="QuotaMessageFilter&lt;T&gt;"/> class.
@@ -35,7 +31,7 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 
 			Contract.EndContractBlock();
 
-			this._quota = quota;
+			Quota = quota;
 		}
 
 		/// <summary>
@@ -43,20 +39,20 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 		/// </summary>
 		/// <param name="context">The message context. This value is not <c>null</c>.</param>
 		protected override void ProcessMessageCore(T context) {
-			if (this._quota == 0) {
+			if (Quota == 0) {
 				// Infinite.
 				return;
 			}
 
-			long length = context.ReceivedData.Sum(s => (long)s.Count);
+			var length = context.ReceivedData.Sum(s => (long)s.Count);
 
-			if (length > this._quota) {
+			if (length > Quota) {
 				throw RpcError.MessageTooLargeError.ToException(
 					new MessagePackObject(
 						new MessagePackObjectDictionary(2)
 						{
 							{ "ActualLength", length },
-							{ "Quota", this._quota }
+							{ "Quota", Quota }
 						},
 						true
 					)

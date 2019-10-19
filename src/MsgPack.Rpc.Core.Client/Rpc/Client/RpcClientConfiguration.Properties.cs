@@ -18,13 +18,13 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </value>
 		public bool PreferIPv4 {
 			get {
-				return this._preferIPv4;
+				return _preferIPv4;
 			}
 			set {
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoercePreferIPv4Value(ref coerced);
-				this._preferIPv4 = coerced;
+				_preferIPv4 = coerced;
 			}
 		}
 
@@ -32,7 +32,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the PreferIPv4 property value.
 		/// </summary>
 		public void ResetPreferIPv4() {
-			this._preferIPv4 = false;
+			_preferIPv4 = false;
 		}
 
 		static partial void CoercePreferIPv4Value(ref bool value);
@@ -49,7 +49,7 @@ namespace MsgPack.Rpc.Core.Client {
 			get {
 				Contract.Ensures(Contract.Result<int>() >= default(int));
 
-				return this._minimumConcurrentRequest;
+				return _minimumConcurrentRequest;
 			}
 			set {
 				if (!(value >= default(int))) {
@@ -58,10 +58,10 @@ namespace MsgPack.Rpc.Core.Client {
 
 				Contract.Ensures(Contract.Result<int>() >= default(int));
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceMinimumConcurrentRequestValue(ref coerced);
-				this._minimumConcurrentRequest = coerced;
+				_minimumConcurrentRequest = coerced;
 			}
 		}
 
@@ -69,7 +69,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the MinimumConcurrentRequest property value.
 		/// </summary>
 		public void ResetMinimumConcurrentRequest() {
-			this._minimumConcurrentRequest = 2;
+			_minimumConcurrentRequest = 2;
 		}
 
 		static partial void CoerceMinimumConcurrentRequestValue(ref int value);
@@ -86,7 +86,7 @@ namespace MsgPack.Rpc.Core.Client {
 			get {
 				Contract.Ensures(Contract.Result<int>() > default(int));
 
-				return this._maximumConcurrentRequest;
+				return _maximumConcurrentRequest;
 			}
 			set {
 				if (!(value > default(int))) {
@@ -95,10 +95,10 @@ namespace MsgPack.Rpc.Core.Client {
 
 				Contract.Ensures(Contract.Result<int>() > default(int));
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceMaximumConcurrentRequestValue(ref coerced);
-				this._maximumConcurrentRequest = coerced;
+				_maximumConcurrentRequest = coerced;
 			}
 		}
 
@@ -106,7 +106,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the MaximumConcurrentRequest property value.
 		/// </summary>
 		public void ResetMaximumConcurrentRequest() {
-			this._maximumConcurrentRequest = 10;
+			_maximumConcurrentRequest = 10;
 		}
 
 		static partial void CoerceMaximumConcurrentRequestValue(ref int value);
@@ -123,7 +123,7 @@ namespace MsgPack.Rpc.Core.Client {
 			get {
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
 
-				return this._connectTimeout;
+				return _connectTimeout;
 			}
 			set {
 				if (!(value == null || value.Value > default(TimeSpan))) {
@@ -132,10 +132,10 @@ namespace MsgPack.Rpc.Core.Client {
 
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceConnectTimeoutValue(ref coerced);
-				this._connectTimeout = coerced;
+				_connectTimeout = coerced;
 			}
 		}
 
@@ -143,7 +143,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the ConnectTimeout property value.
 		/// </summary>
 		public void ResetConnectTimeout() {
-			this._connectTimeout = TimeSpan.FromSeconds(120);
+			_connectTimeout = TimeSpan.FromSeconds(120);
 		}
 
 		static partial void CoerceConnectTimeoutValue(ref TimeSpan? value);
@@ -160,7 +160,7 @@ namespace MsgPack.Rpc.Core.Client {
 			get {
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
 
-				return this._waitTimeout;
+				return _waitTimeout;
 			}
 			set {
 				if (!(value == null || value.Value > default(TimeSpan))) {
@@ -169,10 +169,10 @@ namespace MsgPack.Rpc.Core.Client {
 
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceWaitTimeoutValue(ref coerced);
-				this._waitTimeout = coerced;
+				_waitTimeout = coerced;
 			}
 		}
 
@@ -180,7 +180,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the WaitTimeout property value.
 		/// </summary>
 		public void ResetWaitTimeout() {
-			this._waitTimeout = TimeSpan.FromSeconds(120);
+			_waitTimeout = TimeSpan.FromSeconds(120);
 		}
 
 		static partial void CoerceWaitTimeoutValue(ref TimeSpan? value);
@@ -197,7 +197,7 @@ namespace MsgPack.Rpc.Core.Client {
 			get {
 				Contract.Ensures(Contract.Result<Func<RpcClientConfiguration, ClientTransportManager>>() != null);
 
-				return this._transportManagerProvider;
+				return _transportManagerProvider;
 			}
 			set {
 				if (!(value != null)) {
@@ -206,10 +206,10 @@ namespace MsgPack.Rpc.Core.Client {
 
 				Contract.Ensures(Contract.Result<Func<RpcClientConfiguration, ClientTransportManager>>() != null);
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceTransportManagerProviderValue(ref coerced);
-				this._transportManagerProvider = coerced;
+				_transportManagerProvider = coerced;
 			}
 		}
 
@@ -217,7 +217,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the TransportManagerProvider property value.
 		/// </summary>
 		public void ResetTransportManagerProvider() {
-			this._transportManagerProvider = (configuration) => new TcpClientTransportManager(configuration);
+			_transportManagerProvider = (configuration) => new TcpClientTransportManager(configuration);
 		}
 
 		static partial void CoerceTransportManagerProviderValue(ref Func<RpcClientConfiguration, ClientTransportManager> value);
@@ -232,13 +232,13 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </value>
 		public int InitialMethodNameBufferLength {
 			get {
-				return this._initialMethodNameBufferLength;
+				return _initialMethodNameBufferLength;
 			}
 			set {
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceInitialMethodNameBufferLengthValue(ref coerced);
-				this._initialMethodNameBufferLength = coerced;
+				_initialMethodNameBufferLength = coerced;
 			}
 		}
 
@@ -246,7 +246,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the InitialMethodNameBufferLength property value.
 		/// </summary>
 		public void ResetInitialMethodNameBufferLength() {
-			this._initialMethodNameBufferLength = 256;
+			_initialMethodNameBufferLength = 256;
 		}
 
 		static partial void CoerceInitialMethodNameBufferLengthValue(ref int value);
@@ -261,13 +261,13 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </value>
 		public int InitialArgumentsBufferLength {
 			get {
-				return this._initialArgumentsBufferLength;
+				return _initialArgumentsBufferLength;
 			}
 			set {
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceInitialArgumentsBufferLengthValue(ref coerced);
-				this._initialArgumentsBufferLength = coerced;
+				_initialArgumentsBufferLength = coerced;
 			}
 		}
 
@@ -275,7 +275,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the InitialArgumentsBufferLength property value.
 		/// </summary>
 		public void ResetInitialArgumentsBufferLength() {
-			this._initialArgumentsBufferLength = 65536;
+			_initialArgumentsBufferLength = 65536;
 		}
 
 		static partial void CoerceInitialArgumentsBufferLengthValue(ref int value);
@@ -290,13 +290,13 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </value>
 		public int InitialReceiveBufferLength {
 			get {
-				return this._initialReceiveBufferLength;
+				return _initialReceiveBufferLength;
 			}
 			set {
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceInitialReceiveBufferLengthValue(ref coerced);
-				this._initialReceiveBufferLength = coerced;
+				_initialReceiveBufferLength = coerced;
 			}
 		}
 
@@ -304,12 +304,12 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the InitialReceiveBufferLength property value.
 		/// </summary>
 		public void ResetInitialReceiveBufferLength() {
-			this._initialReceiveBufferLength = 65536;
+			_initialReceiveBufferLength = 65536;
 		}
 
 		static partial void CoerceInitialReceiveBufferLengthValue(ref int value);
 
-		private Boolean _dumpCorruptResponse = false;
+		private bool _dumpCorruptResponse = false;
 
 		/// <summary>
 		/// 	Gets or sets the value whether transport should dump invalid response stream for debugging purposes.
@@ -317,15 +317,15 @@ namespace MsgPack.Rpc.Core.Client {
 		/// <value>
 		/// 	<c>true</c>, if the corrupt response dumping is enabled; <c>false</c>, otherwise.
 		/// </value>
-		public Boolean DumpCorruptResponse {
+		public bool DumpCorruptResponse {
 			get {
-				return this._dumpCorruptResponse;
+				return _dumpCorruptResponse;
 			}
 			set {
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceDumpCorruptResponseValue(ref coerced);
-				this._dumpCorruptResponse = coerced;
+				_dumpCorruptResponse = coerced;
 			}
 		}
 
@@ -333,12 +333,12 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the DumpCorruptResponse property value.
 		/// </summary>
 		public void ResetDumpCorruptResponse() {
-			this._dumpCorruptResponse = false;
+			_dumpCorruptResponse = false;
 		}
 
-		static partial void CoerceDumpCorruptResponseValue(ref Boolean value);
+		static partial void CoerceDumpCorruptResponseValue(ref bool value);
 
-		private String _corruptResponseDumpOutputDirectory = null;
+		private string _corruptResponseDumpOutputDirectory = null;
 
 		/// <summary>
 		/// 	Gets or sets the directory path the corrupt response dump file is created.
@@ -351,15 +351,15 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	The <c>LocalApplicaitonDataDirectory</c> can be gotten using <see cref="Environment.GetFolderPath(Environment.SpecialFolder)" /> with <see cref="Environment.SpecialFolder.LocalApplicationData" />, which is platform dependent.
 		/// 	For example, it is <c>%UserProfile%\Application Data\Local</c> in Windows prior to Windows Vista/Server 2008, <c>%LocalAppData%</c> on recent Windows, and <c>/home/.config/share</c> in Mono on *nix.
 		/// </remarks>
-		public String CorruptResponseDumpOutputDirectory {
+		public string CorruptResponseDumpOutputDirectory {
 			get {
-				return this._corruptResponseDumpOutputDirectory;
+				return _corruptResponseDumpOutputDirectory;
 			}
 			set {
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceCorruptResponseDumpOutputDirectoryValue(ref coerced);
-				this._corruptResponseDumpOutputDirectory = coerced;
+				_corruptResponseDumpOutputDirectory = coerced;
 			}
 		}
 
@@ -367,10 +367,10 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the CorruptResponseDumpOutputDirectory property value.
 		/// </summary>
 		public void ResetCorruptResponseDumpOutputDirectory() {
-			this._corruptResponseDumpOutputDirectory = null;
+			_corruptResponseDumpOutputDirectory = null;
 		}
 
-		static partial void CoerceCorruptResponseDumpOutputDirectoryValue(ref String value);
+		static partial void CoerceCorruptResponseDumpOutputDirectoryValue(ref string value);
 
 		private Func<Func<ClientRequestContext>, ObjectPoolConfiguration, ObjectPool<ClientRequestContext>> _requestContextPoolProvider = (factory, configuration) => new StandardObjectPool<ClientRequestContext>(factory, configuration);
 
@@ -384,7 +384,7 @@ namespace MsgPack.Rpc.Core.Client {
 			get {
 				Contract.Ensures(Contract.Result<Func<Func<ClientRequestContext>, ObjectPoolConfiguration, ObjectPool<ClientRequestContext>>>() != null);
 
-				return this._requestContextPoolProvider;
+				return _requestContextPoolProvider;
 			}
 			set {
 				if (!(value != null)) {
@@ -393,10 +393,10 @@ namespace MsgPack.Rpc.Core.Client {
 
 				Contract.Ensures(Contract.Result<Func<Func<ClientRequestContext>, ObjectPoolConfiguration, ObjectPool<ClientRequestContext>>>() != null);
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceRequestContextPoolProviderValue(ref coerced);
-				this._requestContextPoolProvider = coerced;
+				_requestContextPoolProvider = coerced;
 			}
 		}
 
@@ -404,7 +404,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the RequestContextPoolProvider property value.
 		/// </summary>
 		public void ResetRequestContextPoolProvider() {
-			this._requestContextPoolProvider = (factory, configuration) => new StandardObjectPool<ClientRequestContext>(factory, configuration);
+			_requestContextPoolProvider = (factory, configuration) => new StandardObjectPool<ClientRequestContext>(factory, configuration);
 		}
 
 		static partial void CoerceRequestContextPoolProviderValue(ref Func<Func<ClientRequestContext>, ObjectPoolConfiguration, ObjectPool<ClientRequestContext>> value);
@@ -421,7 +421,7 @@ namespace MsgPack.Rpc.Core.Client {
 			get {
 				Contract.Ensures(Contract.Result<Func<Func<ClientResponseContext>, ObjectPoolConfiguration, ObjectPool<ClientResponseContext>>>() != null);
 
-				return this._responseContextPoolProvider;
+				return _responseContextPoolProvider;
 			}
 			set {
 				if (!(value != null)) {
@@ -430,10 +430,10 @@ namespace MsgPack.Rpc.Core.Client {
 
 				Contract.Ensures(Contract.Result<Func<Func<ClientResponseContext>, ObjectPoolConfiguration, ObjectPool<ClientResponseContext>>>() != null);
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceResponseContextPoolProviderValue(ref coerced);
-				this._responseContextPoolProvider = coerced;
+				_responseContextPoolProvider = coerced;
 			}
 		}
 
@@ -441,7 +441,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the ResponseContextPoolProvider property value.
 		/// </summary>
 		public void ResetResponseContextPoolProvider() {
-			this._responseContextPoolProvider = (factory, configuration) => new StandardObjectPool<ClientResponseContext>(factory, configuration);
+			_responseContextPoolProvider = (factory, configuration) => new StandardObjectPool<ClientResponseContext>(factory, configuration);
 		}
 
 		static partial void CoerceResponseContextPoolProviderValue(ref Func<Func<ClientResponseContext>, ObjectPoolConfiguration, ObjectPool<ClientResponseContext>> value);
@@ -458,7 +458,7 @@ namespace MsgPack.Rpc.Core.Client {
 			get {
 				Contract.Ensures(Contract.Result<Func<Func<TcpClientTransport>, ObjectPoolConfiguration, ObjectPool<TcpClientTransport>>>() != null);
 
-				return this._tcpTransportPoolProvider;
+				return _tcpTransportPoolProvider;
 			}
 			set {
 				if (!(value != null)) {
@@ -467,10 +467,10 @@ namespace MsgPack.Rpc.Core.Client {
 
 				Contract.Ensures(Contract.Result<Func<Func<TcpClientTransport>, ObjectPoolConfiguration, ObjectPool<TcpClientTransport>>>() != null);
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceTcpTransportPoolProviderValue(ref coerced);
-				this._tcpTransportPoolProvider = coerced;
+				_tcpTransportPoolProvider = coerced;
 			}
 		}
 
@@ -478,7 +478,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the TcpTransportPoolProvider property value.
 		/// </summary>
 		public void ResetTcpTransportPoolProvider() {
-			this._tcpTransportPoolProvider = (factory, configuration) => new StandardObjectPool<TcpClientTransport>(factory, configuration);
+			_tcpTransportPoolProvider = (factory, configuration) => new StandardObjectPool<TcpClientTransport>(factory, configuration);
 		}
 
 		static partial void CoerceTcpTransportPoolProviderValue(ref Func<Func<TcpClientTransport>, ObjectPoolConfiguration, ObjectPool<TcpClientTransport>> value);
@@ -495,7 +495,7 @@ namespace MsgPack.Rpc.Core.Client {
 			get {
 				Contract.Ensures(Contract.Result<Func<Func<UdpClientTransport>, ObjectPoolConfiguration, ObjectPool<UdpClientTransport>>>() != null);
 
-				return this._udpTransportPoolProvider;
+				return _udpTransportPoolProvider;
 			}
 			set {
 				if (!(value != null)) {
@@ -504,10 +504,10 @@ namespace MsgPack.Rpc.Core.Client {
 
 				Contract.Ensures(Contract.Result<Func<Func<UdpClientTransport>, ObjectPoolConfiguration, ObjectPool<UdpClientTransport>>>() != null);
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceUdpTransportPoolProviderValue(ref coerced);
-				this._udpTransportPoolProvider = coerced;
+				_udpTransportPoolProvider = coerced;
 			}
 		}
 
@@ -515,7 +515,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// 	Resets the UdpTransportPoolProvider property value.
 		/// </summary>
 		public void ResetUdpTransportPoolProvider() {
-			this._udpTransportPoolProvider = (factory, configuration) => new StandardObjectPool<UdpClientTransport>(factory, configuration);
+			_udpTransportPoolProvider = (factory, configuration) => new StandardObjectPool<UdpClientTransport>(factory, configuration);
 		}
 
 		static partial void CoerceUdpTransportPoolProviderValue(ref Func<Func<UdpClientTransport>, ObjectPoolConfiguration, ObjectPool<UdpClientTransport>> value);
@@ -530,49 +530,49 @@ namespace MsgPack.Rpc.Core.Client {
 			var buffer = new StringBuilder(4096);
 			buffer.Append("{ ");
 			buffer.Append("\"PreferIPv4\" : ");
-			ToString(this.PreferIPv4, buffer);
+			ToString(PreferIPv4, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"MinimumConcurrentRequest\" : ");
-			ToString(this.MinimumConcurrentRequest, buffer);
+			ToString(MinimumConcurrentRequest, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"MaximumConcurrentRequest\" : ");
-			ToString(this.MaximumConcurrentRequest, buffer);
+			ToString(MaximumConcurrentRequest, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"ConnectTimeout\" : ");
-			ToString(this.ConnectTimeout, buffer);
+			ToString(ConnectTimeout, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"WaitTimeout\" : ");
-			ToString(this.WaitTimeout, buffer);
+			ToString(WaitTimeout, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"TransportManagerProvider\" : ");
-			ToString(this.TransportManagerProvider, buffer);
+			ToString(TransportManagerProvider, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"InitialMethodNameBufferLength\" : ");
-			ToString(this.InitialMethodNameBufferLength, buffer);
+			ToString(InitialMethodNameBufferLength, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"InitialArgumentsBufferLength\" : ");
-			ToString(this.InitialArgumentsBufferLength, buffer);
+			ToString(InitialArgumentsBufferLength, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"InitialReceiveBufferLength\" : ");
-			ToString(this.InitialReceiveBufferLength, buffer);
+			ToString(InitialReceiveBufferLength, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"DumpCorruptResponse\" : ");
-			ToString(this.DumpCorruptResponse, buffer);
+			ToString(DumpCorruptResponse, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"CorruptResponseDumpOutputDirectory\" : ");
-			ToString(this.CorruptResponseDumpOutputDirectory, buffer);
+			ToString(CorruptResponseDumpOutputDirectory, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"RequestContextPoolProvider\" : ");
-			ToString(this.RequestContextPoolProvider, buffer);
+			ToString(RequestContextPoolProvider, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"ResponseContextPoolProvider\" : ");
-			ToString(this.ResponseContextPoolProvider, buffer);
+			ToString(ResponseContextPoolProvider, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"TcpTransportPoolProvider\" : ");
-			ToString(this.TcpTransportPoolProvider, buffer);
+			ToString(TcpTransportPoolProvider, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"UdpTransportPoolProvider\" : ");
-			ToString(this.UdpTransportPoolProvider, buffer);
+			ToString(UdpTransportPoolProvider, buffer);
 			buffer.Append(" }");
 			return buffer.ToString();
 		}

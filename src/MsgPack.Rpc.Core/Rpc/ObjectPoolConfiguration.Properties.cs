@@ -18,13 +18,13 @@ namespace MsgPack.Rpc.Core {
 		/// </value>
 		public string Name {
 			get {
-				return this._name;
+				return _name;
 			}
 			set {
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceNameValue(ref coerced);
-				this._name = coerced;
+				_name = coerced;
 			}
 		}
 
@@ -32,7 +32,7 @@ namespace MsgPack.Rpc.Core {
 		/// 	Resets the Name property value.
 		/// </summary>
 		public void ResetName() {
-			this._name = null;
+			_name = null;
 		}
 
 		static partial void CoerceNameValue(ref string value);
@@ -49,7 +49,7 @@ namespace MsgPack.Rpc.Core {
 			get {
 				Contract.Ensures(Contract.Result<int>() >= default(int));
 
-				return this._minimumReserved;
+				return _minimumReserved;
 			}
 			set {
 				if (!(value >= default(int))) {
@@ -58,10 +58,10 @@ namespace MsgPack.Rpc.Core {
 
 				Contract.Ensures(Contract.Result<int>() >= default(int));
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceMinimumReservedValue(ref coerced);
-				this._minimumReserved = coerced;
+				_minimumReserved = coerced;
 			}
 		}
 
@@ -69,7 +69,7 @@ namespace MsgPack.Rpc.Core {
 		/// 	Resets the MinimumReserved property value.
 		/// </summary>
 		public void ResetMinimumReserved() {
-			this._minimumReserved = 1;
+			_minimumReserved = 1;
 		}
 
 		static partial void CoerceMinimumReservedValue(ref int value);
@@ -86,7 +86,7 @@ namespace MsgPack.Rpc.Core {
 			get {
 				Contract.Ensures(Contract.Result<int?>() == null || Contract.Result<int?>().Value >= default(int));
 
-				return this._maximumPooled;
+				return _maximumPooled;
 			}
 			set {
 				if (!(value == null || value.Value >= default(int))) {
@@ -95,10 +95,10 @@ namespace MsgPack.Rpc.Core {
 
 				Contract.Ensures(Contract.Result<int?>() == null || Contract.Result<int?>().Value >= default(int));
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceMaximumPooledValue(ref coerced);
-				this._maximumPooled = coerced;
+				_maximumPooled = coerced;
 			}
 		}
 
@@ -106,7 +106,7 @@ namespace MsgPack.Rpc.Core {
 		/// 	Resets the MaximumPooled property value.
 		/// </summary>
 		public void ResetMaximumPooled() {
-			this._maximumPooled = null;
+			_maximumPooled = null;
 		}
 
 		static partial void CoerceMaximumPooledValue(ref int? value);
@@ -123,19 +123,19 @@ namespace MsgPack.Rpc.Core {
 			get {
 				Contract.Ensures(Enum.IsDefined(typeof(ExhausionPolicy), Contract.Result<ExhausionPolicy>()));
 
-				return this._exhausionPolicy;
+				return _exhausionPolicy;
 			}
 			set {
 				if (!(Enum.IsDefined(typeof(ExhausionPolicy), value))) {
-					throw new ArgumentOutOfRangeException("value", String.Format(CultureInfo.CurrentCulture, "Argument must be valid enum value of '{0}' type.", typeof(ExhausionPolicy)));
+					throw new ArgumentOutOfRangeException("value", string.Format(CultureInfo.CurrentCulture, "Argument must be valid enum value of '{0}' type.", typeof(ExhausionPolicy)));
 				}
 
 				Contract.Ensures(Enum.IsDefined(typeof(ExhausionPolicy), Contract.Result<ExhausionPolicy>()));
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceExhausionPolicyValue(ref coerced);
-				this._exhausionPolicy = coerced;
+				_exhausionPolicy = coerced;
 			}
 		}
 
@@ -143,7 +143,7 @@ namespace MsgPack.Rpc.Core {
 		/// 	Resets the ExhausionPolicy property value.
 		/// </summary>
 		public void ResetExhausionPolicy() {
-			this._exhausionPolicy = ExhausionPolicy.BlockUntilAvailable;
+			_exhausionPolicy = ExhausionPolicy.BlockUntilAvailable;
 		}
 
 		static partial void CoerceExhausionPolicyValue(ref ExhausionPolicy value);
@@ -160,7 +160,7 @@ namespace MsgPack.Rpc.Core {
 			get {
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
 
-				return this._borrowTimeout;
+				return _borrowTimeout;
 			}
 			set {
 				if (!(value == null || value.Value > default(TimeSpan))) {
@@ -169,10 +169,10 @@ namespace MsgPack.Rpc.Core {
 
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceBorrowTimeoutValue(ref coerced);
-				this._borrowTimeout = coerced;
+				_borrowTimeout = coerced;
 			}
 		}
 
@@ -180,7 +180,7 @@ namespace MsgPack.Rpc.Core {
 		/// 	Resets the BorrowTimeout property value.
 		/// </summary>
 		public void ResetBorrowTimeout() {
-			this._borrowTimeout = null;
+			_borrowTimeout = null;
 		}
 
 		static partial void CoerceBorrowTimeoutValue(ref TimeSpan? value);
@@ -197,7 +197,7 @@ namespace MsgPack.Rpc.Core {
 			get {
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
 
-				return this._evitionInterval;
+				return _evitionInterval;
 			}
 			set {
 				if (!(value == null || value.Value > default(TimeSpan))) {
@@ -206,10 +206,10 @@ namespace MsgPack.Rpc.Core {
 
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
 
-				this.VerifyIsNotFrozen();
+				VerifyIsNotFrozen();
 				var coerced = value;
 				CoerceEvitionIntervalValue(ref coerced);
-				this._evitionInterval = coerced;
+				_evitionInterval = coerced;
 			}
 		}
 
@@ -217,7 +217,7 @@ namespace MsgPack.Rpc.Core {
 		/// 	Resets the EvitionInterval property value.
 		/// </summary>
 		public void ResetEvitionInterval() {
-			this._evitionInterval = TimeSpan.FromMinutes(3);
+			_evitionInterval = TimeSpan.FromMinutes(3);
 		}
 
 		static partial void CoerceEvitionIntervalValue(ref TimeSpan? value);
@@ -232,22 +232,22 @@ namespace MsgPack.Rpc.Core {
 			var buffer = new StringBuilder(256);
 			buffer.Append("{ ");
 			buffer.Append("\"Name\" : ");
-			ToString(this.Name, buffer);
+			ToString(Name, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"MinimumReserved\" : ");
-			ToString(this.MinimumReserved, buffer);
+			ToString(MinimumReserved, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"MaximumPooled\" : ");
-			ToString(this.MaximumPooled, buffer);
+			ToString(MaximumPooled, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"ExhausionPolicy\" : ");
-			ToString(this.ExhausionPolicy, buffer);
+			ToString(ExhausionPolicy, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"BorrowTimeout\" : ");
-			ToString(this.BorrowTimeout, buffer);
+			ToString(BorrowTimeout, buffer);
 			buffer.Append(", ");
 			buffer.Append("\"EvitionInterval\" : ");
-			ToString(this.EvitionInterval, buffer);
+			ToString(EvitionInterval, buffer);
 			buffer.Append(" }");
 			return buffer.ToString();
 		}

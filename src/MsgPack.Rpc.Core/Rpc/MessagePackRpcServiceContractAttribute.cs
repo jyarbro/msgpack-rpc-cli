@@ -6,8 +6,6 @@ namespace MsgPack.Rpc.Core {
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
 	public sealed class MessagePackRpcServiceContractAttribute : Attribute {
-		private string _name;
-
 		/// <summary>
 		///		Gets the name of the RPC procedure.
 		/// </summary>
@@ -15,10 +13,7 @@ namespace MsgPack.Rpc.Core {
 		///		The name of the RPC procedure.
 		///		If the value is <c>null</c>, empty or consisted by whitespace characters only, the qualified type name will be used.
 		/// </value>
-		public string Name {
-			get { return this._name; }
-			set { this._name = value; }
-		}
+		public string Name { get; set; }
 
 		/// <summary>
 		///		Gets or sets the version of the RPC procedure.
@@ -36,8 +31,8 @@ namespace MsgPack.Rpc.Core {
 		internal string ToServiceId(Type serviceType) {
 			return
 				ServiceIdentifier.CreateServiceId(
-					String.IsNullOrWhiteSpace(this._name) ? ServiceIdentifier.TruncateGenericsSuffix(serviceType.Name) : this._name,
-					this.Version
+					string.IsNullOrWhiteSpace(Name) ? ServiceIdentifier.TruncateGenericsSuffix(serviceType.Name) : Name,
+					Version
 				);
 		}
 	}

@@ -16,7 +16,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </returns>
 		public static RpcErrorMessage ToClientRpcError(this SocketError socketError) {
 			if (socketError.IsError().GetValueOrDefault()) {
-				return new RpcErrorMessage(socketError.ToRpcError(), new SocketException((int)socketError).Message, String.Empty);
+				return new RpcErrorMessage(socketError.ToRpcError(), new SocketException((int)socketError).Message, string.Empty);
 			}
 			else {
 				return RpcErrorMessage.Success;

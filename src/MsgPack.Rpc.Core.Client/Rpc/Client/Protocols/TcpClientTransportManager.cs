@@ -34,10 +34,10 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		This value will not be <c>null</c>.
 		/// </returns>
 		protected sealed override Task<ClientTransport> ConnectAsyncCore(EndPoint targetEndPoint) {
-			TaskCompletionSource<ClientTransport> source = new TaskCompletionSource<ClientTransport>();
+			var source = new TaskCompletionSource<ClientTransport>();
 			var context = new SocketAsyncEventArgs();
 			context.RemoteEndPoint = targetEndPoint;
-			context.Completed += this.OnCompleted;
+			context.Completed += OnCompleted;
 
 #if !API_SIGNATURE_TEST
 			MsgPackRpcClientProtocolsTrace.TraceEvent(
@@ -45,7 +45,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				"Connecting. {{ \"EndPoint\" : \"{0}\", \"AddressFamily\" : {1}, \"PreferIPv4\" : {2}, \"OSSupportsIPv6\" : {3} }}",
 				targetEndPoint,
 				targetEndPoint.AddressFamily,
-				this.Configuration.PreferIPv4,
+				Configuration.PreferIPv4,
 				Socket.OSSupportsIPv6
 			);
 #endif
@@ -55,7 +55,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			context.UserToken =
 				Tuple.Create(
 					source,
-					this.BeginConnectTimeoutWatch(
+					BeginConnectTimeoutWatch(
 						() => {
 #if !API_SIGNATURE_TEST
 							MsgPackRpcClientProtocolsTrace.TraceEvent(
@@ -63,9 +63,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 								"Connect timeout. {{ \"EndPoint\" : \"{0}\", \"AddressFamily\" : {1}, \"PreferIPv4\" : {2}, \"OSSupportsIPv6\" : {3}, \"ConnectTimeout\" : {4} }}",
 								targetEndPoint,
 								targetEndPoint.AddressFamily,
-								this.Configuration.PreferIPv4,
+								Configuration.PreferIPv4,
 								Socket.OSSupportsIPv6,
-								this.Configuration.ConnectTimeout
+								Configuration.ConnectTimeout
 							);
 #endif
 #if MONO
@@ -87,7 +87,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			if (!Socket.ConnectAsync(SocketType.Stream, ProtocolType.Tcp, context))
 #endif
 			{
-				this.OnCompleted(null, context);
+				OnCompleted(null, context);
 			}
 
 			return source.Task;
@@ -103,13 +103,13 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			var taskCompletionSource = userToken.Item1;
 			var watcher = userToken.Item2;
 			if (watcher != null) {
-				this.EndConnectTimeoutWatch(watcher);
+				EndConnectTimeoutWatch(watcher);
 			}
 
 #if MONO
 			var error = this.HandleSocketError( userToken.Item3 ?? socket, e );
 #else
-			var error = this.HandleSocketError(e.ConnectSocket ?? socket, e);
+			var error = HandleSocketError(e.ConnectSocket ?? socket, e);
 #endif
 			if (error != null) {
 				taskCompletionSource.SetException(error.Value.ToException());
@@ -121,7 +121,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 #if MONO
 					this.OnConnected( userToken.Item3, e, taskCompletionSource );
 #else
-					this.OnConnected(e.ConnectSocket, e, taskCompletionSource);
+					OnConnected(e.ConnectSocket, e, taskCompletionSource);
 #endif
 					break;
 				}
@@ -136,7 +136,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 						e.LastOperation
 					);
 #endif
-					taskCompletionSource.SetException(new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "Unknown socket operation : {0}", e.LastOperation)));
+					taskCompletionSource.SetException(new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Unknown socket operation : {0}", e.LastOperation)));
 					break;
 				}
 			}
@@ -150,7 +150,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 						new RpcTransportException(
 							RpcError.ConnectionTimeoutError,
 							"Connect timeout.",
-							String.Format(CultureInfo.CurrentCulture, "Timeout: {0}", this.Configuration.ConnectTimeout)
+							string.Format(CultureInfo.CurrentCulture, "Timeout: {0}", Configuration.ConnectTimeout)
 						)
 					);
 					return;
@@ -166,7 +166,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				);
 #endif
 
-				taskCompletionSource.SetResult(this.GetTransport(connectSocket));
+				taskCompletionSource.SetResult(GetTransport(connectSocket));
 			}
 			finally {
 				context.Dispose();
@@ -187,11 +187,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </exception>
 		protected sealed override TcpClientTransport GetTransportCore(Socket bindingSocket) {
 			if (bindingSocket == null) {
-				throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "'bindingSocket' is required in {0}.", this.GetType()));
+				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "'bindingSocket' is required in {0}.", GetType()));
 			}
 
 			var transport = base.GetTransportCore(bindingSocket);
-			this.BindSocket(transport, bindingSocket);
+			BindSocket(transport, bindingSocket);
 			return transport;
 		}
 

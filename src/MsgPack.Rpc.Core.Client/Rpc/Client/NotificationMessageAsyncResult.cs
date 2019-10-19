@@ -10,7 +10,7 @@ namespace MsgPack.Rpc.Core.Client {
 				base.Complete(completedSynchronously);
 			}
 
-			var callback = this.AsyncCallback;
+			var callback = AsyncCallback;
 			if (callback != null) {
 				callback(this);
 			}
@@ -33,7 +33,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="owner"/> is null.
 		/// </exception>
-		public NotificationMessageAsyncResult(Object owner, AsyncCallback asyncCallback, object asyncState)
+		public NotificationMessageAsyncResult(object owner, AsyncCallback asyncCallback, object asyncState)
 			: base(owner, null, asyncCallback, asyncState) { }
 	}
 }

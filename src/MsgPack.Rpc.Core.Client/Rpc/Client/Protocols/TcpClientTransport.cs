@@ -12,9 +12,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <value>
 		/// 	<c>true</c> if this instance can resume receiving; otherwise, <c>false</c>.
 		/// </value>
-		protected override bool CanResumeReceiving {
-			get { return true; }
-		}
+		protected override bool CanResumeReceiving => true;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="TcpClientTransport"/> class.
@@ -31,7 +29,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </summary>
 		protected sealed override void ShutdownSending() {
 			try {
-				this.BoundSocket.Shutdown(SocketShutdown.Send);
+				BoundSocket.Shutdown(SocketShutdown.Send);
 			}
 			catch (SocketException ex) {
 				if (ex.SocketErrorCode != SocketError.NotConnected) {
@@ -47,7 +45,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </summary>
 		protected sealed override void ShutdownReceiving() {
 			try {
-				this.BoundSocket.Shutdown(SocketShutdown.Receive);
+				BoundSocket.Shutdown(SocketShutdown.Receive);
 			}
 			catch (SocketException ex) {
 				if (ex.SocketErrorCode != SocketError.NotConnected) {
@@ -63,9 +61,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </summary>
 		/// <param name="context">Context information.</param>
 		protected sealed override void SendCore(ClientRequestContext context) {
-			if (!this.BoundSocket.SendAsync(context.SocketContext)) {
+			if (!BoundSocket.SendAsync(context.SocketContext)) {
 				context.SetCompletedSynchronously();
-				this.OnSent(context);
+				OnSent(context);
 			}
 		}
 
@@ -74,9 +72,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </summary>
 		/// <param name="context">Context information.</param>
 		protected sealed override void ReceiveCore(ClientResponseContext context) {
-			if (!this.BoundSocket.ReceiveAsync(context.SocketContext)) {
+			if (!BoundSocket.ReceiveAsync(context.SocketContext)) {
 				context.SetCompletedSynchronously();
-				this.OnReceived(context);
+				OnReceived(context);
 			}
 		}
 	}

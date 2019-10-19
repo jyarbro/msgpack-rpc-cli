@@ -13,9 +13,7 @@ namespace MsgPack.Rpc.Core {
 		/// <value>
 		///		The instance which represents success (that is, not error.)
 		/// </value>
-		public static RpcErrorMessage Success {
-			get { return new RpcErrorMessage(); }
-		}
+		public static RpcErrorMessage Success => new RpcErrorMessage();
 
 		/// <summary>
 		///		Get the value whether this instance represents success.
@@ -23,9 +21,7 @@ namespace MsgPack.Rpc.Core {
 		/// <value>
 		///		If this instance represents success then true.
 		/// </value>
-		public bool IsSuccess {
-			get { return this._error == null; }
-		}
+		public bool IsSuccess => _error == null;
 
 		private readonly RpcError _error;
 
@@ -40,11 +36,11 @@ namespace MsgPack.Rpc.Core {
 		/// </exception>
 		public RpcError Error {
 			get {
-				if (this._error == null) {
+				if (_error == null) {
 					throw new InvalidOperationException("Operation success.");
 				}
 
-				return this._error;
+				return _error;
 			}
 		}
 
@@ -61,11 +57,11 @@ namespace MsgPack.Rpc.Core {
 		/// </exception>
 		public MessagePackObject Detail {
 			get {
-				if (this._error == null) {
+				if (_error == null) {
 					throw new InvalidOperationException("Operation success.");
 				}
 
-				return this._detail;
+				return _detail;
 			}
 		}
 
@@ -84,8 +80,8 @@ namespace MsgPack.Rpc.Core {
 
 			Contract.EndContractBlock();
 
-			this._error = error;
-			this._detail = detail;
+			_error = error;
+			_detail = detail;
 		}
 
 		/// <summary>
@@ -104,7 +100,7 @@ namespace MsgPack.Rpc.Core {
 
 			Contract.EndContractBlock();
 
-			this._error = error;
+			_error = error;
 
 			var data = new MessagePackObjectDictionary(2);
 			if (description != null) {
@@ -115,7 +111,7 @@ namespace MsgPack.Rpc.Core {
 				data.Add(RpcException.DebugInformationKeyUtf8, debugInformation);
 			}
 
-			this._detail = new MessagePackObject(data);
+			_detail = new MessagePackObject(data);
 		}
 
 		/// <summary>
@@ -134,7 +130,7 @@ namespace MsgPack.Rpc.Core {
 				return false;
 			}
 
-			return this.Equals((RpcErrorMessage)obj);
+			return Equals((RpcErrorMessage)obj);
 		}
 
 		/// <summary>
@@ -147,7 +143,7 @@ namespace MsgPack.Rpc.Core {
 		///		<x>true</x> if the current object is equal to the <paramref name="other"/> parameter; otherwise, <c>false</c>.
 		/// </returns>
 		public bool Equals(RpcErrorMessage other) {
-			return this._error == other._error && this._detail == other._detail;
+			return _error == other._error && _detail == other._detail;
 		}
 
 		/// <summary>
@@ -157,7 +153,7 @@ namespace MsgPack.Rpc.Core {
 		///		A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
 		/// </returns>
 		public override int GetHashCode() {
-			return (this._error == null ? 0 : this._error.GetHashCode()) ^ this._detail.GetHashCode();
+			return (_error == null ? 0 : _error.GetHashCode()) ^ _detail.GetHashCode();
 		}
 
 		/// <summary>
@@ -167,11 +163,11 @@ namespace MsgPack.Rpc.Core {
 		///		String representation of this error.
 		/// </returns>
 		public override string ToString() {
-			if (this.IsSuccess) {
-				return String.Empty;
+			if (IsSuccess) {
+				return string.Empty;
 			}
 			else {
-				return String.Format(CultureInfo.CurrentCulture, "{{ \"ID\" : \"{0}\", \"Code\" : {1}, \"Detail\" : {2} }}", this._error.Identifier, this._error.ErrorCode, this._detail);
+				return string.Format(CultureInfo.CurrentCulture, "{{ \"ID\" : \"{0}\", \"Code\" : {1}, \"Detail\" : {2} }}", _error.Identifier, _error.ErrorCode, _detail);
 			}
 		}
 
@@ -183,11 +179,11 @@ namespace MsgPack.Rpc.Core {
 		///		<see cref="IsSuccess"/> is true.
 		/// </exception>
 		public RpcException ToException() {
-			if (this.IsSuccess) {
+			if (IsSuccess) {
 				throw new InvalidOperationException("Operation has been succeeded.");
 			}
 
-			return this._error.ToException(this._detail);
+			return _error.ToException(_detail);
 		}
 
 		/// <summary>

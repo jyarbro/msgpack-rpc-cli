@@ -20,7 +20,7 @@ namespace MsgPack.Rpc.Core {
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose() {
-			this.Dispose(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
@@ -47,7 +47,7 @@ namespace MsgPack.Rpc.Core {
 		public T Borrow() {
 			Contract.Ensures(Contract.Result<T>() != null);
 
-			return this.BorrowCore();
+			return BorrowCore();
 		}
 
 		/// <summary>
@@ -73,7 +73,7 @@ namespace MsgPack.Rpc.Core {
 
 			Contract.EndContractBlock();
 
-			this.ReturnCore(value);
+			ReturnCore(value);
 		}
 
 		/// <summary>

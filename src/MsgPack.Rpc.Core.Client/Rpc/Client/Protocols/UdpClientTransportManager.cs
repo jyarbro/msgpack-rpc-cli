@@ -33,7 +33,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		This value will not be <c>null</c>.
 		/// </returns>
 		protected sealed override Task<ClientTransport> ConnectAsyncCore(EndPoint targetEndPoint) {
-			var task = new Task<ClientTransport>(this.CreateTransport, targetEndPoint);
+			var task = new Task<ClientTransport>(CreateTransport, targetEndPoint);
 			task.RunSynchronously(TaskScheduler.Default);
 			return task;
 		}
@@ -41,12 +41,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		private UdpClientTransport CreateTransport(object state) {
 			var socket =
 				new Socket(
-					(this.Configuration.PreferIPv4 || !Socket.OSSupportsIPv6) ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6,
+					(Configuration.PreferIPv4 || !Socket.OSSupportsIPv6) ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6,
 					SocketType.Dgram,
 					ProtocolType.Udp
 				);
 
-			var transport = this.GetTransport(socket);
+			var transport = GetTransport(socket);
 			transport.RemoteEndPoint = state as EndPoint;
 			return transport;
 		}
@@ -65,11 +65,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </exception>
 		protected sealed override UdpClientTransport GetTransportCore(Socket bindingSocket) {
 			if (bindingSocket == null) {
-				throw new InvalidOperationException(String.Format(CultureInfo.CurrentCulture, "'bindingSocket' is required in {0}.", this.GetType()));
+				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "'bindingSocket' is required in {0}.", GetType()));
 			}
 
 			var transport = base.GetTransportCore(bindingSocket);
-			this.BindSocket(transport, bindingSocket);
+			BindSocket(transport, bindingSocket);
 			return transport;
 		}
 	}

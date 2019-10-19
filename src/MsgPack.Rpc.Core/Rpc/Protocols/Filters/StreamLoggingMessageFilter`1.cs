@@ -26,7 +26,7 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 
 			Contract.EndContractBlock();
 
-			this._logger = logger;
+			_logger = logger;
 		}
 
 		/// <summary>
@@ -34,7 +34,7 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 		/// </summary>
 		/// <param name="context">The message context. This value is not <c>null</c>.</param>
 		protected override void ProcessMessageCore(T context) {
-			this._logger.Write(context.SessionStartedAt, context.RemoteEndPoint, context.ReceivedData.SelectMany(s => s.AsEnumerable()));
+			_logger.Write(context.SessionStartedAt, context.RemoteEndPoint, context.ReceivedData.SelectMany(s => s.AsEnumerable()));
 		}
 	}
 }

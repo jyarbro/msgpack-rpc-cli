@@ -12,7 +12,7 @@ namespace MsgPack.Rpc.Core {
 		/// <param name="underyingStream">The underying stream.</param>
 		/// <returns><c>true</c> if data read successfully; otherwise, <c>false</c></returns>
 		public static bool TryRead(this Unpacker unpacker, Stream underyingStream) {
-			long position = underyingStream.Position;
+			var position = underyingStream.Position;
 			try {
 				return unpacker.Read();
 			}

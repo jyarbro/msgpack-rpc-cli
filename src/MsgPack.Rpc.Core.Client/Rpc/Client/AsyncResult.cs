@@ -17,19 +17,13 @@ namespace MsgPack.Rpc.Core {
 		private const int _finished = 0x2;
 		private const int _neverSet = unchecked((int)0x80000000);
 
-		private readonly object _owner;
-
 		/// <summary>
 		///		Gets an owner of asynchrnous invocation.
 		/// </summary>
 		/// <value>
 		///		An owner of asynchrnous invocation. This value will not be null.
 		/// </value>
-		internal object Owner {
-			get { return _owner; }
-		}
-
-		private readonly AsyncCallback _asyncCallback;
+		internal object Owner { get; }
 
 		/// <summary>
 		///		Gets a callback of asynchrnous invocation which should be called in completion.
@@ -38,11 +32,7 @@ namespace MsgPack.Rpc.Core {
 		///		A callback of asynchrnous invocation which should be called in completion.
 		///		This value could be null.
 		/// </value>
-		public AsyncCallback AsyncCallback {
-			get { return this._asyncCallback; }
-		}
-
-		private readonly object _asyncState;
+		public AsyncCallback AsyncCallback { get; }
 
 		/// <summary>
 		///		Gets a state object of asynchrnous invocation which will be passed to <see cref="AsyncCallback"/>.
@@ -51,9 +41,7 @@ namespace MsgPack.Rpc.Core {
 		///		A state object of asynchrnous invocation which will be passed to <see cref="AsyncCallback"/>.
 		///		This value could be null.
 		/// </value>
-		public object AsyncState {
-			get { return this._asyncState; }
-		}
+		public object AsyncState { get; }
 
 		private ManualResetEvent _asyncWaitHandle;
 
@@ -65,8 +53,8 @@ namespace MsgPack.Rpc.Core {
 		/// </value>
 		public WaitHandle AsyncWaitHandle {
 			get {
-				var waitHandle = LazyInitializer.EnsureInitialized(ref this._asyncWaitHandle, () => new ManualResetEvent(false));
-				if (this.IsCompleted) {
+				var waitHandle = LazyInitializer.EnsureInitialized(ref _asyncWaitHandle, () => new ManualResetEvent(false));
+				if (IsCompleted) {
 					waitHandle.Set();
 				}
 
@@ -77,9 +65,7 @@ namespace MsgPack.Rpc.Core {
 		// manipulated via Interlocked methods.
 		private int _state;
 
-		bool IAsyncResult.CompletedSynchronously {
-			get { return (this._state & _completedSynchronously) == _completedSynchronously; }
-		}
+		bool IAsyncResult.CompletedSynchronously => (_state & _completedSynchronously) == _completedSynchronously;
 
 		/// <summary>
 		///		Gets a value asynchronous invocation is completed.
@@ -87,9 +73,7 @@ namespace MsgPack.Rpc.Core {
 		/// <value>
 		///		If asynchronous invocation is completed, that is, BeginInvoke is finished then true.
 		/// </value>
-		public bool IsCompleted {
-			get { return (this._state & _completed) == _completed; }
-		}
+		public bool IsCompleted => (_state & _completed) == _completed;
 
 		/// <summary>
 		///		Gets a value asynchronous invocation is finished.
@@ -97,9 +81,7 @@ namespace MsgPack.Rpc.Core {
 		/// <value>
 		///		If asynchronous invocation is finished, that is, EncInvoke is finished then true.
 		/// </value>
-		public bool IsFinished {
-			get { return (this._state & _finished) == _finished; }
-		}
+		public bool IsFinished => (_state & _finished) == _finished;
 
 		private Exception _error;
 
@@ -109,9 +91,7 @@ namespace MsgPack.Rpc.Core {
 		/// <value>
 		///		An error corresponds to this message.
 		/// </value>
-		public Exception Error {
-			get { return this._error; }
-		}
+		public Exception Error => _error;
 
 		/// <summary>
 		///		Initializes new instance.
@@ -135,9 +115,9 @@ namespace MsgPack.Rpc.Core {
 				throw new ArgumentNullException("owner");
 			}
 
-			this._owner = owner;
-			this._asyncCallback = asyncCallback;
-			this._asyncState = asyncState;
+			Owner = owner;
+			AsyncCallback = asyncCallback;
+			AsyncState = asyncState;
 		}
 
 		/// <summary>
@@ -147,9 +127,9 @@ namespace MsgPack.Rpc.Core {
 		///		When operation is completed same thread as initiater then <c>true</c>; otherwise, <c>false</c>.
 		/// </param>
 		internal void Complete(bool completedSynchronously) {
-			int state = _completed | (completedSynchronously ? _completedSynchronously : 0);
-			if (Interlocked.CompareExchange(ref this._state, state, _initialized) == _initialized) {
-				var waitHandle = this._asyncWaitHandle;
+			var state = _completed | (completedSynchronously ? _completedSynchronously : 0);
+			if (Interlocked.CompareExchange(ref _state, state, _initialized) == _initialized) {
+				var waitHandle = _asyncWaitHandle;
 				if (waitHandle != null) {
 					waitHandle.Set();
 				}
@@ -168,8 +148,8 @@ namespace MsgPack.Rpc.Core {
 		public void OnError(Exception error, bool completedSynchronously) {
 			try { }
 			finally {
-				Interlocked.Exchange(ref this._error, error);
-				this.Complete(completedSynchronously);
+				Interlocked.Exchange(ref _error, error);
+				Complete(completedSynchronously);
 			}
 		}
 
@@ -177,9 +157,9 @@ namespace MsgPack.Rpc.Core {
 		///		Waits until asynchronous operation is completed.
 		/// </summary>
 		public void WaitForCompletion() {
-			var current = Interlocked.CompareExchange(ref this._state, _neverSet, _neverSet);
+			var current = Interlocked.CompareExchange(ref _state, _neverSet, _neverSet);
 			if ((current & _completed) == 0) {
-				this.AsyncWaitHandle.WaitOne();
+				AsyncWaitHandle.WaitOne();
 			}
 		}
 
@@ -187,21 +167,21 @@ namespace MsgPack.Rpc.Core {
 		///		Records all operation is finished and clean ups internal resources.
 		/// </summary>
 		public void Finish() {
-			Contract.Assert(this._state != _initialized);
+			Contract.Assert(_state != _initialized);
 			try {
-				int oldValue = this._state;
-				int newValue = this._state | _finished;
-				while (Interlocked.CompareExchange(ref this._state, newValue, oldValue) != oldValue) {
-					oldValue = this._state;
+				var oldValue = _state;
+				var newValue = _state | _finished;
+				while (Interlocked.CompareExchange(ref _state, newValue, oldValue) != oldValue) {
+					oldValue = _state;
 					newValue = oldValue | _finished;
 				}
 
-				if (this._error != null) {
-					throw this._error;
+				if (_error != null) {
+					throw _error;
 				}
 			}
 			finally {
-				var waitHandle = Interlocked.Exchange(ref this._asyncWaitHandle, null);
+				var waitHandle = Interlocked.Exchange(ref _asyncWaitHandle, null);
 				if (waitHandle != null) {
 					waitHandle.Dispose();
 				}
@@ -232,8 +212,7 @@ namespace MsgPack.Rpc.Core {
 				throw new ArgumentNullException("asyncResult");
 			}
 
-			TAsyncResult result = asyncResult as TAsyncResult;
-			if (result == null) {
+			if (!(asyncResult is TAsyncResult result)) {
 				throw new ArgumentException("Unknown asyncResult.", "asyncResult");
 			}
 

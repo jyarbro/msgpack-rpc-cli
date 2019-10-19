@@ -364,7 +364,7 @@ namespace MsgPack.Rpc.Core {
 		#endregion -- Built-in Errors --
 
 		private const string _unexpectedErrorIdentifier = "RPCError.RemoteError.UnexpectedError";
-		private const int _unexpectedErrorCode = Int32.MaxValue;
+		private const int _unexpectedErrorCode = int.MaxValue;
 
 		private static readonly RpcError _unexpected =
 			new RpcError(
@@ -410,19 +410,13 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private readonly string _identifier;
-
 		/// <summary>
 		///		Get iedntifier of this error.
 		/// </summary>
 		/// <value>
 		///		Iedntifier of this error.
 		/// </value>
-		public string Identifier {
-			get { return this._identifier; }
-		}
-
-		private readonly int _errorCode;
+		public string Identifier { get; }
 
 		/// <summary>
 		///		Get error code of this error.
@@ -430,11 +424,7 @@ namespace MsgPack.Rpc.Core {
 		/// <value>
 		///		Error code of this error.
 		/// </value>
-		public int ErrorCode {
-			get { return this._errorCode; }
-		}
-
-		private readonly string _defaultMessageInvariant;
+		public int ErrorCode { get; }
 
 		/// <summary>
 		///		Get default message in invariant culture.
@@ -445,9 +435,7 @@ namespace MsgPack.Rpc.Core {
 		/// <remarks>
 		///		You can use this property to build custom exception.
 		/// </remarks>
-		public string DefaultMessageInvariant {
-			get { return _defaultMessageInvariant; }
-		}
+		public string DefaultMessageInvariant { get; }
 
 		/// <summary>
 		///		Get default message in current UI culture.
@@ -458,20 +446,17 @@ namespace MsgPack.Rpc.Core {
 		/// <remarks>
 		///		You can use this property to build custom exception.
 		/// </remarks>
-		public string DefaultMessage {
-			get {
+		public string DefaultMessage =>
 				// TODO: localization key: Idnentifier ".DefaultMessage"
-				return this.DefaultMessageInvariant;
-			}
-		}
+				DefaultMessageInvariant;
 
 		private readonly Func<RpcError, MessagePackObject, RpcException> _exceptionUnmarshaler;
 
 		private RpcError(string identifier, int errorCode, string defaultMessageInvariant, Func<RpcError, MessagePackObject, RpcException> exceptionUnmarshaler) {
-			this._identifier = identifier;
-			this._errorCode = errorCode;
-			this._defaultMessageInvariant = defaultMessageInvariant;
-			this._exceptionUnmarshaler = exceptionUnmarshaler;
+			Identifier = identifier;
+			ErrorCode = errorCode;
+			DefaultMessageInvariant = defaultMessageInvariant;
+			_exceptionUnmarshaler = exceptionUnmarshaler;
 		}
 
 		/// <summary>
@@ -484,9 +469,9 @@ namespace MsgPack.Rpc.Core {
 		///		<see cref="RpcException"/> which corresponds to this error with specified detailed information.
 		/// </returns>
 		internal RpcException ToException(MessagePackObject detail) {
-			Contract.Assume(this._exceptionUnmarshaler != null);
+			Contract.Assume(_exceptionUnmarshaler != null);
 
-			return this._exceptionUnmarshaler(this, detail);
+			return _exceptionUnmarshaler(this, detail);
 		}
 
 		/// <summary>
@@ -506,7 +491,7 @@ namespace MsgPack.Rpc.Core {
 				return false;
 			}
 
-			return this._errorCode == other._errorCode && this._identifier == other._identifier;
+			return ErrorCode == other.ErrorCode && Identifier == other.Identifier;
 		}
 
 		/// <summary>
@@ -516,7 +501,7 @@ namespace MsgPack.Rpc.Core {
 		///		A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
 		/// </returns>
 		public sealed override int GetHashCode() {
-			return this._errorCode.GetHashCode();
+			return ErrorCode.GetHashCode();
 		}
 
 		/// <summary>
@@ -526,7 +511,7 @@ namespace MsgPack.Rpc.Core {
 		///		A <see cref="System.String"/> that represents this instance.
 		/// </returns>
 		public sealed override string ToString() {
-			return String.Format(CultureInfo.CurrentCulture, "{0}({1}): {2}", this._identifier, this._errorCode, this.DefaultMessage);
+			return string.Format(CultureInfo.CurrentCulture, "{0}({1}): {2}", Identifier, ErrorCode, DefaultMessage);
 		}
 
 		/// <summary>
@@ -555,7 +540,7 @@ namespace MsgPack.Rpc.Core {
 				throw new ArgumentNullException("identifier");
 			}
 
-			if (String.IsNullOrWhiteSpace(identifier)) {
+			if (string.IsNullOrWhiteSpace(identifier)) {
 				throw new ArgumentException("'identifier' cannot be empty.", "identifier");
 			}
 
@@ -600,7 +585,7 @@ namespace MsgPack.Rpc.Core {
 				return result;
 			}
 
-			return CustomError(String.IsNullOrWhiteSpace(identifier) ? _unexpectedErrorIdentifier : identifier, errorCode ?? _unexpectedErrorCode);
+			return CustomError(string.IsNullOrWhiteSpace(identifier) ? _unexpectedErrorIdentifier : identifier, errorCode ?? _unexpectedErrorCode);
 		}
 
 		/// <summary>

@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Security;
 using System.Threading;
-#if WINDOWS_PHONE
-using Mono;
-using Mono.Threading;
-#endif
 
 namespace MsgPack.Rpc.Core {
 	/// <summary>
@@ -27,9 +23,7 @@ namespace MsgPack.Rpc.Core {
 		///		The current context.
 		///		If this thread is initiated by the dispatcher, then <c>null</c>.
 		/// </value>
-		public static RpcApplicationContext Current {
-			get { return _current; }
-		}
+		public static RpcApplicationContext Current => _current;
 
 		/// <summary>
 		///		Sets the current context for this thread.
@@ -38,9 +32,7 @@ namespace MsgPack.Rpc.Core {
 		internal static void SetCurrent(RpcApplicationContext context) {
 			_current = context;
 			context._boundThread = new WeakReference(Thread.CurrentThread);
-#if !SILVERLIGHT
 			context._hardTimeoutWatcher.Reset();
-#endif
 			context._softTimeoutWatcher.Reset();
 		}
 
@@ -89,17 +81,13 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		internal bool IsSoftTimeout {
-			get { return this._softTimeoutWatcher.IsTimeout; }
-		}
+		internal bool IsSoftTimeout => _softTimeoutWatcher.IsTimeout;
 
 		// Set from SetCurrent
 		private WeakReference _boundThread;
 		private AggregateException _exceptionInCancellationCallback;
 		private readonly TimeoutWatcher _softTimeoutWatcher;
-#if !SILVERLIGHT
 		private readonly TimeoutWatcher _hardTimeoutWatcher;
-#endif
 		private readonly CancellationTokenSource _cancellationTokenSource;
 
 #if DEBUG
@@ -107,7 +95,7 @@ namespace MsgPack.Rpc.Core {
 		internal event EventHandler DebugSoftTimeout;
 
 		private void OnDebugSoftTimeout() {
-			var handler = this.DebugSoftTimeout;
+			var handler = DebugSoftTimeout;
 			if (handler != null) {
 				handler(this, EventArgs.Empty);
 			}
@@ -120,80 +108,60 @@ namespace MsgPack.Rpc.Core {
 		/// <value>
 		///		The <see cref="CancellationToken"/> associated with this context.
 		/// </value>
-#if WINDOWS_PHONE
-		internal CancellationToken CancellationToken
-#else
-		public CancellationToken CancellationToken
-#endif
-		{
-			get { return this._cancellationTokenSource.Token; }
-		}
+		public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
 		private TimeSpan? _softTimeout;
 
-#if !SILVERLIGHT
 		private TimeSpan? _hardTimeout;
-#endif
 
 		private int _state;
 
-		internal bool IsDisposed {
-			get { return Interlocked.CompareExchange(ref this._state, 0, 0) == StateDisposed; }
-		}
+		internal bool IsDisposed => Interlocked.CompareExchange(ref _state, 0, 0) == StateDisposed;
 
 		// called from SetCurrent
 		internal RpcApplicationContext(TimeSpan? softTimeout, TimeSpan? hardTimeout) {
-			this._softTimeout = softTimeout;
-#if !SILVERLIGHT
-			this._hardTimeout = hardTimeout;
-#endif
-			this._softTimeoutWatcher = new TimeoutWatcher();
-			this._softTimeoutWatcher.Timeout += (sender, e) => this.OnSoftTimeout();
-#if !SILVERLIGHT
-			this._hardTimeoutWatcher = new TimeoutWatcher();
-			this._hardTimeoutWatcher.Timeout += (sender, e) => this.OnHardTimeout();
-#endif
-			this._cancellationTokenSource = new CancellationTokenSource();
+			_softTimeout = softTimeout;
+			_hardTimeout = hardTimeout;
+			_softTimeoutWatcher = new TimeoutWatcher();
+			_softTimeoutWatcher.Timeout += (sender, e) => OnSoftTimeout();
+			_hardTimeoutWatcher = new TimeoutWatcher();
+			_hardTimeoutWatcher.Timeout += (sender, e) => OnHardTimeout();
+			_cancellationTokenSource = new CancellationTokenSource();
 		}
 
 		/// <summary>
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose() {
-			if (Interlocked.Exchange(ref this._state, StateDisposed) != StateDisposed) {
-#if !SILVERLIGHT
-				this._hardTimeoutWatcher.Dispose();
-#endif
-				this._softTimeoutWatcher.Dispose();
-				this._cancellationTokenSource.Dispose();
+			if (Interlocked.Exchange(ref _state, StateDisposed) != StateDisposed) {
+				_hardTimeoutWatcher.Dispose();
+				_softTimeoutWatcher.Dispose();
+				_cancellationTokenSource.Dispose();
 			}
 		}
 
 		private void OnSoftTimeout() {
-			if (Interlocked.CompareExchange(ref this._state, StateSoftTimeout, StateActive) != StateActive) {
+			if (Interlocked.CompareExchange(ref _state, StateSoftTimeout, StateActive) != StateActive) {
 				return;
 			}
 
 			try {
-				this._cancellationTokenSource.Cancel();
+				_cancellationTokenSource.Cancel();
 			}
 			catch (AggregateException ex) {
-				Interlocked.Exchange(ref this._exceptionInCancellationCallback, ex);
+				Interlocked.Exchange(ref _exceptionInCancellationCallback, ex);
 			}
 
-#if !SILVERLIGHT
-			if (this._hardTimeout != null) {
-				this._hardTimeoutWatcher.Start(this._hardTimeout.Value);
+			if (_hardTimeout != null) {
+				_hardTimeoutWatcher.Start(_hardTimeout.Value);
 			}
-#endif
 #if DEBUG
-			this.OnDebugSoftTimeout();
+			OnDebugSoftTimeout();
 #endif
 		}
 
-#if !SILVERLIGHT
 		private void OnHardTimeout() {
-			if (Interlocked.CompareExchange(ref this._state, StateHardTimeout, StateSoftTimeout) != StateSoftTimeout) {
+			if (Interlocked.CompareExchange(ref _state, StateHardTimeout, StateSoftTimeout) != StateSoftTimeout) {
 				return;
 			}
 
@@ -206,29 +174,25 @@ namespace MsgPack.Rpc.Core {
 
 		[SecuritySafeCritical]
 		private void DoHardTimeout() {
-			var thread = this._boundThread.Target as Thread;
-			if (thread != null) {
+			if (_boundThread.Target is Thread thread) {
 				try {
 					thread.Abort(HardTimeoutToken);
 				}
 				catch (ThreadStateException) { }
 			}
 		}
-#endif
 
 		internal void StartTimeoutWatch() {
-			if (this._softTimeout == null) {
+			if (_softTimeout == null) {
 				return;
 			}
 
-			this._softTimeoutWatcher.Start(this._softTimeout.Value);
+			_softTimeoutWatcher.Start(_softTimeout.Value);
 		}
 
 		internal void StopTimeoutWatch() {
-#if !SILVERLIGHT
-			this._hardTimeoutWatcher.Stop();
-#endif
-			this._softTimeoutWatcher.Stop();
+			_hardTimeoutWatcher.Stop();
+			_softTimeoutWatcher.Stop();
 
 			var exceptionInCancellationCallback = Interlocked.Exchange(ref _exceptionInCancellationCallback, null);
 			if (exceptionInCancellationCallback != null) {

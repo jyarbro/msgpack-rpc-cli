@@ -5,15 +5,11 @@ namespace MsgPack.Rpc.Core {
 	///		Common <see cref="IAsyncResult"/> implementation for MsgPack-RPC async invocation.
 	/// </summary>
 	internal class MessageAsyncResult : AsyncResult {
-		private readonly int? _messageId;
-
 		/// <summary>
 		///		Gets the ID of message.
 		/// </summary>
 		/// <value>The ID of message.</value>
-		public int? MessageId {
-			get { return this._messageId; }
-		}
+		public int? MessageId { get; }
 
 		/// <summary>
 		///		Initialize new instance.
@@ -33,9 +29,9 @@ namespace MsgPack.Rpc.Core {
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="owner"/> is null.
 		/// </exception>
-		public MessageAsyncResult(Object owner, int? messageId, AsyncCallback asyncCallback, object asyncState)
+		public MessageAsyncResult(object owner, int? messageId, AsyncCallback asyncCallback, object asyncState)
 			: base(owner, asyncCallback, asyncState) {
-			this._messageId = messageId;
+			MessageId = messageId;
 		}
 	}
 }

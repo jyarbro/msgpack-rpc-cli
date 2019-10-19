@@ -57,7 +57,7 @@ namespace MsgPack.Rpc.Core {
 				yield break;
 			}
 
-			for (int i = 0; i < source.Count; i++) {
+			for (var i = 0; i < source.Count; i++) {
 				yield return source.Array[i + source.Offset];
 			}
 		}

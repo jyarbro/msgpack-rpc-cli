@@ -32,17 +32,13 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 		}
 
-		private IList<MessageFilterProvider> _filterProviders = new List<MessageFilterProvider>();
-
 		/// <summary>
 		///		Gets the filter providers collection.
 		/// </summary>
 		/// <value>
 		///		The filter providers collection. Default is empty.
 		/// </value>
-		public IList<MessageFilterProvider> FilterProviders {
-			get { return this._filterProviders; }
-		}
+		public IList<MessageFilterProvider> FilterProviders { get; private set; } = new List<MessageFilterProvider>();
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcClientConfiguration"/> class.
@@ -59,7 +55,7 @@ namespace MsgPack.Rpc.Core.Client {
 		public ObjectPoolConfiguration CreateTransportPoolConfiguration() {
 			Contract.Ensures(Contract.Result<ObjectPoolConfiguration>() != null);
 
-			return new ObjectPoolConfiguration() { ExhausionPolicy = ExhausionPolicy.BlockUntilAvailable, MaximumPooled = this.MaximumConcurrentRequest, MinimumReserved = this.MinimumConcurrentRequest };
+			return new ObjectPoolConfiguration() { ExhausionPolicy = ExhausionPolicy.BlockUntilAvailable, MaximumPooled = MaximumConcurrentRequest, MinimumReserved = MinimumConcurrentRequest };
 		}
 
 		/// <summary>
@@ -72,7 +68,7 @@ namespace MsgPack.Rpc.Core.Client {
 		public ObjectPoolConfiguration CreateRequestContextPoolConfiguration() {
 			Contract.Ensures(Contract.Result<ObjectPoolConfiguration>() != null);
 
-			return new ObjectPoolConfiguration() { ExhausionPolicy = ExhausionPolicy.BlockUntilAvailable, MaximumPooled = this.MaximumConcurrentRequest, MinimumReserved = this.MinimumConcurrentRequest };
+			return new ObjectPoolConfiguration() { ExhausionPolicy = ExhausionPolicy.BlockUntilAvailable, MaximumPooled = MaximumConcurrentRequest, MinimumReserved = MinimumConcurrentRequest };
 		}
 
 		/// <summary>
@@ -85,7 +81,7 @@ namespace MsgPack.Rpc.Core.Client {
 		public ObjectPoolConfiguration CreateResponseContextPoolConfiguration() {
 			Contract.Ensures(Contract.Result<ObjectPoolConfiguration>() != null);
 
-			return new ObjectPoolConfiguration() { ExhausionPolicy = ExhausionPolicy.BlockUntilAvailable, MaximumPooled = this.MaximumConcurrentRequest, MinimumReserved = this.MinimumConcurrentRequest };
+			return new ObjectPoolConfiguration() { ExhausionPolicy = ExhausionPolicy.BlockUntilAvailable, MaximumPooled = MaximumConcurrentRequest, MinimumReserved = MinimumConcurrentRequest };
 		}
 
 		/// <summary>
@@ -97,9 +93,9 @@ namespace MsgPack.Rpc.Core.Client {
 		public RpcClientConfiguration Clone() {
 			Contract.Ensures(Contract.Result<RpcClientConfiguration>() != null);
 			Contract.Ensures(!Object.ReferenceEquals(Contract.Result<RpcClientConfiguration>(), this));
-			Contract.Ensures(Contract.Result<RpcClientConfiguration>().IsFrozen == this.IsFrozen);
+			Contract.Ensures(Contract.Result<RpcClientConfiguration>().IsFrozen == IsFrozen);
 
-			return this.CloneCore() as RpcClientConfiguration;
+			return CloneCore() as RpcClientConfiguration;
 		}
 
 		/// <summary>
@@ -110,9 +106,9 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </returns>
 		public RpcClientConfiguration Freeze() {
 			Contract.Ensures(Object.ReferenceEquals(Contract.Result<RpcClientConfiguration>(), this));
-			Contract.Ensures(this.IsFrozen);
+			Contract.Ensures(IsFrozen);
 
-			return this.FreezeCore() as RpcClientConfiguration;
+			return FreezeCore() as RpcClientConfiguration;
 		}
 
 		/// <summary>
@@ -126,9 +122,9 @@ namespace MsgPack.Rpc.Core.Client {
 			Contract.Ensures(Contract.Result<RpcClientConfiguration>() != null);
 			Contract.Ensures(!Object.ReferenceEquals(Contract.Result<RpcClientConfiguration>(), this));
 			Contract.Ensures(Contract.Result<RpcClientConfiguration>().IsFrozen);
-			Contract.Ensures(this.IsFrozen == Contract.OldValue(this.IsFrozen));
+			Contract.Ensures(IsFrozen == Contract.OldValue(IsFrozen));
 
-			return this.AsFrozenCore() as RpcClientConfiguration;
+			return AsFrozenCore() as RpcClientConfiguration;
 		}
 
 		/// <summary>
@@ -139,7 +135,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </returns>
 		protected override FreezableObject CloneCore() {
 			var result = base.CloneCore() as RpcClientConfiguration;
-			result._filterProviders = new List<MessageFilterProvider>(result._filterProviders);
+			result.FilterProviders = new List<MessageFilterProvider>(result.FilterProviders);
 			return result;
 		}
 
@@ -151,7 +147,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </returns>
 		protected override FreezableObject FreezeCore() {
 			var result = base.FreezeCore() as RpcClientConfiguration;
-			result._filterProviders = new ReadOnlyCollection<MessageFilterProvider>(result._filterProviders);
+			result.FilterProviders = new ReadOnlyCollection<MessageFilterProvider>(result.FilterProviders);
 			return result;
 		}
 	}

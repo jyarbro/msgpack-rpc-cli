@@ -33,26 +33,24 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		/// <param name="stream">The MessagePack data stream. This value might be corrupted or actually not a MessagePack stream.</param>
 		public override void Write(DateTimeOffset sessionStartTime, EndPoint remoteEndPoint, IEnumerable<byte> stream) {
 			string remoteEndPointString;
-			DnsEndPoint dnsEndPoint;
-			IPEndPoint ipEndPoint;
-			if ((dnsEndPoint = remoteEndPoint as DnsEndPoint) != null) {
+			if (remoteEndPoint is DnsEndPoint dnsEndPoint) {
 				remoteEndPointString = _ipAddressEscapingRegex.Replace(dnsEndPoint.Host, "_");
 			}
-			else if ((ipEndPoint = remoteEndPoint as IPEndPoint) != null) {
+			else if (remoteEndPoint is IPEndPoint ipEndPoint) {
 				remoteEndPointString = _ipAddressEscapingRegex.Replace(ipEndPoint.Address.ToString(), "_");
 			}
 			else {
 				remoteEndPointString = "(unknown)";
 			}
 
-			string fileName = String.Format(CultureInfo.InvariantCulture, "{0:yyyyMMdd_HHmmss_fff}-{1}-{2}.mpac", sessionStartTime.UtcDateTime, remoteEndPointString, ThreadId);
+			var fileName = string.Format(CultureInfo.InvariantCulture, "{0:yyyyMMdd_HHmmss_fff}-{1}-{2}.mpac", sessionStartTime.UtcDateTime, remoteEndPointString, ThreadId);
 
 			while (true) {
 				try {
 					using (var storage = IsolatedStorageFile.GetUserStoreForApplication())
 					using (var fileStream = storage.OpenFile(fileName, FileMode.Append, FileAccess.Write, FileShare.Read)) {
 						if (stream != null) {
-							long written = fileStream.Length;
+							var written = fileStream.Length;
 							foreach (var b in Skip(stream, written)) {
 								fileStream.WriteByte(b);
 							}
