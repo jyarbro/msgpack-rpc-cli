@@ -16,7 +16,7 @@ namespace MsgPack.Rpc
 #endif
 	[SuppressMessage( "Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData." )]
 	[SuppressMessage( "Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData." )]
-	public sealed class UnexpcetedRpcException : RpcException
+	public sealed class UnexpectedRpcException : RpcException
 	{
 		private const string _errorKey = "Error";
 		private const string _errorDetailKey = "ErrorDetail";
@@ -62,7 +62,7 @@ namespace MsgPack.Rpc
 		///		Value of return field of response in error.
 		///		This value may be nil, but server can set any value.
 		/// </param>
-		public UnexpcetedRpcException( MessagePackObject error, MessagePackObject errorDetail )
+		public UnexpectedRpcException( MessagePackObject error, MessagePackObject errorDetail )
 			: base( RpcError.Unexpected, RpcError.Unexpected.DefaultMessage, null )
 		{
 			this._error = error;
@@ -150,7 +150,7 @@ namespace MsgPack.Rpc
 
 			public void CompleteDeserialization( object deserialized )
 			{
-				var enclosing = deserialized as UnexpcetedRpcException;
+				var enclosing = deserialized as UnexpectedRpcException;
 				enclosing._error = this.Error;
 				enclosing._errorDetail = this.ErrorDetail;
 			}
