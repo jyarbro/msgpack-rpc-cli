@@ -44,11 +44,8 @@ namespace MsgPack.Rpc.Core {
 				return 0;
 			}
 
-#if !WINDOWS_PHONE
 			Array.ConstrainedCopy(source.Array, source.Offset + sourceOffset, array, arrayOffset, length);
-#else
-			Array.Copy( source.Array, source.Offset + sourceOffset, array, arrayOffset, length );
-#endif
+
 			return length;
 		}
 

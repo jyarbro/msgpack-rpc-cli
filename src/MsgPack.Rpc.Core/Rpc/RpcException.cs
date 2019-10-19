@@ -99,7 +99,7 @@ namespace MsgPack.Rpc.Core {
 		///		Initializes a new instance of the <see cref="RpcException"/> class with a specified error message.
 		/// </summary>
 		/// <param name="rpcError">
-		///		The metadata of the error. If <c>null</c> is specified, the <see cref="MsgPack.Rpc.Core.RpcError.RemoteRuntimeError"/> is used.
+		///		The metadata of the error. If <c>null</c> is specified, the <see cref="Core.RpcError.RemoteRuntimeError"/> is used.
 		///	</param>
 		/// <param name="message">
 		///		The error message to desribe condition. Note that this message should not include security related information.
@@ -125,7 +125,7 @@ namespace MsgPack.Rpc.Core {
 		///		Initializes a new instance of the <see cref="RpcException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception. 
 		/// </summary>
 		/// <param name="rpcError">
-		///		The metadata of the error. If <c>null</c> is specified, the <see cref="MsgPack.Rpc.Core.RpcError.RemoteRuntimeError"/> is used.
+		///		The metadata of the error. If <c>null</c> is specified, the <see cref="Core.RpcError.RemoteRuntimeError"/> is used.
 		///	</param>
 		/// <param name="message">
 		///		The error message to desribe condition. Note that this message should not include security related information.
@@ -229,7 +229,7 @@ namespace MsgPack.Rpc.Core {
 		/// </summary>
 		/// <param name="sender">The <see cref="Exception"/> instance itself.</param>
 		/// <param name="e">
-		///		The <see cref="System.Runtime.Serialization.SafeSerializationEventArgs"/> instance containing the event data.
+		///		The <see cref="SafeSerializationEventArgs"/> instance containing the event data.
 		///		The overriding method adds its internal state to this object via <see cref="M:SafeSerializationEventArgs.AddSerializedState"/>.
 		///	</param>
 		///	<remarks>

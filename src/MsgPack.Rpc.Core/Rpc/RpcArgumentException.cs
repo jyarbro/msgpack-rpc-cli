@@ -229,7 +229,7 @@ namespace MsgPack.Rpc.Core {
 		/// </summary>
 		/// <param name="sender">The <see cref="Exception"/> instance itself.</param>
 		/// <param name="e">
-		///		The <see cref="System.Runtime.Serialization.SafeSerializationEventArgs"/> instance containing the event data.
+		///		The <see cref="SafeSerializationEventArgs"/> instance containing the event data.
 		///		The overriding method adds its internal state to this object via <see cref="M:SafeSerializationEventArgs.AddSerializedState"/>.
 		///	</param>
 		/// <seealso cref="ISafeSerializationData"/>

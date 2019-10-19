@@ -5,9 +5,7 @@ namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Thrown when object pool is in corrupted state.
 	/// </summary>
-#if !SILVERLIGHT
 	[Serializable]
-#endif
 	public sealed class ObjectPoolCorruptedException : Exception {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPoolCorruptedException"/> class with a default message.
@@ -29,7 +27,6 @@ namespace MsgPack.Rpc.Core {
 		/// </param>
 		public ObjectPoolCorruptedException(string message, Exception inner) : base(message ?? "Object pool may be corrupted.", inner) { }
 
-#if !SILVERLIGHT
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPoolCorruptedException"/> class with serialized data.
 		/// </summary>
@@ -48,6 +45,5 @@ namespace MsgPack.Rpc.Core {
 		///	</exception>
 		private ObjectPoolCorruptedException(SerializationInfo info, StreamingContext context)
 			: base(info, context) { }
-#endif
 	}
 }

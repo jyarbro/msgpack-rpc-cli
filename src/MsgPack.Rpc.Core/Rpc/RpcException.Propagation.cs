@@ -18,7 +18,7 @@ namespace MsgPack.Rpc.Core {
 		///		Initialize new instance with unpacked data.
 		/// </summary>
 		/// <param name="rpcError">
-		///		Metadata of error. If you specify null, <see cref="MsgPack.Rpc.Core.RpcError.RemoteRuntimeError"/> is used.
+		///		Metadata of error. If you specify null, <see cref="Core.RpcError.RemoteRuntimeError"/> is used.
 		///	</param>
 		/// <param name="unpackedException">
 		///		Exception data from remote MessagePack-RPC server.

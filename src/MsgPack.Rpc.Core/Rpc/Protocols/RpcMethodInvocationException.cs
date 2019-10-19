@@ -8,9 +8,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 	/// <summary>
 	///		Thrown if something wrong during remote method invocation.
 	/// </summary>
-#if !SILVERLIGHT
 	[Serializable]
-#endif
 	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
 	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public class RpcMethodInvocationException : RpcException {
@@ -141,7 +139,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///		Initialize new instance with unpacked data.
 		/// </summary>
 		/// <param name="rpcError">
-		///		Metadata of error. If you specify null, <see cref="MsgPack.Rpc.Core.RpcError.RemoteRuntimeError"/> is used.
+		///		Metadata of error. If you specify null, <see cref="RpcError.RemoteRuntimeError"/> is used.
 		///	</param>
 		/// <param name="unpackedException">
 		///		Exception data from remote MessagePack-RPC server.
@@ -154,59 +152,6 @@ namespace MsgPack.Rpc.Core.Protocols {
 			_methodName = unpackedException.GetString(MethodNameKeyUtf8);
 			Contract.Assume(_methodName != null, "Unpacked data does not have MethodName.");
 		}
-
-#if MONO
-		/// <summary>
-		///		Initializes a new instance with serialized data. 
-		/// </summary>
-		/// <param name="info">
-		///		The <see cref="SerializationInfo"/> that holds the serialized object data about the exception being thrown. 
-		/// </param>
-		/// <param name="context">
-		///		The <see cref="StreamingContext"/> that contains contextual information about the source or destination.
-		/// </param>
-		/// <exception cref="T:System.ArgumentNullException">
-		///   <paramref name="info"/><paramref name="info"/> is <c>null</c>.
-		/// </exception>
-		/// <exception cref="T:System.Runtime.Serialization.SerializationException">
-		///		The class name is <c>null</c>.
-		///		Or <see cref="P:System.Exception.HResult"/> is zero(0).
-		///		Or <see cref="MethodName"/> is <c>null</c> or blank.
-		/// </exception>
-		/// <permission cref="System.Security.Permissions.SecurityPermission"><c>LinkDemand</c>, <c>Flags=SerializationFormatter</c></permission>
-		[SecurityPermission( SecurityAction.LinkDemand, SerializationFormatter = true )]
-		protected RpcMethodInvocationException( SerializationInfo info, StreamingContext context )
-			: base( info, context )
-		{
-			this._methodName = info.GetString( _methodNameKey );
-
-			if ( String.IsNullOrWhiteSpace( this._methodName ) )
-			{
-				throw new SerializationException( "'MethodName' is required" );
-			}
-		}
-
-		/// <summary>
-		///		When overridden in a derived class, sets the <see cref="SerializationInfo"/> with information about the exception.
-		/// </summary>
-		/// <param name="info">
-		///		The <see cref="SerializationInfo"/> that holds the serialized object data about the exception being thrown. 
-		/// </param>
-		/// <param name="context">
-		///		The <see cref="StreamingContext"/> that contains contextual information about the source or destination.
-		/// </param>
-		/// <exception cref="T:System.ArgumentNullException">
-		///   <paramref name="info"/><paramref name="info"/> is <c>null</c>.
-		/// </exception>
-		/// <permission cref="System.Security.Permissions.SecurityPermission"><c>LinkDemand</c>, <c>Flags=SerializationFormatter</c></permission>
-		[SecurityPermission( SecurityAction.LinkDemand, SerializationFormatter = true )]
-		public override void GetObjectData( SerializationInfo info, StreamingContext context )
-		{
-			base.GetObjectData( info, context );
-
-			info.AddValue( _methodNameKey, this._methodName );
-		}
-#endif
 
 		/// <summary>
 		///		Stores derived type specific information to specified dictionary.
@@ -222,13 +167,12 @@ namespace MsgPack.Rpc.Core.Protocols {
 			store.Add(MethodNameKeyUtf8, MessagePackConvert.EncodeString(_methodName));
 		}
 
-#if !SILVERLIGHT && !MONO
 		/// <summary>
 		///		When overridden on the derived class, handles <see cref="E:Exception.SerializeObjectState"/> event to add type-specified serialization state.
 		/// </summary>
 		/// <param name="sender">The <see cref="Exception"/> instance itself.</param>
 		/// <param name="e">
-		///		The <see cref="System.Runtime.Serialization.SafeSerializationEventArgs"/> instance containing the event data.
+		///		The <see cref="SafeSerializationEventArgs"/> instance containing the event data.
 		///		The overriding method adds its internal state to this object via <see cref="M:SafeSerializationEventArgs.AddSerializedState"/>.
 		///	</param>
 		/// <seealso cref="ISafeSerializationData"/>
@@ -250,6 +194,5 @@ namespace MsgPack.Rpc.Core.Protocols {
 				enclosing._methodName = MethodName;
 			}
 		}
-#endif
 	}
 }

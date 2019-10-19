@@ -11,7 +11,6 @@ using System.Runtime.Serialization;
 using System.Security;
 
 namespace MsgPack.Rpc.Core {
-#if !NET_4_5 && !SILVERLIGHT && !MONO
 	internal sealed class ExceptionDispatchInfo {
 		private static readonly Type[] _constructorParameterStringException = new[] { typeof(string), typeof(Exception) };
 		private static readonly PropertyInfo _exceptionHResultProperty = typeof(Exception).GetProperty("HResult", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -274,5 +273,4 @@ namespace MsgPack.Rpc.Core {
 			private WrapperSocketException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 		}
 	}
-#endif
 }

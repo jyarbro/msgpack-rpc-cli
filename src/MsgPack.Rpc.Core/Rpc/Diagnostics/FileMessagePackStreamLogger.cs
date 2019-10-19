@@ -17,12 +17,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 	///		</note>
 	/// </remarks>
 	public class FileMessagePackStreamLogger : MessagePackStreamLogger {
-		private static readonly Regex _ipAddressEscapingRegex =
-			new Regex(
-				@"[:\./]",
-				RegexOptions.Compiled
-				| RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture
-			);
+		private static readonly Regex ipAddressEscapingRegex = new Regex(@"[:\./]", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 
 		/// <summary>
 		///		Gets the base directory path.
@@ -64,10 +59,10 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		public override void Write(DateTimeOffset sessionStartTime, EndPoint remoteEndPoint, IEnumerable<byte> stream) {
 			string remoteEndPointString;
 			if (remoteEndPoint is DnsEndPoint dnsEndPoint) {
-				remoteEndPointString = _ipAddressEscapingRegex.Replace(dnsEndPoint.Host, "_");
+				remoteEndPointString = ipAddressEscapingRegex.Replace(dnsEndPoint.Host, "_");
 			}
 			else if (remoteEndPoint is IPEndPoint ipEndPoint) {
-				remoteEndPointString = _ipAddressEscapingRegex.Replace(ipEndPoint.Address.ToString(), "_");
+				remoteEndPointString = ipAddressEscapingRegex.Replace(ipEndPoint.Address.ToString(), "_");
 			}
 			else {
 				remoteEndPointString = "(unknown)";
@@ -81,12 +76,12 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 				}
 
 				try {
-					using (var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, 64 * 1024, FileOptions.None)) {
-						if (stream != null) {
-							var written = fileStream.Length;
-							foreach (var b in Skip(stream, written)) {
-								fileStream.WriteByte(b);
-							}
+					using var fileStream = new FileStream(filePath, FileMode.Append, FileAccess.Write, FileShare.Read, 64 * 1024, FileOptions.None);
+
+					if (stream != null) {
+						var written = fileStream.Length;
+						foreach (var b in Skip(stream, written)) {
+							fileStream.WriteByte(b);
 						}
 					}
 

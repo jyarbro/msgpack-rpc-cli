@@ -108,11 +108,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 
 			var oldBoundTransport = Interlocked.CompareExchange(ref _boundTransport, transport, null);
 			if (oldBoundTransport != null) {
-#if !SILVERLIGHT
 				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "This context is already bounded to '{0}'(Socket: 0x{1:X}).", transport.GetType(), transport.BoundSocket == null ? IntPtr.Zero : transport.BoundSocket.Handle));
-#else
-				throw new InvalidOperationException( String.Format( CultureInfo.CurrentCulture, "This context is already bounded to '{0}'(Socket: 0x{1:X}).", transport.GetType(), transport.BoundSocket == null ? 0 : transport.BoundSocket.GetHashCode() ) );
-#endif
 			}
 
 			SocketContext.Completed += transport.OnSocketOperationCompleted;

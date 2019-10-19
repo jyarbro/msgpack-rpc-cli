@@ -1,17 +1,11 @@
+using MsgPack.Rpc.Core.StandardObjectPoolTracing;
 using System;
-#if !SILVERLIGHT
 using System.Collections.Concurrent;
-#endif
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Threading;
-#if SILVERLIGHT
-using Mono.Collections.Concurrent;
-using Mono.Threading;
-#endif
-using MsgPack.Rpc.Core.StandardObjectPoolTracing;
 
 namespace MsgPack.Rpc.Core {
 	/// <summary>
@@ -45,7 +39,6 @@ namespace MsgPack.Rpc.Core {
 		private readonly ReaderWriterLockSlim _leasesLock;
 
 		internal int LeasedCount => _leases.Count;
-
 
 		// TODO: Timer might be too heavy.
 		private readonly Timer _evictionTimer;
@@ -81,7 +74,6 @@ namespace MsgPack.Rpc.Core {
 				_name = safeConfiguration.Name;
 			}
 
-#if !API_SIGNATURE_TEST
 			if (configuration == null && TraceSource.ShouldTrace(StandardObjectPoolTrace.InitializedWithDefaultConfiguration)) {
 				TraceSource.TraceEvent(
 					StandardObjectPoolTrace.InitializedWithDefaultConfiguration,
@@ -101,18 +93,14 @@ namespace MsgPack.Rpc.Core {
 					configuration
 				);
 			}
-#endif
+
 			_configuration = safeConfiguration;
 			_factory = factory;
 			_leasesLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 			_borrowTimeout = safeConfiguration.BorrowTimeout ?? TimeSpan.FromMilliseconds(Timeout.Infinite);
 			_pool =
 				new BlockingCollection<T>(
-#if !SILVERLIGHT
 					new ConcurrentStack<T>()
-#else
-					new ConcurrentStack<T>() 
-#endif
 				);
 
 			if (safeConfiguration.MaximumPooled == null) {
@@ -124,7 +112,6 @@ namespace MsgPack.Rpc.Core {
 
 			for (var i = 0; i < safeConfiguration.MinimumReserved; i++) {
 				if (!AddToPool(factory(), 0)) {
-#if !API_SIGNATURE_TEST
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.FailedToAddPoolInitially,
 						"Failed to add item. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }}",
@@ -132,14 +119,14 @@ namespace MsgPack.Rpc.Core {
 						GetType(),
 						GetHashCode()
 					);
-#endif
 				}
 			}
 
 			_evictionIntervalMilliseconds = safeConfiguration.EvitionInterval == null ? default(int?) : unchecked((int)safeConfiguration.EvitionInterval.Value.TotalMilliseconds);
+
 			if (safeConfiguration.MaximumPooled != null
-				&& safeConfiguration.MinimumReserved != safeConfiguration.MaximumPooled.GetValueOrDefault()
-				&& _evictionIntervalMilliseconds != null) {
+						 && safeConfiguration.MinimumReserved != safeConfiguration.MaximumPooled.GetValueOrDefault()
+						 && _evictionIntervalMilliseconds != null) {
 				_evictionTimer = new Timer(OnEvictionTimerElapsed, null, _evictionIntervalMilliseconds.Value, Timeout.Infinite);
 			}
 			else {
@@ -169,7 +156,6 @@ namespace MsgPack.Rpc.Core {
 				}
 				_leasesLock.Dispose();
 
-#if !API_SIGNATURE_TEST
 				if (TraceSource.ShouldTrace(StandardObjectPoolTrace.Disposed)) {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.Disposed,
@@ -179,10 +165,8 @@ namespace MsgPack.Rpc.Core {
 						GetHashCode()
 					);
 				}
-#endif
 			}
 			else {
-#if !API_SIGNATURE_TEST
 				if (TraceSource.ShouldTrace(StandardObjectPoolTrace.Finalized)) {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.Finalized,
@@ -192,7 +176,6 @@ namespace MsgPack.Rpc.Core {
 						GetHashCode()
 					);
 				}
-#endif
 			}
 
 			base.Dispose(disposing);
@@ -218,7 +201,6 @@ namespace MsgPack.Rpc.Core {
 			}
 
 			if (!_evictionTimer.Change(_evictionIntervalMilliseconds.Value, Timeout.Infinite)) {
-#if !API_SIGNATURE_TEST
 				TraceSource.TraceEvent(
 					StandardObjectPoolTrace.FailedToRefreshEvictionTImer,
 					"Failed to refresh evition timer. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }}",
@@ -226,7 +208,6 @@ namespace MsgPack.Rpc.Core {
 					GetType(),
 					GetHashCode()
 				);
-#endif
 			}
 		}
 
@@ -241,7 +222,6 @@ namespace MsgPack.Rpc.Core {
 			var remains = _pool.Count - _configuration.MinimumReserved;
 			var evicting = remains / 2 + remains % 2;
 			if (evicting > 0) {
-#if !API_SIGNATURE_TEST
 				if (isInduced && TraceSource.ShouldTrace(StandardObjectPoolTrace.EvictingExtraItemsInduced)) {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.EvictingExtraItemsInduced,
@@ -262,11 +242,9 @@ namespace MsgPack.Rpc.Core {
 						evicting
 					);
 				}
-#endif
 
 				var disposed = EvictItems(evicting);
 
-#if !API_SIGNATURE_TEST
 				if (isInduced && TraceSource.ShouldTrace(StandardObjectPoolTrace.EvictedExtraItemsInduced)) {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.EvictedExtraItemsInduced,
@@ -287,7 +265,6 @@ namespace MsgPack.Rpc.Core {
 						disposed.Count
 					);
 				}
-#endif
 
 				CollectLeases(disposed);
 			}
@@ -339,7 +316,6 @@ namespace MsgPack.Rpc.Core {
 						}
 					}
 
-#if !API_SIGNATURE_TEST
 					if (freed - disposed.Count > 0 && TraceSource.ShouldTrace(StandardObjectPoolTrace.GarbageCollectedWithLost)) {
 						TraceSource.TraceEvent(
 							StandardObjectPoolTrace.GarbageCollectedWithLost,
@@ -361,7 +337,6 @@ namespace MsgPack.Rpc.Core {
 							freed
 						);
 					}
-#endif
 				}
 				finally {
 					_leasesLock.ExitWriteLock();
@@ -391,11 +366,9 @@ namespace MsgPack.Rpc.Core {
 			T result;
 			while (true) {
 				if (_pool.TryTake(out result, 0)) {
-#if !API_SIGNATURE_TEST
 					if (TraceSource.ShouldTrace(StandardObjectPoolTrace.BorrowFromPool)) {
 						TraceBorrow(result);
 					}
-#endif
 
 					return result;
 				}
@@ -407,7 +380,6 @@ namespace MsgPack.Rpc.Core {
 						Contract.Assume(newObject != null);
 
 						if (_leases.TryAdd(new WeakReference(newObject), 0)) {
-#if !API_SIGNATURE_TEST
 							if (TraceSource.ShouldTrace(StandardObjectPoolTrace.ExpandPool)) {
 								TraceSource.TraceEvent(
 									StandardObjectPoolTrace.ExpandPool,
@@ -420,11 +392,9 @@ namespace MsgPack.Rpc.Core {
 							}
 
 							TraceBorrow(newObject);
-#endif
 							return newObject;
 						}
 						else {
-#if !API_SIGNATURE_TEST
 							if (TraceSource.ShouldTrace(StandardObjectPoolTrace.FailedToExpandPool)) {
 								TraceSource.TraceEvent(
 									StandardObjectPoolTrace.FailedToExpandPool,
@@ -435,7 +405,6 @@ namespace MsgPack.Rpc.Core {
 									_pool.Count
 								);
 							}
-#endif
 
 							DisposeItem(newObject);
 						}
@@ -449,7 +418,6 @@ namespace MsgPack.Rpc.Core {
 				break;
 			}
 
-#if !API_SIGNATURE_TEST
 			if (TraceSource.ShouldTrace(StandardObjectPoolTrace.PoolIsEmpty)) {
 				TraceSource.TraceEvent(
 					StandardObjectPoolTrace.PoolIsEmpty,
@@ -459,7 +427,6 @@ namespace MsgPack.Rpc.Core {
 					GetHashCode()
 				);
 			}
-#endif
 
 			if (_configuration.ExhausionPolicy == ExhausionPolicy.ThrowException) {
 				throw new ObjectPoolEmptyException();
@@ -469,17 +436,14 @@ namespace MsgPack.Rpc.Core {
 					throw new TimeoutException(string.Format(CultureInfo.CurrentCulture, "The object borrowing is not completed in the time out {0}.", _borrowTimeout));
 				}
 
-#if !API_SIGNATURE_TEST
 				if (TraceSource.ShouldTrace(StandardObjectPoolTrace.BorrowFromPool)) {
 					TraceBorrow(result);
 				}
-#endif
 
 				return result;
 			}
 		}
 
-#if !API_SIGNATURE_TEST
 		private void TraceBorrow(T result) {
 			TraceSource.TraceEvent(
 				StandardObjectPoolTrace.BorrowFromPool,
@@ -491,7 +455,6 @@ namespace MsgPack.Rpc.Core {
 				result.GetHashCode()
 			);
 		}
-#endif
 
 		private static void DisposeItem(T item) {
 			if (_isDisposableTInternal) {
@@ -501,7 +464,6 @@ namespace MsgPack.Rpc.Core {
 
 		protected sealed override void ReturnCore(T value) {
 			if (!_pool.TryAdd(value)) {
-#if !API_SIGNATURE_TEST
 				TraceSource.TraceEvent(
 					StandardObjectPoolTrace.FailedToReturnToPool,
 					"Failed to return the value to the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"Value\" : 0x{2:X}, \"Resource\" : \"{3}\", \"HashCodeOfResource\" : 0x{4:X} }}",
@@ -511,12 +473,10 @@ namespace MsgPack.Rpc.Core {
 					value,
 					value.GetHashCode()
 				);
-#endif
 				SetIsCorrupted();
 				throw new ObjectPoolCorruptedException("Failed to return the value to the pool.");
 			}
 			else {
-#if !API_SIGNATURE_TEST
 				if (TraceSource.ShouldTrace(StandardObjectPoolTrace.ReturnToPool)) {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.ReturnToPool,
@@ -528,7 +488,6 @@ namespace MsgPack.Rpc.Core {
 						value.GetHashCode()
 					);
 				}
-#endif
 			}
 		}
 	}

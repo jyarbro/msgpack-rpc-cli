@@ -6,11 +6,7 @@ namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		The standard implementation of the <see cref="IFreezable"/> interface.
 	/// </summary>
-	public abstract class FreezableObject : IFreezable
-#if !SILVERLIGHT
-		, ICloneable
-#endif
-	{
+	public abstract class FreezableObject : IFreezable, ICloneable {
 		private int _isFrozen;
 
 		/// <summary>
@@ -77,12 +73,10 @@ namespace MsgPack.Rpc.Core {
 			return CloneCore().FreezeCore();
 		}
 
-#if !SILVERLIGHT
 		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via CloneCore().")]
 		object ICloneable.Clone() {
 			return CloneCore();
 		}
-#endif
 
 		/// <summary>
 		/// Gets the frozen copy of this instance.

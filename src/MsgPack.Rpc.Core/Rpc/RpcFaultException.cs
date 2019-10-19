@@ -13,9 +13,7 @@ namespace MsgPack.Rpc.Core {
 	///		The solution is to pack error information to Message-Pack map representation.
 	///		So, this class wraps the map as CLI <see cref="Exception"/> to interoperate MessagePack-RPC and CLI environment.
 	/// </remarks>
-#if !SILVERLIGHT
 	[Serializable]
-#endif
 	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
 	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public class RpcFaultException : RpcException {
@@ -88,28 +86,5 @@ namespace MsgPack.Rpc.Core {
 		/// </exception>
 		protected internal RpcFaultException(RpcError rpcError, MessagePackObject unpackedException)
 			: base(rpcError, unpackedException) { }
-
-#if MONO
-		/// <summary>
-		///		Initializes a new instance with serialized data. 
-		/// </summary>
-		/// <param name="info">
-		///		The <see cref="SerializationInfo"/> that holds the serialized object data about the exception being thrown. 
-		/// </param>
-		/// <param name="context">
-		///		The <see cref="StreamingContext"/> that contains contextual information about the source or destination.
-		/// </param>
-		/// <exception cref="T:System.ArgumentNullException">
-		///   <paramref name="info"/><paramref name="info"/> is <c>null</c>.
-		/// </exception>
-		/// <exception cref="T:System.Runtime.Serialization.SerializationException">
-		///		The class name is <c>null</c>.
-		///		Or <see cref="P:System.Exception.HResult"/> is zero(0).
-		/// </exception>
-		/// <permission cref="System.Security.Permissions.SecurityPermission"><c>LinkDemand</c>, <c>Flags=SerializationFormatter</c></permission>
-		[SecurityPermission( SecurityAction.LinkDemand, SerializationFormatter = true )]
-		private RpcFaultException( SerializationInfo info, StreamingContext context )
-			: base( info, context ) { }
-#endif
 	}
 }

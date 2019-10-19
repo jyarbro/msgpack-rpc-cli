@@ -5,9 +5,7 @@ namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Throwsn when the object pool with <see cref="ExhausionPolicy.ThrowException"/> is empty at borrowing.
 	/// </summary>
-#if !SILVERLIGHT
 	[Serializable]
-#endif
 	public sealed class ObjectPoolEmptyException : Exception {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPoolEmptyException"/> class with a default message.
@@ -29,7 +27,6 @@ namespace MsgPack.Rpc.Core {
 		/// </param>
 		public ObjectPoolEmptyException(string message, Exception innerException) : base(message ?? "The object pool is empty.", innerException) { }
 
-#if !SILVERLIGHT
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ObjectPoolEmptyException"/> class with serialized data.
 		/// </summary>
@@ -47,6 +44,5 @@ namespace MsgPack.Rpc.Core {
 		///		or <see cref="P:System.Exception.HResult"/> is zero.
 		///	</exception>
 		private ObjectPoolEmptyException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-#endif
 	}
 }

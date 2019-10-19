@@ -16,7 +16,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///		Called when the async socket operation is completed.
 		/// </summary>
 		/// <param name="sender">The sender.</param>
-		/// <param name="e">The <see cref="System.Net.Sockets.SocketAsyncEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">The <see cref="SocketAsyncEventArgs"/> instance containing the event data.</param>
 		void OnSocketOperationCompleted(object sender, SocketAsyncEventArgs e);
 	}
 

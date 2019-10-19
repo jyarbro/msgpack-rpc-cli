@@ -114,7 +114,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <summary>
 		///		Raises <see cref="ShutdownCompleted"/> event.
 		/// </summary>
-		/// <param name="e">The <see cref="MsgPack.Rpc.Core.Protocols.ShutdownCompletedEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">The <see cref="ShutdownCompletedEventArgs"/> instance containing the event data.</param>
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="e"/> is <c>null</c>.
 		/// </exception>		
@@ -145,7 +145,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <summary>
 		///		Raises the <see cref="E:UnknownResponseReceived"/> event.
 		/// </summary>
-		/// <param name="e">The <see cref="MsgPack.Rpc.Core.Client.Protocols.UnknownResponseReceivedEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">The <see cref="UnknownResponseReceivedEventArgs"/> instance containing the event data.</param>
 		protected virtual void OnUnknownResponseReceived(UnknownResponseReceivedEventArgs e) {
 			if (e == null) {
 				throw new ArgumentNullException("e");

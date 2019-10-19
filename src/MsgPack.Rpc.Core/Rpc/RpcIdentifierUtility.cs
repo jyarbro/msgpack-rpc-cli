@@ -14,14 +14,7 @@ namespace MsgPack.Rpc.Core {
 		private const string _idStart = @"\p{L}\p{Nl}";
 		private const string _idContinue = @"\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}";
 
-		private static readonly Regex _validIdentififerPattern =
-			new Regex(
-				"^[" + _idStart + "]([" + _idContinue + "]*)$",
-#if !SILVERLIGHT
- RegexOptions.Compiled |
-#endif
- RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.Singleline
-			);
+		private static readonly Regex _validIdentififerPattern = new Regex("^[" + _idStart + "]([" + _idContinue + "]*)$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.Singleline);
 
 		/// <summary>
 		///		Verifies the specified identifier is compliant to MessagePack-RPC spec and returns normalized one.
@@ -36,12 +29,8 @@ namespace MsgPack.Rpc.Core {
 				return identifier;
 			}
 
-			var normalized =
-#if !SILVERLIGHT
-				identifier.Normalize(NormalizationForm.FormC);
-#else
-				identifier;
-#endif
+			var normalized = identifier.Normalize(NormalizationForm.FormC);
+
 			if (!_validIdentififerPattern.IsMatch(normalized)) {
 				throw new ArgumentException(
 					string.Format(

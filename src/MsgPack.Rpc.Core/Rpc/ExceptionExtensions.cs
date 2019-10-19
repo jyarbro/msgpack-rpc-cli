@@ -37,10 +37,6 @@ namespace MsgPack.Rpc.Core {
 				throw new ArgumentNullException("source");
 			}
 
-#if NET_4_5
-				// Thanks to ExceptionDispatchInfo, Matrioshika is completely unecessary.
-				return source.InnerException;
-#else
 			var inner = source.InnerException;
 			if (inner == null) {
 				return null;
@@ -52,7 +48,6 @@ namespace MsgPack.Rpc.Core {
 
 			// inner is matrioshka.
 			return GetInnerException(inner);
-#endif
 		}
 	}
 }

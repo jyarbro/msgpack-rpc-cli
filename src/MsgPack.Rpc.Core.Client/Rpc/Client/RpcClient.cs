@@ -239,7 +239,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		You can <see cref="BeginCall"/> and <see cref="EndCall"/> to get appropriate exception directly.
 		/// </remarks>
 		public Task<MessagePackObject> CallAsync(string methodName, object[] arguments, object asyncState) {
-			return Task.Factory.FromAsync<string, object[], MessagePackObject>(BeginCall, EndCall, methodName, arguments, asyncState, TaskCreationOptions.None);
+			return Task.Factory.FromAsync(BeginCall, EndCall, methodName, arguments, asyncState, TaskCreationOptions.None);
 		}
 #endif
 
@@ -402,7 +402,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		You can <see cref="BeginNotify"/> and <see cref="EndNotify"/> to get appropriate exception directly.
 		/// </remarks>
 		public Task NotifyAsync(string methodName, object[] arguments, object asyncState) {
-			return Task.Factory.FromAsync<string, object[]>(BeginNotify, EndNotify, methodName, arguments, asyncState, TaskCreationOptions.None);
+			return Task.Factory.FromAsync(BeginNotify, EndNotify, methodName, arguments, asyncState, TaskCreationOptions.None);
 		}
 #endif
 

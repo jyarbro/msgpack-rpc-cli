@@ -59,10 +59,10 @@ namespace MsgPack.Rpc.Core.Client {
 		}
 
 		/// <summary>
-		///		Creates the <see cref="ObjectPoolConfiguration"/> for the <see cref="MsgPack.Rpc.Core.Client.Protocols.ClientRequestContext"/> pool corresponds to values of this instance.
+		///		Creates the <see cref="ObjectPoolConfiguration"/> for the <see cref="Protocols.ClientRequestContext"/> pool corresponds to values of this instance.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="ObjectPoolConfiguration"/> for the <see cref="MsgPack.Rpc.Core.Client.Protocols.ClientRequestContext"/> pool corresponds to values of this instance.
+		///		The <see cref="ObjectPoolConfiguration"/> for the <see cref="Protocols.ClientRequestContext"/> pool corresponds to values of this instance.
 		///		This value will not be <c>null</c>.
 		/// </returns>
 		public ObjectPoolConfiguration CreateRequestContextPoolConfiguration() {
@@ -72,10 +72,10 @@ namespace MsgPack.Rpc.Core.Client {
 		}
 
 		/// <summary>
-		///		Creates the <see cref="ObjectPoolConfiguration"/> for the <see cref="MsgPack.Rpc.Core.Client.Protocols.ClientResponseContext"/> pool corresponds to values of this instance.
+		///		Creates the <see cref="ObjectPoolConfiguration"/> for the <see cref="Protocols.ClientResponseContext"/> pool corresponds to values of this instance.
 		/// </summary>
 		/// <returns>
-		///		The <see cref="ObjectPoolConfiguration"/> for the <see cref="MsgPack.Rpc.Core.Client.Protocols.ClientResponseContext"/> pool corresponds to values of this instance.
+		///		The <see cref="ObjectPoolConfiguration"/> for the <see cref="Protocols.ClientResponseContext"/> pool corresponds to values of this instance.
 		///		This value will not be <c>null</c>.
 		/// </returns>
 		public ObjectPoolConfiguration CreateResponseContextPoolConfiguration() {

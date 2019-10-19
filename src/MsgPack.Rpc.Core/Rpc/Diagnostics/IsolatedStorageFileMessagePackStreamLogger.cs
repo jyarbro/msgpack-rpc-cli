@@ -11,14 +11,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 	///		Isolated storage file based <see cref="MessagePackStreamLogger"/> implementation.
 	/// </summary>
 	public class IsolatedStorageFileMessagePackStreamLogger : MessagePackStreamLogger {
-		private static readonly Regex _ipAddressEscapingRegex =
-			new Regex(
-				@"[:\./]",
-#if !SILVERLIGHT
- RegexOptions.Compiled |
-#endif
- RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture
-			);
+		private static readonly Regex _ipAddressEscapingRegex = new Regex(@"[:\./]", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="IsolatedStorageFileMessagePackStreamLogger"/> class.

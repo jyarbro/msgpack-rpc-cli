@@ -95,10 +95,7 @@ namespace MsgPack.Rpc.Core {
 		internal event EventHandler DebugSoftTimeout;
 
 		private void OnDebugSoftTimeout() {
-			var handler = DebugSoftTimeout;
-			if (handler != null) {
-				handler(this, EventArgs.Empty);
-			}
+			DebugSoftTimeout?.Invoke(this, EventArgs.Empty);
 		}
 #endif
 
@@ -155,6 +152,7 @@ namespace MsgPack.Rpc.Core {
 			if (_hardTimeout != null) {
 				_hardTimeoutWatcher.Start(_hardTimeout.Value);
 			}
+
 #if DEBUG
 			OnDebugSoftTimeout();
 #endif

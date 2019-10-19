@@ -15,7 +15,6 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		private static readonly string _processName = GetProcessName();
 
 		private static DateTime GetProcessStartTimeUtc() {
-#if !SILVERLIGHT
 			try {
 				return PrivilegedGetProcessStartTimeUtc();
 			}
@@ -27,22 +26,16 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 				// This value ensures that resulting process identifier is unique.
 				return DateTime.UtcNow;
 			}
-#else
-			return DateTime.UtcNow;
-#endif
 		}
 
-#if !SILVERLIGHT
 		[SecuritySafeCritical]
 		private static DateTime PrivilegedGetProcessStartTimeUtc() {
 			using (var process = Process.GetCurrentProcess()) {
 				return process.StartTime.ToUniversalTime();
 			}
 		}
-#endif
 
 		private static string GetProcessName() {
-#if !SILVERLIGHT
 			try {
 				return PrivilegedGetProcessName();
 			}
@@ -52,19 +45,14 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 			catch (MemberAccessException) {
 				return string.Empty;
 			}
-#else
-			return String.Empty;
-#endif
 		}
 
-#if !SILVERLIGHT
 		[SecuritySafeCritical]
 		private static string PrivilegedGetProcessName() {
 			using (var process = Process.GetCurrentProcess()) {
 				return Path.GetFileNameWithoutExtension(process.MainModule.ModuleName);
 			}
 		}
-#endif
 
 		/// <summary>
 		///		Gets the current process id.
