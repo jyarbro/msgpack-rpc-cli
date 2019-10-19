@@ -1,31 +1,10 @@
-#region -- License Terms --
-//
-// MessagePack for CLI
-//
-// Copyright (C) 2010 FUJIWARA, Yusuke
-//
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-//
-//        http://www.apache.org/licenses/LICENSE-2.0
-//
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
-//
-#endregion -- License Terms --
-
+using MsgPack.Serialization;
 using System;
 using System.Diagnostics.Contracts;
 using System.Dynamic;
 using System.Net;
-using MsgPack.Serialization;
 
-namespace MsgPack.Rpc.Client
-{
+namespace MsgPack.Rpc.Client {
 	/// <summary>
 	///		Acts as dynamic MessagePack RPC proxy object.
 	/// </summary>
@@ -91,8 +70,7 @@ namespace MsgPack.Rpc.Client
 	///			When you have to use "Notification" message, use <see cref="RpcClient"/> directly.
 	///		</note>
 	/// </remarks>
-	public sealed class DynamicRpcProxy : DynamicObject, IDisposable
-	{
+	public sealed class DynamicRpcProxy : DynamicObject, IDisposable {
 		private readonly RpcClient _client;
 
 		/// <summary>
@@ -102,11 +80,9 @@ namespace MsgPack.Rpc.Client
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="client"/> is <c>null</c>.
 		/// </exception>
-		public DynamicRpcProxy( RpcClient client )
-		{
-			if ( client == null )
-			{
-				throw new ArgumentNullException( "client" );
+		public DynamicRpcProxy(RpcClient client) {
+			if (client == null) {
+				throw new ArgumentNullException("client");
 			}
 
 			Contract.EndContractBlock();
@@ -123,8 +99,8 @@ namespace MsgPack.Rpc.Client
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="targetEndPoint"/> is <c>null</c>.
 		/// </exception>
-		public DynamicRpcProxy( EndPoint targetEndPoint )
-			: this( new RpcClient( targetEndPoint ) ) { }
+		public DynamicRpcProxy(EndPoint targetEndPoint)
+			: this(new RpcClient(targetEndPoint)) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="DynamicRpcProxy"/> class.
@@ -138,8 +114,8 @@ namespace MsgPack.Rpc.Client
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="targetEndPoint"/> is <c>null</c>.
 		/// </exception>
-		public DynamicRpcProxy( EndPoint targetEndPoint, RpcClientConfiguration configuration )
-			: this( new RpcClient( targetEndPoint, configuration ) ) { }
+		public DynamicRpcProxy(EndPoint targetEndPoint, RpcClientConfiguration configuration)
+			: this(new RpcClient(targetEndPoint, configuration)) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="DynamicRpcProxy"/> class.
@@ -153,8 +129,8 @@ namespace MsgPack.Rpc.Client
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="targetEndPoint"/> is <c>null</c>.
 		/// </exception>
-		public DynamicRpcProxy( EndPoint targetEndPoint, SerializationContext serializationContext )
-			: this( new RpcClient( targetEndPoint, serializationContext ) ) { }
+		public DynamicRpcProxy(EndPoint targetEndPoint, SerializationContext serializationContext)
+			: this(new RpcClient(targetEndPoint, serializationContext)) { }
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="DynamicRpcProxy"/> class.
@@ -171,14 +147,13 @@ namespace MsgPack.Rpc.Client
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="targetEndPoint"/> is <c>null</c>.
 		/// </exception>
-		public DynamicRpcProxy( EndPoint targetEndPoint, RpcClientConfiguration configuration, SerializationContext serializationContext )
-			: this( new RpcClient( targetEndPoint, configuration, serializationContext ) ) { }
+		public DynamicRpcProxy(EndPoint targetEndPoint, RpcClientConfiguration configuration, SerializationContext serializationContext)
+			: this(new RpcClient(targetEndPoint, configuration, serializationContext)) { }
 
 		/// <summary>
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		public void Dispose()
-		{
+		public void Dispose() {
 			this._client.Dispose();
 		}
 
@@ -203,53 +178,45 @@ namespace MsgPack.Rpc.Client
 		/// <remarks>
 		///		For detailed information, see the <strong>remarks</strong> section of the type description.
 		/// </remarks>
-		public override bool TryInvokeMember( InvokeMemberBinder binder, object[] args, out object result )
-		{
-			if ( binder == null )
-			{
-				throw new ArgumentNullException( "binder" );
+		public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result) {
+			if (binder == null) {
+				throw new ArgumentNullException("binder");
 			}
 
-			if ( binder.Name.StartsWith( "Begin", binder.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal )
+			if (binder.Name.StartsWith("Begin", binder.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)
 				&& binder.Name.Length > "Begin".Length
-				&& args.Length >= 2 )
-			{
-				var asAsyncCallback = args[ args.Length - 2 ] as AsyncCallback;
-				var asAction = args[ args.Length - 2 ] as Action<IAsyncResult>;
-				if ( args[ args.Length - 2 ] == null || asAsyncCallback != null || asAsyncCallback != null )
-				{
-					var realArgs = new object[ args.Length - 2 ];
-					Array.ConstrainedCopy( args, 0, realArgs, 0, args.Length - 2 );
-					if ( asAsyncCallback == null && asAction != null )
-					{
-						asAsyncCallback = ar => asAction( ar );
+				&& args.Length >= 2) {
+				var asAsyncCallback = args[args.Length - 2] as AsyncCallback;
+				var asAction = args[args.Length - 2] as Action<IAsyncResult>;
+				if (args[args.Length - 2] == null || asAsyncCallback != null || asAsyncCallback != null) {
+					var realArgs = new object[args.Length - 2];
+					Array.ConstrainedCopy(args, 0, realArgs, 0, args.Length - 2);
+					if (asAsyncCallback == null && asAction != null) {
+						asAsyncCallback = ar => asAction(ar);
 					}
-					result = this._client.BeginCall( binder.Name.Substring( "Begin".Length ), realArgs, asAsyncCallback, args[ args.Length - 1 ] );
+					result = this._client.BeginCall(binder.Name.Substring("Begin".Length), realArgs, asAsyncCallback, args[args.Length - 1]);
 					return true;
 				}
 			}
-			else if ( binder.Name.StartsWith( "End", binder.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal )
+			else if (binder.Name.StartsWith("End", binder.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)
 				&& binder.Name.Length > "End".Length
-				&& args.Length == 1 )
-			{
-				var ar = args[ 0 ] as IAsyncResult;
-				if ( ar != null )
-				{
-					result = this._client.EndCall( ar );
+				&& args.Length == 1) {
+				var ar = args[0] as IAsyncResult;
+				if (ar != null) {
+					result = this._client.EndCall(ar);
 					return true;
 				}
 			}
-			else if ( binder.Name.EndsWith( "Async", binder.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal )
+			else if (binder.Name.EndsWith("Async", binder.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)
 				&& binder.Name.Length > "Async".Length
-				&& args.Length >= 1 )
-			{
-				var realArgs = new object[ args.Length - 1 ];
-				Array.ConstrainedCopy( args, 0, realArgs, 0, args.Length - 1 );
-				result = this._client.CallAsync( binder.Name.Remove( binder.Name.Length - "Async".Length ), realArgs, args[ args.Length - 1 ] );
+				&& args.Length >= 1) {
+				var realArgs = new object[args.Length - 1];
+				Array.ConstrainedCopy(args, 0, realArgs, 0, args.Length - 1);
+				result = this._client.CallAsync(binder.Name.Remove(binder.Name.Length - "Async".Length), realArgs, args[args.Length - 1]);
 				return true;
 			}
 
-			result = this._client.Call( binder.Name, args );
+			result = this._client.Call(binder.Name, args);
 			return true;
 		}
 	}

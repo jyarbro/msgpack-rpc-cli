@@ -1,23 +1,3 @@
-#region -- License Terms --
-//
-// MessagePack for CLI
-//
-// Copyright (C) 2010 FUJIWARA, Yusuke
-//
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-//
-//        http://www.apache.org/licenses/LICENSE-2.0
-//
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
-//
-#endregion -- License Terms --
-
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -27,30 +7,28 @@ using Mono.Diagnostics;
 #endif
 using MsgPack.Rpc.Protocols;
 
-namespace MsgPack.Rpc.Client.Protocols
-{
+namespace MsgPack.Rpc.Client.Protocols {
 	/// <summary>
 	///		Represents context information for the client side request including notification.
 	/// </summary>
-	public sealed class ClientRequestContext : OutboundMessageContext
-	{
+	public sealed class ClientRequestContext : OutboundMessageContext {
 		/// <summary>
 		///		Constant part of the request header.
 		/// </summary>
 		private static readonly ArraySegment<byte> _requestHeader =
-			new ArraySegment<byte>( new byte[] { 0x94, 0x00 } ); // [FixArray4], [Request:0]
+			new ArraySegment<byte>(new byte[] { 0x94, 0x00 }); // [FixArray4], [Request:0]
 
 		/// <summary>
 		///		Constant part of the request header.
 		/// </summary>
 		private static readonly ArraySegment<byte> _notificationHeader =
-			new ArraySegment<byte>( new byte[] { 0x94, 0x02 } ); // [FixArray4], [Notification:2]
+			new ArraySegment<byte>(new byte[] { 0x94, 0x02 }); // [FixArray4], [Notification:2]
 
 		/// <summary>
 		///		Empty array of <see cref="ArraySegment{T}"/> of <see cref="Byte"/>.
 		/// </summary>
 		private static readonly ArraySegment<byte> _emptyBuffer =
-			new ArraySegment<byte>( new byte[ 0 ], 0, 0 );
+			new ArraySegment<byte>(new byte[0], 0, 0);
 
 		private MessageType _messageType;
 
@@ -63,11 +41,9 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <remarks>
 		///		This value can be set via <see cref="SetRequest"/> or <see cref="SetNotification"/> method.
 		/// </remarks>
-		public MessageType MessageType
-		{
-			get
-			{
-				Contract.Ensures( Contract.Result<MessageType>() == Rpc.Protocols.MessageType.Request || Contract.Result<MessageType>() == Rpc.Protocols.MessageType.Notification );
+		public MessageType MessageType {
+			get {
+				Contract.Ensures(Contract.Result<MessageType>() == Rpc.Protocols.MessageType.Request || Contract.Result<MessageType>() == Rpc.Protocols.MessageType.Notification);
 
 				return this._messageType;
 			}
@@ -82,11 +58,9 @@ namespace MsgPack.Rpc.Client.Protocols
 		///		The <see cref="Packer"/> to pack arguments array.
 		///		This value will not be <c>null</c>.
 		/// </value>
-		public Packer ArgumentsPacker
-		{
-			get
-			{
-				Contract.Ensures( Contract.Result<Packer>() != null );
+		public Packer ArgumentsPacker {
+			get {
+				Contract.Ensures(Contract.Result<Packer>() != null);
 
 				return this._argumentsPacker;
 			}
@@ -104,8 +78,7 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <remarks>
 		///		This value can be set via <see cref="SetRequest"/> or <see cref="SetNotification"/> method.
 		/// </remarks>
-		public string MethodName
-		{
+		public string MethodName {
 			get { return this._methodName; }
 		}
 
@@ -178,8 +151,7 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <remarks>
 		///		This value can be set via <see cref="SetNotification"/> method.
 		/// </remarks>
-		public Action<Exception, bool> NotificationCompletionCallback
-		{
+		public Action<Exception, bool> NotificationCompletionCallback {
 			get { return this._notificationCompletionCallback; }
 		}
 
@@ -198,15 +170,13 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <remarks>
 		///		This value can be set via <see cref="SetRequest"/> method.
 		/// </remarks>
-		public Action<ClientResponseContext, Exception, bool> RequestCompletionCallback
-		{
+		public Action<ClientResponseContext, Exception, bool> RequestCompletionCallback {
 			get { return this._requestCompletionCallback; }
 		}
 
 		private readonly Stopwatch _stopwatch;
 
-		internal TimeSpan ElapsedTime
-		{
+		internal TimeSpan ElapsedTime {
 			get { return this._stopwatch.Elapsed; }
 		}
 
@@ -214,8 +184,7 @@ namespace MsgPack.Rpc.Client.Protocols
 		///		Initializes a new instance of the <see cref="ClientRequestContext"/> class with default settings.
 		/// </summary>
 		public ClientRequestContext()
-			: this( null )
-		{
+			: this(null) {
 		}
 
 		/// <summary>
@@ -224,29 +193,26 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <param name="configuration">
 		///		An <see cref="RpcClientConfiguration"/> to tweak this instance initial state.
 		/// </param>
-		public ClientRequestContext( RpcClientConfiguration configuration )
-		{
+		public ClientRequestContext(RpcClientConfiguration configuration) {
 			this._methodNameBuffer =
-				new MemoryStream( ( configuration ?? RpcClientConfiguration.Default ).InitialMethodNameBufferLength );
+				new MemoryStream((configuration ?? RpcClientConfiguration.Default).InitialMethodNameBufferLength);
 			this._argumentsBuffer =
-				new MemoryStream( ( configuration ?? RpcClientConfiguration.Default ).InitialArgumentsBufferLength );
-			this.SendingBuffer = new ArraySegment<byte>[ 4 ];
+				new MemoryStream((configuration ?? RpcClientConfiguration.Default).InitialArgumentsBufferLength);
+			this.SendingBuffer = new ArraySegment<byte>[4];
 #if MONO
 			this._unifiedSendingBuffer = new MemoryStream( ( configuration ?? RpcClientConfiguration.Default ).InitialReceiveBufferLength );
 #endif
-			this._argumentsPacker = Packer.Create( this._argumentsBuffer, false );
+			this._argumentsPacker = Packer.Create(this._argumentsBuffer, false);
 			this._messageType = MessageType.Response;
 			this._stopwatch = new Stopwatch();
 		}
 
-		internal override void StartWatchTimeout( TimeSpan timeout )
-		{
-			base.StartWatchTimeout( timeout );
+		internal override void StartWatchTimeout(TimeSpan timeout) {
+			base.StartWatchTimeout(timeout);
 			this._stopwatch.Restart();
 		}
 
-		internal override void StopWatchTimeout()
-		{
+		internal override void StopWatchTimeout() {
 			this._stopwatch.Stop();
 			base.StopWatchTimeout();
 		}
@@ -267,28 +233,24 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <exception cref="ArgumentException">
 		///		<paramref name="methodName"/> is empty.
 		/// </exception>
-		public void SetRequest( int messageId, string methodName, Action<ClientResponseContext, Exception, bool> completionCallback )
-		{
-			if ( methodName == null )
-			{
-				throw new ArgumentNullException( "methodName" );
+		public void SetRequest(int messageId, string methodName, Action<ClientResponseContext, Exception, bool> completionCallback) {
+			if (methodName == null) {
+				throw new ArgumentNullException("methodName");
 			}
 
-			if ( methodName.Length == 0 )
-			{
-				throw new ArgumentException( "Method name cannot be empty.", "methodName" );
+			if (methodName.Length == 0) {
+				throw new ArgumentException("Method name cannot be empty.", "methodName");
 			}
 
-			if ( completionCallback == null )
-			{
-				throw new ArgumentNullException( "completionCallback" );
+			if (completionCallback == null) {
+				throw new ArgumentNullException("completionCallback");
 			}
 
-			Contract.Ensures( this.MessageType == Rpc.Protocols.MessageType.Request );
-			Contract.Ensures( this.MessageId != null );
-			Contract.Ensures( !String.IsNullOrEmpty( this.MethodName ) );
-			Contract.Ensures( this.RequestCompletionCallback != null );
-			Contract.Ensures( this.NotificationCompletionCallback == null );
+			Contract.Ensures(this.MessageType == Rpc.Protocols.MessageType.Request);
+			Contract.Ensures(this.MessageId != null);
+			Contract.Ensures(!String.IsNullOrEmpty(this.MethodName));
+			Contract.Ensures(this.RequestCompletionCallback != null);
+			Contract.Ensures(this.NotificationCompletionCallback == null);
 
 			this._messageType = Rpc.Protocols.MessageType.Request;
 			this.MessageId = messageId;
@@ -312,28 +274,24 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <exception cref="ArgumentException">
 		///		<paramref name="methodName"/> is empty.
 		/// </exception>
-		public void SetNotification( string methodName, Action<Exception, bool> completionCallback )
-		{
-			if ( methodName == null )
-			{
-				throw new ArgumentNullException( "methodName" );
+		public void SetNotification(string methodName, Action<Exception, bool> completionCallback) {
+			if (methodName == null) {
+				throw new ArgumentNullException("methodName");
 			}
 
-			if ( methodName.Length == 0 )
-			{
-				throw new ArgumentException( "Method name cannot be empty.", "methodName" );
+			if (methodName.Length == 0) {
+				throw new ArgumentException("Method name cannot be empty.", "methodName");
 			}
 
-			if ( completionCallback == null )
-			{
-				throw new ArgumentNullException( "completionCallback" );
+			if (completionCallback == null) {
+				throw new ArgumentNullException("completionCallback");
 			}
 
-			Contract.Ensures( this.MessageType == Rpc.Protocols.MessageType.Notification );
-			Contract.Ensures( this.MessageId == null );
-			Contract.Ensures( !String.IsNullOrEmpty( this.MethodName ) );
-			Contract.Ensures( this.RequestCompletionCallback == null );
-			Contract.Ensures( this.NotificationCompletionCallback != null );
+			Contract.Ensures(this.MessageType == Rpc.Protocols.MessageType.Notification);
+			Contract.Ensures(this.MessageId == null);
+			Contract.Ensures(!String.IsNullOrEmpty(this.MethodName));
+			Contract.Ensures(this.RequestCompletionCallback == null);
+			Contract.Ensures(this.NotificationCompletionCallback != null);
 
 			this._messageType = Rpc.Protocols.MessageType.Notification;
 			this.MessageId = null;
@@ -345,38 +303,33 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <summary>
 		///		Prepares this instance to send request or notification message.
 		/// </summary>
-		internal void Prepare( bool canUseChunkedBuffer )
-		{
-			if ( this._messageType == MessageType.Response )
-			{
-				throw new InvalidOperationException( "MessageType is not set." );
+		internal void Prepare(bool canUseChunkedBuffer) {
+			if (this._messageType == MessageType.Response) {
+				throw new InvalidOperationException("MessageType is not set.");
 			}
 
-			Contract.Assert( this._methodName != null );
+			Contract.Assert(this._methodName != null);
 
-			using ( var packer = Packer.Create( this._methodNameBuffer, false ) )
-			{
-				packer.Pack( this._methodName );
+			using (var packer = Packer.Create(this._methodNameBuffer, false)) {
+				packer.Pack(this._methodName);
 			}
 
-			if ( this._messageType == MessageType.Request )
-			{
-				Contract.Assert( this.MessageId != null );
-				Contract.Assert( this._requestCompletionCallback != null );
+			if (this._messageType == MessageType.Request) {
+				Contract.Assert(this.MessageId != null);
+				Contract.Assert(this._requestCompletionCallback != null);
 
-				this.SendingBuffer[ 0 ] = _requestHeader;
-				this.SendingBuffer[ 1 ] = this.GetPackedMessageId();
-				this.SendingBuffer[ 2 ] = new ArraySegment<byte>( this._methodNameBuffer.GetBuffer(), 0, unchecked( ( int )this._methodNameBuffer.Length ) );
-				this.SendingBuffer[ 3 ] = new ArraySegment<byte>( this._argumentsBuffer.GetBuffer(), 0, unchecked( ( int )this._argumentsBuffer.Length ) );
+				this.SendingBuffer[0] = _requestHeader;
+				this.SendingBuffer[1] = this.GetPackedMessageId();
+				this.SendingBuffer[2] = new ArraySegment<byte>(this._methodNameBuffer.GetBuffer(), 0, unchecked((int)this._methodNameBuffer.Length));
+				this.SendingBuffer[3] = new ArraySegment<byte>(this._argumentsBuffer.GetBuffer(), 0, unchecked((int)this._argumentsBuffer.Length));
 			}
-			else
-			{
-				Contract.Assert( this._notificationCompletionCallback != null );
+			else {
+				Contract.Assert(this._notificationCompletionCallback != null);
 
-				this.SendingBuffer[ 0 ] = _notificationHeader;
-				this.SendingBuffer[ 1 ] = new ArraySegment<byte>( this._methodNameBuffer.GetBuffer(), 0, unchecked( ( int )this._methodNameBuffer.Length ) );
-				this.SendingBuffer[ 2 ] = new ArraySegment<byte>( this._argumentsBuffer.GetBuffer(), 0, unchecked( ( int )this._argumentsBuffer.Length ) );
-				this.SendingBuffer[ 3 ] = _emptyBuffer;
+				this.SendingBuffer[0] = _notificationHeader;
+				this.SendingBuffer[1] = new ArraySegment<byte>(this._methodNameBuffer.GetBuffer(), 0, unchecked((int)this._methodNameBuffer.Length));
+				this.SendingBuffer[2] = new ArraySegment<byte>(this._argumentsBuffer.GetBuffer(), 0, unchecked((int)this._argumentsBuffer.Length));
+				this.SendingBuffer[3] = _emptyBuffer;
 			}
 
 #if MONO
@@ -393,29 +346,27 @@ namespace MsgPack.Rpc.Client.Protocols
 				return;
 			}
 #endif
-			this.SocketContext.SetBuffer( null, 0, 0 );
+			this.SocketContext.SetBuffer(null, 0, 0);
 			this.SocketContext.BufferList = this.SendingBuffer;
 		}
 
-		internal override void ClearBuffers()
-		{
-			this._methodNameBuffer.SetLength( 0 );
-			this._argumentsBuffer.SetLength( 0 );
+		internal override void ClearBuffers() {
+			this._methodNameBuffer.SetLength(0);
+			this._argumentsBuffer.SetLength(0);
 			this.SocketContext.BufferList = null;
 			this._argumentsPacker.Dispose();
-			this._argumentsPacker = Packer.Create( this._argumentsBuffer, false );
-			this.SendingBuffer[ 0 ] = new ArraySegment<byte>();
-			this.SendingBuffer[ 1 ] = new ArraySegment<byte>();
-			this.SendingBuffer[ 2 ] = new ArraySegment<byte>();
-			this.SendingBuffer[ 3 ] = new ArraySegment<byte>();
+			this._argumentsPacker = Packer.Create(this._argumentsBuffer, false);
+			this.SendingBuffer[0] = new ArraySegment<byte>();
+			this.SendingBuffer[1] = new ArraySegment<byte>();
+			this.SendingBuffer[2] = new ArraySegment<byte>();
+			this.SendingBuffer[3] = new ArraySegment<byte>();
 			base.ClearBuffers();
 		}
 
 		/// <summary>
 		///		Clears this instance internal buffers for reuse.
 		/// </summary>
-		internal sealed override void Clear()
-		{
+		internal sealed override void Clear() {
 			this.ClearBuffers();
 			this._methodName = null;
 			this._messageType = MessageType.Response; // Invalid.

@@ -1,39 +1,15 @@
-﻿
-#region -- License Terms --
-//
-// MessagePack for CLI
-//
-// Copyright (C) 2010 FUJIWARA, Yusuke
-//
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-//
-//        http://www.apache.org/licenses/LICENSE-2.0
-//
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
-//
-#endregion -- License Terms --
-
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace MsgPack.Rpc.Client.Protocols
-{
+namespace MsgPack.Rpc.Client.Protocols {
 	/// <summary>
 	/// 	Defines trace for MsgPack.Rpc.Client.Protocols namespace.
 	/// </summary>
-	internal static partial class MsgPackRpcClientProtocolsTrace
-	{
-		private static readonly TraceSource _source = new TraceSource( "MsgPack.Rpc.Client.Protocols" );
+	internal static partial class MsgPackRpcClientProtocolsTrace {
+		private static readonly TraceSource _source = new TraceSource("MsgPack.Rpc.Client.Protocols");
 
-		private static readonly Dictionary<MessageId, TraceEventType> _typeTable = 
-			new Dictionary<MessageId, TraceEventType> ( 25 )
+		private static readonly Dictionary<MessageId, TraceEventType> _typeTable =
+			new Dictionary<MessageId, TraceEventType>(25)
 			{
 				{ MessageId.DetectServerShutdown, TraceEventType.Information },
 				{ MessageId.OrphanError, TraceEventType.Error },
@@ -68,8 +44,7 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <value>
 		/// 	The <see cref="TraceSource" />.
 		/// </value>
-		public static TraceSource Source
-		{
+		public static TraceSource Source {
 			get { return _source; }
 		}
 
@@ -82,9 +57,8 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <returns>
 		/// 	<c>true</c> if the specified message should be traced; otherwise, <c>false</c>.
 		/// </returns>
-		public static bool ShouldTrace ( MessageId id )
-		{
-			return _source.Switch.ShouldTrace( _typeTable[ id ] );
+		public static bool ShouldTrace(MessageId id) {
+			return _source.Switch.ShouldTrace(_typeTable[id]);
 		}
 
 		/// <summary>
@@ -99,15 +73,12 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <param name="args">
 		/// 	The format arguments of the descriptive message.
 		/// </param>
-		public static void TraceEvent ( MessageId id, string format, params object[] args )
-		{
-			if ( args == null || args.Length == 0 )
-			{
-				_source.TraceEvent( _typeTable[ id ], ( int )id, format );
+		public static void TraceEvent(MessageId id, string format, params object[] args) {
+			if (args == null || args.Length == 0) {
+				_source.TraceEvent(_typeTable[id], (int)id, format);
 			}
-			else
-			{
-				_source.TraceEvent( _typeTable[ id ], ( int )id, format, args );
+			else {
+				_source.TraceEvent(_typeTable[id], (int)id, format, args);
 			}
 		}
 
@@ -120,9 +91,8 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// <param name="data">
 		/// 	The raw data for this event.
 		/// </param>
-		public static void TraceData ( MessageId id, params object[] data )
-		{
-			_source.TraceData( _typeTable[ id ], ( int )id, data );
+		public static void TraceData(MessageId id, params object[] data) {
+			_source.TraceData(_typeTable[id], (int)id, data);
 		}
 
 		/// <summary>
@@ -225,8 +195,7 @@ namespace MsgPack.Rpc.Client.Protocols
 		/// 	<see cref="MessageId" /> of .DisposeTransport (ID:3019) message.
 		/// </summary>
 		public const MessageId DisposeTransport = MessageId.DisposeTransport;
-		public enum MessageId
-		{
+		public enum MessageId {
 			DetectServerShutdown = 11,
 			OrphanError = 91,
 			SocketError = 101,
