@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 using System.Threading;
-#if SILVERLIGHT
-using Mono.Threading;
-#endif
 
 namespace MsgPack.Rpc.Core {
 	/// <summary>

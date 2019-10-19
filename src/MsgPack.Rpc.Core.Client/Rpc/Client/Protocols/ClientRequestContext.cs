@@ -1,11 +1,8 @@
+using MsgPack.Rpc.Core.Protocols;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
-#if SILVERLIGHT
-using Mono.Diagnostics;
-#endif
-using MsgPack.Rpc.Core.Protocols;
 
 namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
@@ -49,8 +46,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private Packer _argumentsPacker;
-
 		/// <summary>
 		///		Gets the <see cref="Packer"/> to pack arguments array.
 		/// </summary>
@@ -58,13 +53,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		The <see cref="Packer"/> to pack arguments array.
 		///		This value will not be <c>null</c>.
 		/// </value>
-		public Packer ArgumentsPacker {
-			get {
-				Contract.Ensures(Contract.Result<Packer>() != null);
-
-				return _argumentsPacker;
-			}
-		}
+		public Packer ArgumentsPacker { get; private set; }
 
 		/// <summary>
 		///		Gets the name of the calling method.
@@ -82,13 +71,13 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		The reusable buffer to pack method name.
 		///		This value will not be <c>null</c>.
 		/// </summary>
-		private readonly MemoryStream _methodNameBuffer;
+		private readonly MemoryStream methodNameBuffer;
 
 		/// <summary>
 		///		The reusable buffer to pack arguments.
 		///		This value will not be <c>null</c>.
 		/// </summary>
-		private readonly MemoryStream _argumentsBuffer;
+		private readonly MemoryStream argumentsBuffer;
 
 		/// <summary>
 		///		The resusable buffer to hold sending response data.
@@ -128,11 +117,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		</list>
 		/// </remarks>
 		internal readonly ArraySegment<byte>[] SendingBuffer;
-
-#if MONO
-		private readonly MemoryStream _unifiedSendingBuffer;
-#endif
-
 
 		/// <summary>
 		///		Gets the callback delegate which will be called when the notification is sent.
@@ -181,15 +165,10 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		An <see cref="RpcClientConfiguration"/> to tweak this instance initial state.
 		/// </param>
 		public ClientRequestContext(RpcClientConfiguration configuration) {
-			_methodNameBuffer =
-				new MemoryStream((configuration ?? RpcClientConfiguration.Default).InitialMethodNameBufferLength);
-			_argumentsBuffer =
-				new MemoryStream((configuration ?? RpcClientConfiguration.Default).InitialArgumentsBufferLength);
+			methodNameBuffer = new MemoryStream((configuration ?? RpcClientConfiguration.Default).InitialMethodNameBufferLength);
+			argumentsBuffer = new MemoryStream((configuration ?? RpcClientConfiguration.Default).InitialArgumentsBufferLength);
 			SendingBuffer = new ArraySegment<byte>[4];
-#if MONO
-			this._unifiedSendingBuffer = new MemoryStream( ( configuration ?? RpcClientConfiguration.Default ).InitialReceiveBufferLength );
-#endif
-			_argumentsPacker = Packer.Create(_argumentsBuffer, false);
+			ArgumentsPacker = Packer.Create(argumentsBuffer, false);
 			_messageType = MessageType.Response;
 			_stopwatch = new Stopwatch();
 		}
@@ -297,7 +276,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			Contract.Assert(MethodName != null);
 
-			using (var packer = Packer.Create(_methodNameBuffer, false)) {
+			using (var packer = Packer.Create(methodNameBuffer, false)) {
 				packer.Pack(MethodName);
 			}
 
@@ -307,42 +286,28 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 				SendingBuffer[0] = _requestHeader;
 				SendingBuffer[1] = GetPackedMessageId();
-				SendingBuffer[2] = new ArraySegment<byte>(_methodNameBuffer.GetBuffer(), 0, unchecked((int)_methodNameBuffer.Length));
-				SendingBuffer[3] = new ArraySegment<byte>(_argumentsBuffer.GetBuffer(), 0, unchecked((int)_argumentsBuffer.Length));
+				SendingBuffer[2] = new ArraySegment<byte>(methodNameBuffer.GetBuffer(), 0, unchecked((int)methodNameBuffer.Length));
+				SendingBuffer[3] = new ArraySegment<byte>(argumentsBuffer.GetBuffer(), 0, unchecked((int)argumentsBuffer.Length));
 			}
 			else {
 				Contract.Assert(NotificationCompletionCallback != null);
 
 				SendingBuffer[0] = _notificationHeader;
-				SendingBuffer[1] = new ArraySegment<byte>(_methodNameBuffer.GetBuffer(), 0, unchecked((int)_methodNameBuffer.Length));
-				SendingBuffer[2] = new ArraySegment<byte>(_argumentsBuffer.GetBuffer(), 0, unchecked((int)_argumentsBuffer.Length));
+				SendingBuffer[1] = new ArraySegment<byte>(methodNameBuffer.GetBuffer(), 0, unchecked((int)methodNameBuffer.Length));
+				SendingBuffer[2] = new ArraySegment<byte>(argumentsBuffer.GetBuffer(), 0, unchecked((int)argumentsBuffer.Length));
 				SendingBuffer[3] = _emptyBuffer;
 			}
 
-#if MONO
-			if ( !canUseChunkedBuffer )
-			{
-				this._unifiedSendingBuffer.Position = 0;
-				this._unifiedSendingBuffer.SetLength( 0 );
-				this._unifiedSendingBuffer.Write( this.SendingBuffer[ 0 ].Array, this.SendingBuffer[ 0 ].Offset, this.SendingBuffer[ 0 ].Count );
-				this._unifiedSendingBuffer.Write( this.SendingBuffer[ 1 ].Array, this.SendingBuffer[ 1 ].Offset, this.SendingBuffer[ 1 ].Count );
-				this._unifiedSendingBuffer.Write( this.SendingBuffer[ 2 ].Array, this.SendingBuffer[ 2 ].Offset, this.SendingBuffer[ 2 ].Count );
-				this._unifiedSendingBuffer.Write( this.SendingBuffer[ 3 ].Array, this.SendingBuffer[ 3 ].Offset, this.SendingBuffer[ 3 ].Count );
-				this.SocketContext.SetBuffer( this._unifiedSendingBuffer.GetBuffer(), 0, unchecked( ( int )this._unifiedSendingBuffer.Length ) );
-				this.SocketContext.BufferList = null;
-				return;
-			}
-#endif
 			SocketContext.SetBuffer(null, 0, 0);
 			SocketContext.BufferList = SendingBuffer;
 		}
 
 		internal override void ClearBuffers() {
-			_methodNameBuffer.SetLength(0);
-			_argumentsBuffer.SetLength(0);
+			methodNameBuffer.SetLength(0);
+			argumentsBuffer.SetLength(0);
 			SocketContext.BufferList = null;
-			_argumentsPacker.Dispose();
-			_argumentsPacker = Packer.Create(_argumentsBuffer, false);
+			ArgumentsPacker.Dispose();
+			ArgumentsPacker = Packer.Create(argumentsBuffer, false);
 			SendingBuffer[0] = new ArraySegment<byte>();
 			SendingBuffer[1] = new ArraySegment<byte>();
 			SendingBuffer[2] = new ArraySegment<byte>();

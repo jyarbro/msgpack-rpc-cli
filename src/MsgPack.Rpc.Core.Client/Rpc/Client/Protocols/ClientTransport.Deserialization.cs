@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 using System.Globalization;
-#if SILVERLIGHT
-using System.IO.IsolatedStorage;
-#endif
 using MsgPack.Rpc.Core.Protocols;
 
 namespace MsgPack.Rpc.Core.Client.Protocols {
@@ -222,16 +219,10 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 
 			if (Manager.Configuration.DumpCorruptResponse) {
-#if !SILVERLIGHT
-				using (var dumpStream = OpenDumpStream(context.SessionStartedAt, context.RemoteEndPoint, context.SessionId, MessageType.Response, context.MessageId))
-#else
-				using( var storage = IsolatedStorageFile.GetUserStoreForApplication() )
-				using( var dumpStream = OpenDumpStream( storage, context.SessionStartedAt, context.RemoteEndPoint, context.SessionId, MessageType.Response, context.MessageId ) )
-#endif
-				{
-					dumpStream.Write(context.CurrentReceivingBuffer, context.CurrentReceivingBufferOffset, context.BytesTransferred);
-					dumpStream.Flush();
-				}
+				using var dumpStream = OpenDumpStream(context.SessionStartedAt, context.RemoteEndPoint, context.SessionId, MessageType.Response, context.MessageId);
+
+				dumpStream.Write(context.CurrentReceivingBuffer, context.CurrentReceivingBufferOffset, context.BytesTransferred);
+				dumpStream.Flush();
 			}
 
 			context.ShiftCurrentReceivingBuffer();

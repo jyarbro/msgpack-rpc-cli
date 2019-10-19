@@ -2,9 +2,7 @@
 using System.Diagnostics.Contracts;
 using System.Net;
 using System.Threading;
-#if !WINDOWS_PHONE
 using System.Threading.Tasks;
-#endif
 using MsgPack.Rpc.Core.Client.Protocols;
 using MsgPack.Serialization;
 
@@ -207,7 +205,6 @@ namespace MsgPack.Rpc.Core.Client {
 			return EndCall(BeginCall(methodName, arguments, null, null));
 		}
 
-#if !WINDOWS_PHONE
 		/// <summary>
 		///		Calls specified remote method with specified argument asynchronously. 
 		/// </summary>
@@ -241,7 +238,6 @@ namespace MsgPack.Rpc.Core.Client {
 		public Task<MessagePackObject> CallAsync(string methodName, object[] arguments, object asyncState) {
 			return Task.Factory.FromAsync(BeginCall, EndCall, methodName, arguments, asyncState, TaskCreationOptions.None);
 		}
-#endif
 
 		/// <summary>
 		///		Calls specified remote method with specified argument asynchronously. 
@@ -372,7 +368,6 @@ namespace MsgPack.Rpc.Core.Client {
 			EndNotify(BeginNotify(methodName, arguments, null, null));
 		}
 
-#if !WINDOWS_PHONE
 		/// <summary>
 		///		Sends specified remote method with specified argument as notification message asynchronously.
 		/// </summary>
@@ -404,7 +399,6 @@ namespace MsgPack.Rpc.Core.Client {
 		public Task NotifyAsync(string methodName, object[] arguments, object asyncState) {
 			return Task.Factory.FromAsync(BeginNotify, EndNotify, methodName, arguments, asyncState, TaskCreationOptions.None);
 		}
-#endif
 
 		/// <summary>
 		///		Sends specified remote method with specified argument as notification message asynchronously.

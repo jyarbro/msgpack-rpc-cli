@@ -5,11 +5,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
-[module: SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Scope = "member", Target = "MsgPack.Rpc.Core.Client.RpcClientConfiguration.#UdpTransportPoolProvider")]
-[module: SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Scope = "member", Target = "MsgPack.Rpc.Core.Client.RpcClientConfiguration.#RequestContextPoolProvider")]
-[module: SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Scope = "member", Target = "MsgPack.Rpc.Core.Client.RpcClientConfiguration.#TcpTransportPoolProvider")]
-[module: SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Scope = "member", Target = "MsgPack.Rpc.Core.Client.RpcClientConfiguration.#ResponseContextPoolProvider")]
-[module: SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Scope = "member", Target = "MsgPack.Rpc.Core.Client.RpcClientConfiguration.#ToString`1(!!0,System.Text.StringBuilder)", Justification = "Boolean value should be lower case.")]
 namespace MsgPack.Rpc.Core.Client {
 	/// <summary>
 	///		Represents client side configuration settings.

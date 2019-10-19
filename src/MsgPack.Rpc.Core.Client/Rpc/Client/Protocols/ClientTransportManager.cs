@@ -1,13 +1,11 @@
-﻿using System;
+﻿using MsgPack.Rpc.Core.Protocols;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-#if !WINDOWS_PHONE
 using System.Threading.Tasks;
-#endif
-using MsgPack.Rpc.Core.Protocols;
 
 namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>

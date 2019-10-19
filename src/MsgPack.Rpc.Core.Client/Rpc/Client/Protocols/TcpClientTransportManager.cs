@@ -1,11 +1,9 @@
+using MsgPack.Rpc.Core.Protocols;
 using System;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
-#if !WINDOWS_PHONE
 using System.Threading.Tasks;
-#endif
-using MsgPack.Rpc.Core.Protocols;
 
 namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
@@ -20,9 +18,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </param>
 		public TcpClientTransportManager(RpcClientConfiguration configuration)
 			: base(configuration) {
-#if !API_SIGNATURE_TEST
-			base.SetTransportPool(configuration.TcpTransportPoolProvider(() => new TcpClientTransport(this), configuration.CreateTransportPoolConfiguration()));
-#endif
+			SetTransportPool(configuration.TcpTransportPoolProvider(() => new TcpClientTransport(this), configuration.CreateTransportPoolConfiguration()));
 		}
 
 		/// <summary>
@@ -39,7 +35,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			context.RemoteEndPoint = targetEndPoint;
 			context.Completed += OnCompleted;
 
-#if !API_SIGNATURE_TEST
 			MsgPackRpcClientProtocolsTrace.TraceEvent(
 				MsgPackRpcClientProtocolsTrace.BeginConnect,
 				"Connecting. {{ \"EndPoint\" : \"{0}\", \"AddressFamily\" : {1}, \"PreferIPv4\" : {2}, \"OSSupportsIPv6\" : {3} }}",
@@ -48,16 +43,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				Configuration.PreferIPv4,
 				Socket.OSSupportsIPv6
 			);
-#endif
-#if MONO
-			var connectingSocket = new Socket( targetEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp );
-#endif
+
 			context.UserToken =
 				Tuple.Create(
 					source,
 					BeginConnectTimeoutWatch(
 						() => {
-#if !API_SIGNATURE_TEST
 							MsgPackRpcClientProtocolsTrace.TraceEvent(
 								MsgPackRpcClientProtocolsTrace.ConnectTimeout,
 								"Connect timeout. {{ \"EndPoint\" : \"{0}\", \"AddressFamily\" : {1}, \"PreferIPv4\" : {2}, \"OSSupportsIPv6\" : {3}, \"ConnectTimeout\" : {4} }}",
@@ -67,26 +58,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 								Socket.OSSupportsIPv6,
 								Configuration.ConnectTimeout
 							);
-#endif
-#if MONO
-							// Cancel ConnectAsync.
-							connectingSocket.Close();
-#else
 							Socket.CancelConnectAsync(context);
-#endif
 						}
 					)
-#if MONO
-					, connectingSocket
-#endif
 				);
 
-#if MONO
-			if( !connectingSocket.ConnectAsync( context ) )
-#else
-			if (!Socket.ConnectAsync(SocketType.Stream, ProtocolType.Tcp, context))
-#endif
-			{
+			if (!Socket.ConnectAsync(SocketType.Stream, ProtocolType.Tcp, context)) {
 				OnCompleted(null, context);
 			}
 
@@ -95,22 +72,14 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 		private void OnCompleted(object sender, SocketAsyncEventArgs e) {
 			var socket = sender as Socket;
-#if MONO
-			var userToken = e.UserToken as Tuple<TaskCompletionSource<ClientTransport>, ConnectTimeoutWatcher, Socket>;
-#else
 			var userToken = e.UserToken as Tuple<TaskCompletionSource<ClientTransport>, ConnectTimeoutWatcher>;
-#endif
 			var taskCompletionSource = userToken.Item1;
 			var watcher = userToken.Item2;
 			if (watcher != null) {
 				EndConnectTimeoutWatch(watcher);
 			}
 
-#if MONO
-			var error = this.HandleSocketError( userToken.Item3 ?? socket, e );
-#else
 			var error = HandleSocketError(e.ConnectSocket ?? socket, e);
-#endif
 			if (error != null) {
 				taskCompletionSource.SetException(error.Value.ToException());
 				return;
@@ -118,15 +87,10 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			switch (e.LastOperation) {
 				case SocketAsyncOperation.Connect: {
-#if MONO
-					this.OnConnected( userToken.Item3, e, taskCompletionSource );
-#else
 					OnConnected(e.ConnectSocket, e, taskCompletionSource);
-#endif
 					break;
 				}
 				default: {
-#if !API_SIGNATURE_TEST
 					MsgPackRpcClientProtocolsTrace.TraceEvent(
 						MsgPackRpcClientProtocolsTrace.UnexpectedLastOperation,
 						"Unexpected operation. {{ \"Socket\" : 0x{0:X}, \"RemoteEndPoint\" : \"{1}\", \"LocalEndPoint\" : \"{2}\", \"LastOperation\" : \"{3}\" }}",
@@ -135,7 +99,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 						ClientTransport.GetLocalEndPoint(socket),
 						e.LastOperation
 					);
-#endif
 					taskCompletionSource.SetException(new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Unknown socket operation : {0}", e.LastOperation)));
 					break;
 				}
@@ -156,7 +119,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					return;
 				}
 
-#if !API_SIGNATURE_TEST
 				MsgPackRpcClientProtocolsTrace.TraceEvent(
 					MsgPackRpcClientProtocolsTrace.EndConnect,
 					"Connected. {{ \"Socket\" : 0x{0:X}, \"RemoteEndPoint\" : \"{1}\", \"LocalEndPoint\" : \"{2}\" }}",
@@ -164,7 +126,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					ClientTransport.GetRemoteEndPoint(connectSocket, context),
 					ClientTransport.GetLocalEndPoint(connectSocket)
 				);
-#endif
 
 				taskCompletionSource.SetResult(GetTransport(connectSocket));
 			}
@@ -194,27 +155,5 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			BindSocket(transport, bindingSocket);
 			return transport;
 		}
-
-#if WINDOWS_PHONE
-		private static class Tuple
-		{
-			public static Tuple<T1, T2> Create<T1, T2>( T1 item1, T2 item2 )
-			{
-				return new Tuple<T1, T2>( item1, item2 );
-			}
-		}
-
-		private sealed class Tuple<T1, T2>
-		{
-			public readonly T1 Item1;
-			public readonly T2 Item2;
-
-			public Tuple( T1 item1, T2 item2 )
-			{
-				this.Item1 = item1;
-				this.Item2 = item2;
-			}
-		}
-#endif
 	}
 }

@@ -2,9 +2,7 @@ using System;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
-#if !WINDOWS_PHONE
 using System.Threading.Tasks;
-#endif
 
 namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
@@ -19,9 +17,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </param>
 		public UdpClientTransportManager(RpcClientConfiguration configuration)
 			: base(configuration) {
-#if !API_SIGNATURE_TEST
-			base.SetTransportPool(configuration.UdpTransportPoolProvider(() => new UdpClientTransport(this), configuration.CreateTransportPoolConfiguration()));
-#endif
+			SetTransportPool(configuration.UdpTransportPoolProvider(() => new UdpClientTransport(this), configuration.CreateTransportPoolConfiguration()));
 		}
 
 		/// <summary>

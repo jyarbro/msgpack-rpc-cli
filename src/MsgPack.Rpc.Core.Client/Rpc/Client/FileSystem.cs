@@ -8,9 +8,7 @@ namespace MsgPack.Rpc.Core.Client {
 		private static readonly Regex _invalidPathChars =
 			new Regex(
 				"[" + Regex.Escape(string.Join(string.Empty, Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).Distinct())) + "]",
-#if !SILVERLIGHT
 				 RegexOptions.Compiled |
-#endif
 				 RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.Singleline
 			);
 
@@ -19,11 +17,7 @@ namespace MsgPack.Rpc.Core.Client {
 				throw new ArgumentNullException("value");
 			}
 
-#if !SILVERIGHT
 			return _invalidPathChars.Replace(value, replacement ?? string.Empty);
-#else
-			return "." + Path.DirectorySepartorChar + _invalidPathChars.Replace( value, replacement ?? String.Empty );
-#endif
 		}
 	}
 }

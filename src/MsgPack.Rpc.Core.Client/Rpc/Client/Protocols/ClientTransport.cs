@@ -1,7 +1,7 @@
-﻿using System;
-#if !SILVERLIGHT
+﻿using MsgPack.Rpc.Core.Protocols;
+using MsgPack.Rpc.Core.Protocols.Filters;
+using System;
 using System.Collections.Concurrent;
-#endif
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -9,18 +9,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
-#if SILVERLIGHT
-using System.IO.IsolatedStorage;
-#endif
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-#if SILVERLIGHT
-using Mono.Collections.Concurrent;
-#endif
-using MsgPack.Rpc.Core.Protocols;
-using MsgPack.Rpc.Core.Protocols.Filters;
 
 namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>
@@ -356,10 +348,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			switch (context.LastOperation) {
 				case SocketAsyncOperation.Send:
-#if !SILVERLIGHT
 				case SocketAsyncOperation.SendTo:
 				case SocketAsyncOperation.SendPackets:
-#endif
 				{
 					var requestContext = context as ClientRequestContext;
 					Contract.Assert(requestContext != null);
@@ -367,10 +357,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					break;
 				}
 				case SocketAsyncOperation.Receive:
-#if !SILVERLIGHT
 				case SocketAsyncOperation.ReceiveFrom:
 				case SocketAsyncOperation.ReceiveMessageFrom:
-#endif
 				{
 					var responseContext = context as ClientResponseContext;
 					Contract.Assert(responseContext != null);
@@ -531,17 +519,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				GetLocalEndPoint(socket),
 				rpcError,
 				returnValue,
-#if !SILVERLIGHT
 				new StackTrace(0, true)
-#else
- new StackTrace()
-#endif
  );
 
 			_manager.HandleOrphan(messageId, rpcError, returnValue);
 		}
 
-#if !SILVERLIGHT
 		private Stream OpenDumpStream(DateTimeOffset sessionStartedAt, EndPoint destination, long sessionId, MessageType type, int? messageId) {
 			var directoryPath =
 				string.IsNullOrWhiteSpace(Manager.Configuration.CorruptResponseDumpOutputDirectory)
@@ -574,18 +557,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					FileOptions.None
 				);
 		}
-#else
-		private static Stream OpenDumpStream( IsolatedStorageFile storage, DateTimeOffset sessionStartedAt, EndPoint destination, long sessionId, MessageType type, int? messageId )
-		{
-			return
-				storage.OpenFile(
-					String.Format( CultureInfo.InvariantCulture, "{0:yyyy-MM-dd_HH-mm-ss}-{1}-{2}-{3}{4}.dat", sessionStartedAt, destination == null ? String.Empty : destination.ToString().Replace( ':', '_' ).Replace( '/', '_' ).Replace( '.', '_' ), sessionId, type, messageId == null ? String.Empty : "-" + messageId ),
-					FileMode.Append,
-					FileAccess.Write,
-					FileShare.Read
-				);
-		}
-#endif
 
 		private static void ApplyFilters<T>(IList<MessageFilter<T>> filters, T context)
 			where T : MessageContext {
@@ -1010,7 +981,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		#region -- Tracing --
 
 		internal static IntPtr GetHandle(Socket socket) {
-#if !SILVERLIGHT
 			if (socket != null) {
 				try {
 					return socket.Handle;
@@ -1018,7 +988,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				catch (SocketException) { }
 				catch (ObjectDisposedException) { }
 			}
-#endif
 
 			return IntPtr.Zero;
 		}
@@ -1070,7 +1039,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		}
 
 		internal static EndPoint GetLocalEndPoint(Socket socket) {
-#if !SILVERLIGHT
 			if (socket != null) {
 				try {
 					return socket.LocalEndPoint;
@@ -1078,7 +1046,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				catch (SocketException) { }
 				catch (ObjectDisposedException) { }
 			}
-#endif
 
 			return null;
 		}

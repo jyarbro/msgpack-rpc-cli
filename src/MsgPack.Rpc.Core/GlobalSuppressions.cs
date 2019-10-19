@@ -4,3 +4,4 @@
 // a specific target and scoped to a namespace, type, member, etc.
 
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "By design.", Scope = "namespace", Target = "MsgPack.Rpc.Core")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2229:Implement serialization constructors", Justification = "By design.", Scope = "namespace", Target = "MsgPack.Rpc.Core")]

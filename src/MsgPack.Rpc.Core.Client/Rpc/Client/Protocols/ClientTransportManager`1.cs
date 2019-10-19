@@ -1,14 +1,9 @@
-﻿using System;
-#if !SILVERLIGHT
+﻿using MsgPack.Rpc.Core.Protocols;
+using System;
 using System.Collections.Concurrent;
-#endif
 using System.Diagnostics.Contracts;
 using System.Net.Sockets;
 using System.Threading;
-#if SILVERLIGHT
-using Mono.Collections.Concurrent;
-#endif
-using MsgPack.Rpc.Core.Protocols;
 
 namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <summary>

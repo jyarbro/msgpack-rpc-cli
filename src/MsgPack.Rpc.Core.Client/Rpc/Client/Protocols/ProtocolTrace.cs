@@ -220,4 +220,3 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		}
 	}
 }
-
