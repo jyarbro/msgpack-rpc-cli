@@ -182,14 +182,14 @@ namespace MsgPack.Rpc.Core.Client {
 			if (binder.Name.StartsWith("Begin", binder.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)
 				&& binder.Name.Length > "Begin".Length
 				&& args.Length >= 2) {
-				var asAsyncCallback = args[^2] as AsyncCallback;
-				if (args[^2] == null || asAsyncCallback != null || asAsyncCallback != null) {
+				var asAsyncCallback = args[args.Length - 2] as AsyncCallback;
+				if (args[args.Length - 2] == null || asAsyncCallback != null || asAsyncCallback != null) {
 					var realArgs = new object[args.Length - 2];
 					Array.ConstrainedCopy(args, 0, realArgs, 0, args.Length - 2);
-					if (asAsyncCallback == null && args[^2] is Action<IAsyncResult> asAction) {
+					if (asAsyncCallback == null && args[args.Length - 2] is Action<IAsyncResult> asAction) {
 						asAsyncCallback = ar => asAction(ar);
 					}
-					result = client.BeginCall(binder.Name.Substring("Begin".Length), realArgs, asAsyncCallback, args[^1]);
+					result = client.BeginCall(binder.Name.Substring("Begin".Length), realArgs, asAsyncCallback, args[args.Length - 1]);
 					return true;
 				}
 			}
@@ -206,7 +206,7 @@ namespace MsgPack.Rpc.Core.Client {
 				&& args.Length >= 1) {
 				var realArgs = new object[args.Length - 1];
 				Array.ConstrainedCopy(args, 0, realArgs, 0, args.Length - 1);
-				result = client.CallAsync(binder.Name.Remove(binder.Name.Length - "Async".Length), realArgs, args[^1]);
+				result = client.CallAsync(binder.Name.Remove(binder.Name.Length - "Async".Length), realArgs, args[args.Length - 1]);
 				return true;
 			}
 
