@@ -31,8 +31,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </returns>
 		protected sealed override Task<ClientTransport> ConnectAsyncCore(EndPoint targetEndPoint) {
 			var source = new TaskCompletionSource<ClientTransport>();
-			var context = new SocketAsyncEventArgs();
-			context.RemoteEndPoint = targetEndPoint;
+			var context = new SocketAsyncEventArgs {
+				RemoteEndPoint = targetEndPoint
+			};
 			context.Completed += OnCompleted;
 
 			MsgPackRpcClientProtocolsTrace.TraceEvent(

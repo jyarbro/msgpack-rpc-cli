@@ -184,7 +184,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			try {
 				Action<ClientResponseContext, Exception, bool> handler = null;
 				try {
-					_pendingRequestTable.TryRemove(context.MessageId.Value, out handler);
+					pendingRequestTable.TryRemove(context.MessageId.Value, out handler);
 				}
 				finally {
 					// Best effort to rescue from ThreadAbortException...

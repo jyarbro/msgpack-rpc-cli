@@ -26,7 +26,7 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 		/// </exception>
 		public void ProcessMessage(T context) {
 			if (context == null) {
-				throw new ArgumentNullException("context");
+				throw new ArgumentNullException(nameof(context));
 			}
 
 			Contract.EndContractBlock();

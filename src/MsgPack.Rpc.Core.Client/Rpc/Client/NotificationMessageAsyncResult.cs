@@ -4,16 +4,13 @@ namespace MsgPack.Rpc.Core.Client {
 	internal sealed class NotificationMessageAsyncResult : MessageAsyncResult {
 		public void OnCompleted(Exception exception, bool completedSynchronously) {
 			if (exception != null) {
-				base.OnError(exception, completedSynchronously);
+				OnError(exception, completedSynchronously);
 			}
 			else {
-				base.Complete(completedSynchronously);
+				Complete(completedSynchronously);
 			}
 
-			var callback = AsyncCallback;
-			if (callback != null) {
-				callback(this);
-			}
+			AsyncCallback?.Invoke(this);
 		}
 
 		/// <summary>

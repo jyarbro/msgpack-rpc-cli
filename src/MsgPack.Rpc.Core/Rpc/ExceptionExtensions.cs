@@ -34,7 +34,7 @@ namespace MsgPack.Rpc.Core {
 		/// </remarks>
 		public static Exception GetInnerException(this Exception source) {
 			if (source == null) {
-				throw new ArgumentNullException("source");
+				throw new ArgumentNullException(nameof(source));
 			}
 
 			var inner = source.InnerException;

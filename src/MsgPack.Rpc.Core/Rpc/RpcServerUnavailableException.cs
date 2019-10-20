@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace MsgPack.Rpc.Core {
@@ -7,8 +6,6 @@ namespace MsgPack.Rpc.Core {
 	///		Exception thrown when server is (maybe temporaly) unavailable.
 	/// </summary>
 	[Serializable]
-	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public sealed class RpcServerUnavailableException : RpcException {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcServerUnavailableException"/> class with the default error message.

@@ -11,20 +11,20 @@ namespace MsgPack.Rpc.Core.Client {
 	///		Entry point of MessagePack-RPC client.
 	/// </summary>
 	public sealed class RpcClient : IDisposable {
-		private static int _messageIdGenerator;
+		private static int messageIdGenerator;
 		private static int NextId() {
-			return Interlocked.Increment(ref _messageIdGenerator);
+			return Interlocked.Increment(ref messageIdGenerator);
 		}
 
 		internal SerializationContext SerializationContext { get; }
 
 		internal ClientTransportManager TransportManager { get; }
 
-		private ClientTransport _transport;
+		private ClientTransport transport;
 
-		internal ClientTransport Transport => _transport;
+		internal ClientTransport Transport => transport;
 
-		private TaskCompletionSource<object> _transportShutdownCompletionSource;
+		private TaskCompletionSource<object> transportShutdownCompletionSource;
 
 		/// <summary>
 		///		Gets a value indicating whether this instance is connected to the server.
@@ -32,20 +32,20 @@ namespace MsgPack.Rpc.Core.Client {
 		/// <value>
 		/// 	<c>true</c> if this instance is connected to the server; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsConnected => Interlocked.CompareExchange(ref _transport, null, null) != null;
+		public bool IsConnected => Interlocked.CompareExchange(ref transport, null, null) != null;
 
-		private Task<ClientTransport> _connectTask;
+		private Task<ClientTransport> connectTask;
 
 		internal void EnsureConnected() {
-			var task = Interlocked.CompareExchange(ref _connectTask, null, null);
+			var task = Interlocked.CompareExchange(ref connectTask, null, null);
 			if (task != null) {
-				Interlocked.Exchange(ref _transport, task.Result);
-				Interlocked.Exchange(ref _connectTask, null);
+				Interlocked.Exchange(ref transport, task.Result);
+				Interlocked.Exchange(ref connectTask, null);
 				task.Dispose();
 			}
 		}
 
-		private bool _isDisposed;
+		private bool isDisposed;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcClient"/> class.
@@ -103,7 +103,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </exception>
 		public RpcClient(EndPoint targetEndPoint, RpcClientConfiguration configuration, SerializationContext serializationContext) {
 			if (targetEndPoint == null) {
-				throw new ArgumentNullException("targetEndPoint");
+				throw new ArgumentNullException(nameof(targetEndPoint));
 			}
 
 			Contract.EndContractBlock();
@@ -112,15 +112,15 @@ namespace MsgPack.Rpc.Core.Client {
 
 			TransportManager = safeConfiguration.TransportManagerProvider(safeConfiguration);
 			SerializationContext = serializationContext ?? new SerializationContext();
-			Interlocked.Exchange(ref _connectTask, TransportManager.ConnectAsync(targetEndPoint));
+			Interlocked.Exchange(ref connectTask, TransportManager.ConnectAsync(targetEndPoint));
 		}
 
 		/// <summary>
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose() {
-			_isDisposed = true;
-			var transport = Interlocked.CompareExchange(ref _transport, null, null);
+			isDisposed = true;
+			var transport = Interlocked.CompareExchange(ref this.transport, null, null);
 			if (transport != null) {
 				transport.Dispose();
 			}
@@ -129,7 +129,7 @@ namespace MsgPack.Rpc.Core.Client {
 		}
 
 		private void VerifyIsNotDisposed() {
-			if (_isDisposed) {
+			if (isDisposed) {
 				throw new ObjectDisposedException(ToString());
 			}
 		}
@@ -138,10 +138,10 @@ namespace MsgPack.Rpc.Core.Client {
 		///		Initiates shutdown of current connection and wait to complete it.
 		/// </summary>
 		public void Shutdown() {
-			using (var task = ShutdownAsync()) {
-				if (task != null) {
-					task.Wait();
-				}
+			using var task = ShutdownAsync();
+
+			if (task != null) {
+				task.Wait();
 			}
 		}
 
@@ -155,22 +155,22 @@ namespace MsgPack.Rpc.Core.Client {
 		public Task ShutdownAsync() {
 			VerifyIsNotDisposed();
 
-			if (_transportShutdownCompletionSource != null) {
+			if (transportShutdownCompletionSource != null) {
 				return null;
 			}
 
 			var taskCompletionSource = new TaskCompletionSource<object>();
-			if (Interlocked.CompareExchange(ref _transportShutdownCompletionSource, taskCompletionSource, null) != null) {
+			if (Interlocked.CompareExchange(ref transportShutdownCompletionSource, taskCompletionSource, null) != null) {
 				return null;
 			}
 
-			_transport.ShutdownCompleted += OnTranportShutdownComplete;
-			_transport.BeginShutdown();
+			transport.ShutdownCompleted += OnTranportShutdownComplete;
+			transport.BeginShutdown();
 			return taskCompletionSource.Task;
 		}
 
 		private void OnTranportShutdownComplete(object sender, EventArgs e) {
-			var taskCompletionSource = Interlocked.CompareExchange(ref _transportShutdownCompletionSource, null, _transportShutdownCompletionSource);
+			var taskCompletionSource = Interlocked.CompareExchange(ref transportShutdownCompletionSource, null, transportShutdownCompletionSource);
 			if (taskCompletionSource != null) {
 				var transport = sender as ClientTransport;
 				transport.ShutdownCompleted -= OnTranportShutdownComplete;
@@ -276,11 +276,11 @@ namespace MsgPack.Rpc.Core.Client {
 			var asyncResult = new RequestMessageAsyncResult(this, messageId, asyncCallback, asyncState);
 
 			var isSucceeded = false;
-			var context = _transport.GetClientRequestContext();
+			var context = transport.GetClientRequestContext();
 			try {
 				context.SetRequest(messageId, methodName, asyncResult.OnCompleted);
 				if (arguments == null) {
-					context.ArgumentsPacker.Pack(new MessagePackObject[0]);
+					context.ArgumentsPacker.Pack(Array.Empty<MessagePackObject>());
 				}
 				else {
 					context.ArgumentsPacker.PackArrayHeader(arguments.Length);
@@ -294,12 +294,12 @@ namespace MsgPack.Rpc.Core.Client {
 					}
 				}
 
-				_transport.Send(context);
+				transport.Send(context);
 				isSucceeded = true;
 			}
 			finally {
 				if (!isSucceeded) {
-					_transport.ReturnContext(context);
+					transport.ReturnContext(context);
 				}
 			}
 
@@ -436,11 +436,11 @@ namespace MsgPack.Rpc.Core.Client {
 			var asyncResult = new NotificationMessageAsyncResult(this, asyncCallback, asyncState);
 
 			var isSucceeded = false;
-			var context = _transport.GetClientRequestContext();
+			var context = transport.GetClientRequestContext();
 			try {
 				context.SetNotification(methodName, asyncResult.OnCompleted);
 				if (arguments == null) {
-					context.ArgumentsPacker.Pack(new MessagePackObject[0]);
+					context.ArgumentsPacker.Pack(Array.Empty<MessagePackObject>());
 				}
 				else {
 					context.ArgumentsPacker.PackArrayHeader(arguments.Length);
@@ -454,12 +454,12 @@ namespace MsgPack.Rpc.Core.Client {
 					}
 				}
 
-				_transport.Send(context);
+				transport.Send(context);
 				isSucceeded = true;
 			}
 			finally {
 				if (!isSucceeded) {
-					_transport.ReturnContext(context);
+					transport.ReturnContext(context);
 				}
 			}
 

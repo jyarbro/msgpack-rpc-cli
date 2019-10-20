@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace MsgPack.Rpc.Core.Protocols {
@@ -7,8 +6,6 @@ namespace MsgPack.Rpc.Core.Protocols {
 	///		Exception thrown when network error occurred in/under transport layer.
 	/// </summary>
 	[Serializable]
-	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public sealed class RpcTransportException : RpcException {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcTransportException"/> class with the default error message.

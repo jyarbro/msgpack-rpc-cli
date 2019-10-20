@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace MsgPack.Rpc.Core {
@@ -73,7 +72,6 @@ namespace MsgPack.Rpc.Core {
 			return CloneCore().FreezeCore();
 		}
 
-		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via CloneCore().")]
 		object ICloneable.Clone() {
 			return CloneCore();
 		}
@@ -85,12 +83,10 @@ namespace MsgPack.Rpc.Core {
 		/// This instance if it is already frozen.
 		/// Otherwise, frozen copy of this instance.
 		/// </returns>
-		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via AsFrozenCore().")]
 		IFreezable IFreezable.AsFrozen() {
 			return AsFrozenCore();
 		}
 
-		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes", Justification = "Exposed via FreezeCore().")]
 		IFreezable IFreezable.Freeze() {
 			return FreezeCore();
 		}

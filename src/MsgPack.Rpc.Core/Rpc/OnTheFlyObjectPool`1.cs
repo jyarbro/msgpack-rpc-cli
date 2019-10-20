@@ -30,18 +30,10 @@ namespace MsgPack.Rpc.Core {
 		///		Or <paramref name="configuration"/> is <c>null</c>.
 		/// </exception>
 		public OnTheFlyObjectPool(Func<ObjectPoolConfiguration, T> factory, ObjectPoolConfiguration configuration) {
-			if (factory == null) {
-				throw new ArgumentNullException("factory");
-			}
-
-			if (configuration == null) {
-				throw new ArgumentNullException("configuration");
-			}
-
 			Contract.EndContractBlock();
 
-			_factory = factory;
-			_configuration = configuration;
+			_factory = factory ?? throw new ArgumentNullException(nameof(factory));
+			_configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 		}
 
 		/// <summary>

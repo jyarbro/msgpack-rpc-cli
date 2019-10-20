@@ -71,7 +71,7 @@ namespace MsgPack.Rpc.Core.Client {
 	///		</note>
 	/// </remarks>
 	public sealed class DynamicRpcProxy : DynamicObject, IDisposable {
-		private readonly RpcClient _client;
+		private readonly RpcClient client;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="DynamicRpcProxy"/> class.
@@ -81,13 +81,9 @@ namespace MsgPack.Rpc.Core.Client {
 		///		<paramref name="client"/> is <c>null</c>.
 		/// </exception>
 		public DynamicRpcProxy(RpcClient client) {
-			if (client == null) {
-				throw new ArgumentNullException("client");
-			}
-
 			Contract.EndContractBlock();
 
-			_client = client;
+			this.client = client ?? throw new ArgumentNullException(nameof(client));
 		}
 
 		/// <summary>
@@ -154,7 +150,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose() {
-			_client.Dispose();
+			client.Dispose();
 		}
 
 		/// <summary>
@@ -180,20 +176,20 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </remarks>
 		public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result) {
 			if (binder == null) {
-				throw new ArgumentNullException("binder");
+				throw new ArgumentNullException(nameof(binder));
 			}
 
 			if (binder.Name.StartsWith("Begin", binder.IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)
 				&& binder.Name.Length > "Begin".Length
 				&& args.Length >= 2) {
-				var asAsyncCallback = args[args.Length - 2] as AsyncCallback;
-				if (args[args.Length - 2] == null || asAsyncCallback != null || asAsyncCallback != null) {
+				var asAsyncCallback = args[^2] as AsyncCallback;
+				if (args[^2] == null || asAsyncCallback != null || asAsyncCallback != null) {
 					var realArgs = new object[args.Length - 2];
 					Array.ConstrainedCopy(args, 0, realArgs, 0, args.Length - 2);
-					if (asAsyncCallback == null && args[args.Length - 2] is Action<IAsyncResult> asAction) {
+					if (asAsyncCallback == null && args[^2] is Action<IAsyncResult> asAction) {
 						asAsyncCallback = ar => asAction(ar);
 					}
-					result = _client.BeginCall(binder.Name.Substring("Begin".Length), realArgs, asAsyncCallback, args[args.Length - 1]);
+					result = client.BeginCall(binder.Name.Substring("Begin".Length), realArgs, asAsyncCallback, args[^1]);
 					return true;
 				}
 			}
@@ -201,7 +197,7 @@ namespace MsgPack.Rpc.Core.Client {
 				&& binder.Name.Length > "End".Length
 				&& args.Length == 1) {
 				if (args[0] is IAsyncResult ar) {
-					result = _client.EndCall(ar);
+					result = client.EndCall(ar);
 					return true;
 				}
 			}
@@ -210,11 +206,11 @@ namespace MsgPack.Rpc.Core.Client {
 				&& args.Length >= 1) {
 				var realArgs = new object[args.Length - 1];
 				Array.ConstrainedCopy(args, 0, realArgs, 0, args.Length - 1);
-				result = _client.CallAsync(binder.Name.Remove(binder.Name.Length - "Async".Length), realArgs, args[args.Length - 1]);
+				result = client.CallAsync(binder.Name.Remove(binder.Name.Length - "Async".Length), realArgs, args[^1]);
 				return true;
 			}
 
-			result = _client.Call(binder.Name, args);
+			result = client.Call(binder.Name, args);
 			return true;
 		}
 	}

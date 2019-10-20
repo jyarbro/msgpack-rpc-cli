@@ -16,33 +16,33 @@ namespace MsgPack.Rpc.Core {
 	/// </typeparam>
 	internal sealed class StandardObjectPool<T> : ObjectPool<T>
 		where T : class {
-		private static readonly bool _isDisposableTInternal = typeof(IDisposable).IsAssignableFrom(typeof(T));
+		private static readonly bool isDisposableTInternal = typeof(IDisposable).IsAssignableFrom(typeof(T));
 
 		// name for debugging purpose, explicitly specified, or automatically constructed.
-		private readonly string _name;
+		private readonly string name;
 
 		internal TraceSource TraceSource { get; }
 
-		private readonly ObjectPoolConfiguration _configuration;
+		private readonly ObjectPoolConfiguration configuration;
 
-		private int _isCorrupted;
-		private bool IsCorrupted => Interlocked.CompareExchange(ref _isCorrupted, 0, 0) != 0;
+		private int isCorrupted;
+		private bool IsCorrupted => Interlocked.CompareExchange(ref isCorrupted, 0, 0) != 0;
 
-		private readonly Func<T> _factory;
-		private readonly BlockingCollection<T> _pool;
-		private readonly TimeSpan _borrowTimeout;
+		private readonly Func<T> factory;
+		private readonly BlockingCollection<T> pool;
+		private readonly TimeSpan borrowTimeout;
 
 		// Debug
-		internal int PooledCount => _pool.Count;
+		internal int PooledCount => pool.Count;
 
-		private readonly BlockingCollection<WeakReference> _leases;
-		private readonly ReaderWriterLockSlim _leasesLock;
+		private readonly BlockingCollection<WeakReference> leases;
+		private readonly ReaderWriterLockSlim leasesLock;
 
-		internal int LeasedCount => _leases.Count;
+		internal int LeasedCount => leases.Count;
 
 		// TODO: Timer might be too heavy.
-		private readonly Timer _evictionTimer;
-		private readonly int? _evictionIntervalMilliseconds;
+		private readonly Timer evictionTimer;
+		private readonly int? evictionIntervalMilliseconds;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="StandardObjectPool&lt;T&gt;"/> class.
@@ -57,28 +57,24 @@ namespace MsgPack.Rpc.Core {
 		///		<paramref name="factory"/> is <c>null</c>.
 		/// </exception>
 		public StandardObjectPool(Func<T> factory, ObjectPoolConfiguration configuration) {
-			if (factory == null) {
-				throw new ArgumentNullException("factory");
-			}
-
 			Contract.EndContractBlock();
 
 			var safeConfiguration = (configuration ?? ObjectPoolConfiguration.Default).AsFrozen();
 
 			if (string.IsNullOrWhiteSpace(safeConfiguration.Name)) {
 				TraceSource = new TraceSource(GetType().FullName);
-				_name = GetType().FullName + "@" + GetHashCode().ToString("X", CultureInfo.InvariantCulture);
+				name = GetType().FullName + "@" + GetHashCode().ToString("X", CultureInfo.InvariantCulture);
 			}
 			else {
 				TraceSource = new TraceSource(safeConfiguration.Name);
-				_name = safeConfiguration.Name;
+				name = safeConfiguration.Name;
 			}
 
 			if (configuration == null && TraceSource.ShouldTrace(StandardObjectPoolTrace.InitializedWithDefaultConfiguration)) {
 				TraceSource.TraceEvent(
 					StandardObjectPoolTrace.InitializedWithDefaultConfiguration,
 					"Initialized with default configuration. { \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }",
-					_name,
+					name,
 					GetType(),
 					GetHashCode()
 				);
@@ -87,27 +83,27 @@ namespace MsgPack.Rpc.Core {
 				TraceSource.TraceEvent(
 					StandardObjectPoolTrace.InitializedWithConfiguration,
 					"Initialized with specified configuration. { \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Configuration\" : {3} }",
-					_name,
+					name,
 					GetType(),
 					GetHashCode(),
 					configuration
 				);
 			}
 
-			_configuration = safeConfiguration;
-			_factory = factory;
-			_leasesLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-			_borrowTimeout = safeConfiguration.BorrowTimeout ?? TimeSpan.FromMilliseconds(Timeout.Infinite);
-			_pool =
+			this.configuration = safeConfiguration;
+			this.factory = factory ?? throw new ArgumentNullException(nameof(factory));
+			leasesLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+			borrowTimeout = safeConfiguration.BorrowTimeout ?? TimeSpan.FromMilliseconds(Timeout.Infinite);
+			pool =
 				new BlockingCollection<T>(
 					new ConcurrentStack<T>()
 				);
 
 			if (safeConfiguration.MaximumPooled == null) {
-				_leases = new BlockingCollection<WeakReference>(new ConcurrentQueue<WeakReference>());
+				leases = new BlockingCollection<WeakReference>(new ConcurrentQueue<WeakReference>());
 			}
 			else {
-				_leases = new BlockingCollection<WeakReference>(new ConcurrentQueue<WeakReference>(), safeConfiguration.MaximumPooled.Value);
+				leases = new BlockingCollection<WeakReference>(new ConcurrentQueue<WeakReference>(), safeConfiguration.MaximumPooled.Value);
 			}
 
 			for (var i = 0; i < safeConfiguration.MinimumReserved; i++) {
@@ -115,22 +111,22 @@ namespace MsgPack.Rpc.Core {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.FailedToAddPoolInitially,
 						"Failed to add item. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }}",
-						_name,
+						name,
 						GetType(),
 						GetHashCode()
 					);
 				}
 			}
 
-			_evictionIntervalMilliseconds = safeConfiguration.EvitionInterval == null ? default(int?) : unchecked((int)safeConfiguration.EvitionInterval.Value.TotalMilliseconds);
+			evictionIntervalMilliseconds = safeConfiguration.EvitionInterval == null ? default(int?) : unchecked((int)safeConfiguration.EvitionInterval.Value.TotalMilliseconds);
 
 			if (safeConfiguration.MaximumPooled != null
 						 && safeConfiguration.MinimumReserved != safeConfiguration.MaximumPooled.GetValueOrDefault()
-						 && _evictionIntervalMilliseconds != null) {
-				_evictionTimer = new Timer(OnEvictionTimerElapsed, null, _evictionIntervalMilliseconds.Value, Timeout.Infinite);
+						 && evictionIntervalMilliseconds != null) {
+				evictionTimer = new Timer(OnEvictionTimerElapsed, null, evictionIntervalMilliseconds.Value, Timeout.Infinite);
 			}
 			else {
-				_evictionTimer = null;
+				evictionTimer = null;
 			}
 		}
 
@@ -138,8 +134,8 @@ namespace MsgPack.Rpc.Core {
 			var result = false;
 			try { }
 			finally {
-				if (_pool.TryAdd(value, millisecondsTimeout)) {
-					if (_leases.TryAdd(new WeakReference(value))) {
+				if (pool.TryAdd(value, millisecondsTimeout)) {
+					if (leases.TryAdd(new WeakReference(value))) {
 						result = true;
 					}
 				}
@@ -150,17 +146,20 @@ namespace MsgPack.Rpc.Core {
 
 		protected sealed override void Dispose(bool disposing) {
 			if (disposing) {
-				_pool.Dispose();
-				if (_evictionTimer != null) {
-					_evictionTimer.Dispose();
+				pool.Dispose();
+
+				if (evictionTimer != null) {
+					evictionTimer.Dispose();
 				}
-				_leasesLock.Dispose();
+
+				leases.Dispose();
+				leasesLock.Dispose();
 
 				if (TraceSource.ShouldTrace(StandardObjectPoolTrace.Disposed)) {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.Disposed,
 						"Object pool is disposed. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }}",
-						_name,
+						name,
 						GetType(),
 						GetHashCode()
 					);
@@ -171,7 +170,7 @@ namespace MsgPack.Rpc.Core {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.Finalized,
 						"Object pool is finalized. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }}",
-						_name,
+						name,
 						GetType(),
 						GetHashCode()
 					);
@@ -188,23 +187,23 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		private void SetIsCorrupted() {
-			Interlocked.Exchange(ref _isCorrupted, 1);
+			Interlocked.Exchange(ref isCorrupted, 1);
 		}
 
 		private void OnEvictionTimerElapsed(object state) {
 			EvictExtraItemsCore(false);
 
-			Contract.Assert(_evictionIntervalMilliseconds.HasValue);
+			Contract.Assert(evictionIntervalMilliseconds.HasValue);
 
 			if (IsCorrupted) {
 				return;
 			}
 
-			if (!_evictionTimer.Change(_evictionIntervalMilliseconds.Value, Timeout.Infinite)) {
+			if (!evictionTimer.Change(evictionIntervalMilliseconds.Value, Timeout.Infinite)) {
 				TraceSource.TraceEvent(
 					StandardObjectPoolTrace.FailedToRefreshEvictionTImer,
 					"Failed to refresh evition timer. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }}",
-					_name,
+					name,
 					GetType(),
 					GetHashCode()
 				);
@@ -219,14 +218,14 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		private void EvictExtraItemsCore(bool isInduced) {
-			var remains = _pool.Count - _configuration.MinimumReserved;
+			var remains = pool.Count - configuration.MinimumReserved;
 			var evicting = remains / 2 + remains % 2;
 			if (evicting > 0) {
 				if (isInduced && TraceSource.ShouldTrace(StandardObjectPoolTrace.EvictingExtraItemsInduced)) {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.EvictingExtraItemsInduced,
 						"Start induced eviction. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicting\" : {3} }}",
-						_name,
+						name,
 						GetType(),
 						GetHashCode(),
 						evicting
@@ -236,7 +235,7 @@ namespace MsgPack.Rpc.Core {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.EvictingExtraItemsPreiodic,
 						"Start periodic eviction. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicting\" : {3} }}",
-						_name,
+						name,
 						GetType(),
 						GetHashCode(),
 						evicting
@@ -249,7 +248,7 @@ namespace MsgPack.Rpc.Core {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.EvictedExtraItemsInduced,
 						"Finish induced eviction. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicted\" : {3} }}",
-						_name,
+						name,
 						GetType(),
 						GetHashCode(),
 						disposed.Count
@@ -259,7 +258,7 @@ namespace MsgPack.Rpc.Core {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.EvictedExtraItemsPreiodic,
 						"Finish periodic eviction. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicted\" : {3} }}",
-						_name,
+						name,
 						GetType(),
 						GetHashCode(),
 						disposed.Count
@@ -277,8 +276,7 @@ namespace MsgPack.Rpc.Core {
 		private List<T> EvictItems(int count) {
 			var disposed = new List<T>(count);
 			for (var i = 0; i < count; i++) {
-				T disposing;
-				if (!_pool.TryTake(out disposing, 0)) {
+				if (!pool.TryTake(out var disposing, 0)) {
 					// Race, cancel eviction now.
 					return disposed;
 				}
@@ -293,19 +291,19 @@ namespace MsgPack.Rpc.Core {
 		private void CollectLeases(List<T> disposed) {
 			var isSuccess = false;
 			try {
-				_leasesLock.EnterWriteLock();
+				leasesLock.EnterWriteLock();
 				try {
-					var buffer = new List<WeakReference>(_leases.Count + Environment.ProcessorCount * 2);
-					WeakReference dequeud;
-					while (_leases.TryTake(out dequeud)) {
+					var buffer = new List<WeakReference>(leases.Count + Environment.ProcessorCount * 2);
+
+					while (leases.TryTake(out var dequeud)) {
 						buffer.Add(dequeud);
 					}
 
 					var isFlushed = false;
 					var freed = 0;
 					foreach (var item in buffer) {
-						if (!isFlushed && item.IsAlive && !disposed.Exists(x => Object.ReferenceEquals(x, SafeGetTarget(item)))) {
-							if (!_leases.TryAdd(item)) {
+						if (!isFlushed && item.IsAlive && !disposed.Exists(x => ReferenceEquals(x, SafeGetTarget(item)))) {
+							if (!leases.TryAdd(item)) {
 								// Just evict
 								isFlushed = true;
 								freed++;
@@ -320,7 +318,7 @@ namespace MsgPack.Rpc.Core {
 						TraceSource.TraceEvent(
 							StandardObjectPoolTrace.GarbageCollectedWithLost,
 							"Garbage items are collected, but there may be lost items. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Collected\" : {3}, \"MayBeLost\" : {4} }}",
-							_name,
+							name,
 							GetType(),
 							GetHashCode(),
 							freed,
@@ -331,7 +329,7 @@ namespace MsgPack.Rpc.Core {
 						TraceSource.TraceEvent(
 							StandardObjectPoolTrace.GarbageCollectedWithoutLost,
 							"Garbage items are collected. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Collected\" : {3} }}",
-							_name,
+							name,
 							GetType(),
 							GetHashCode(),
 							freed
@@ -339,7 +337,7 @@ namespace MsgPack.Rpc.Core {
 					}
 				}
 				finally {
-					_leasesLock.ExitWriteLock();
+					leasesLock.ExitWriteLock();
 				}
 
 				isSuccess = true;
@@ -365,7 +363,7 @@ namespace MsgPack.Rpc.Core {
 
 			T result;
 			while (true) {
-				if (_pool.TryTake(out result, 0)) {
+				if (pool.TryTake(out result, 0)) {
 					if (TraceSource.ShouldTrace(StandardObjectPoolTrace.BorrowFromPool)) {
 						TraceBorrow(result);
 					}
@@ -373,21 +371,21 @@ namespace MsgPack.Rpc.Core {
 					return result;
 				}
 
-				_leasesLock.EnterReadLock(); // TODO: Timeout
+				leasesLock.EnterReadLock(); // TODO: Timeout
 				try {
-					if (_leases.Count < _leases.BoundedCapacity) {
-						var newObject = _factory();
+					if (leases.Count < leases.BoundedCapacity) {
+						var newObject = factory();
 						Contract.Assume(newObject != null);
 
-						if (_leases.TryAdd(new WeakReference(newObject), 0)) {
+						if (leases.TryAdd(new WeakReference(newObject), 0)) {
 							if (TraceSource.ShouldTrace(StandardObjectPoolTrace.ExpandPool)) {
 								TraceSource.TraceEvent(
 									StandardObjectPoolTrace.ExpandPool,
 									"Expand the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"NewCount\" : {3} }}",
-									_name,
+									name,
 									GetType(),
 									GetHashCode(),
-									_pool.Count
+									pool.Count
 								);
 							}
 
@@ -399,10 +397,10 @@ namespace MsgPack.Rpc.Core {
 								TraceSource.TraceEvent(
 									StandardObjectPoolTrace.FailedToExpandPool,
 									"Failed to expand the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"NewCount\" : {3} }}",
-									_name,
+									name,
 									GetType(),
 									GetHashCode(),
-									_pool.Count
+									pool.Count
 								);
 							}
 
@@ -411,7 +409,7 @@ namespace MsgPack.Rpc.Core {
 					}
 				}
 				finally {
-					_leasesLock.ExitReadLock();
+					leasesLock.ExitReadLock();
 				}
 
 				// Wait or exception
@@ -422,18 +420,18 @@ namespace MsgPack.Rpc.Core {
 				TraceSource.TraceEvent(
 					StandardObjectPoolTrace.PoolIsEmpty,
 					"Pool is empty. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X} }}",
-					_name,
+					name,
 					GetType(),
 					GetHashCode()
 				);
 			}
 
-			if (_configuration.ExhausionPolicy == ExhausionPolicy.ThrowException) {
+			if (configuration.ExhausionPolicy == ExhausionPolicy.ThrowException) {
 				throw new ObjectPoolEmptyException();
 			}
 			else {
-				if (!_pool.TryTake(out result, _borrowTimeout)) {
-					throw new TimeoutException(string.Format(CultureInfo.CurrentCulture, "The object borrowing is not completed in the time out {0}.", _borrowTimeout));
+				if (!pool.TryTake(out result, borrowTimeout)) {
+					throw new TimeoutException(string.Format(CultureInfo.CurrentCulture, "The object borrowing is not completed in the time out {0}.", borrowTimeout));
 				}
 
 				if (TraceSource.ShouldTrace(StandardObjectPoolTrace.BorrowFromPool)) {
@@ -448,7 +446,7 @@ namespace MsgPack.Rpc.Core {
 			TraceSource.TraceEvent(
 				StandardObjectPoolTrace.BorrowFromPool,
 				"Borrow the value from the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicted\" : 0x{2:X}, \"Resource\" : \"{3}\", \"HashCodeOfResource\" : 0x{4:X} }}",
-				_name,
+				name,
 				GetType(),
 				GetHashCode(),
 				result,
@@ -457,17 +455,17 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		private static void DisposeItem(T item) {
-			if (_isDisposableTInternal) {
+			if (isDisposableTInternal) {
 				((IDisposable)item).Dispose();
 			}
 		}
 
 		protected sealed override void ReturnCore(T value) {
-			if (!_pool.TryAdd(value)) {
+			if (!pool.TryAdd(value)) {
 				TraceSource.TraceEvent(
 					StandardObjectPoolTrace.FailedToReturnToPool,
 					"Failed to return the value to the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"Value\" : 0x{2:X}, \"Resource\" : \"{3}\", \"HashCodeOfResource\" : 0x{4:X} }}",
-					_name,
+					name,
 					GetType(),
 					GetHashCode(),
 					value,
@@ -481,7 +479,7 @@ namespace MsgPack.Rpc.Core {
 					TraceSource.TraceEvent(
 						StandardObjectPoolTrace.ReturnToPool,
 						"Return the value to the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"Value\" : 0x{2:X}, \"Resource\" : \"{3}\", \"HashCodeOfResource\" : 0x{4:X} }}",
-						_name,
+						name,
 						GetType(),
 						GetHashCode(),
 						value,

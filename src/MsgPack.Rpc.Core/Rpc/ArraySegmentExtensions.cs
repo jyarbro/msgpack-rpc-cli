@@ -5,11 +5,11 @@ namespace MsgPack.Rpc.Core {
 	internal static class ArraySegmentExtensions {
 		public static T Get<T>(this ArraySegment<T> source, int index) {
 			if (source.Array == null) {
-				throw new ArgumentNullException("source");
+				throw new ArgumentNullException(nameof(source));
 			}
 
 			if (index < 0 || source.Count <= index) {
-				throw new ArgumentOutOfRangeException("index");
+				throw new ArgumentOutOfRangeException(nameof(index));
 			}
 
 			return source.Array[source.Offset + index];
@@ -17,7 +17,7 @@ namespace MsgPack.Rpc.Core {
 
 		public static int CopyTo<T>(this ArraySegment<T> source, int sourceOffset, T[] array, int arrayOffset, int count) {
 			if (array == null) {
-				throw new ArgumentNullException("array");
+				throw new ArgumentNullException(nameof(array));
 			}
 
 			if (source.Count == 0) {
@@ -25,7 +25,7 @@ namespace MsgPack.Rpc.Core {
 			}
 
 			if (source.Count <= sourceOffset) {
-				throw new ArgumentOutOfRangeException("sourceOffset");
+				throw new ArgumentOutOfRangeException(nameof(sourceOffset));
 			}
 
 			int length;
@@ -37,7 +37,7 @@ namespace MsgPack.Rpc.Core {
 			}
 
 			if (array.Length - arrayOffset < length) {
-				throw new ArgumentException("Array is too small.", "array");
+				throw new ArgumentException("Array is too small.", nameof(array));
 			}
 
 			if (source.Array == null) {

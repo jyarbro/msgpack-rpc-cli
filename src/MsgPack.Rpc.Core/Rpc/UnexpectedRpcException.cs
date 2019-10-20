@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace MsgPack.Rpc.Core {
@@ -10,14 +9,9 @@ namespace MsgPack.Rpc.Core {
 	///		If server returns error but its structure is not compatible with de-facto standard, client library will throw this exception.
 	/// </remarks>
 	[Serializable]
-	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public sealed class UnexpectedRpcException : RpcException {
-		private const string _errorKey = "Error";
-		private const string _errorDetailKey = "ErrorDetail";
-
 		// NOT readonly for safe deserialization
-		private MessagePackObject _error;
+		private MessagePackObject error;
 
 		/// <summary>
 		///		Get the value of error field of response.
@@ -26,10 +20,10 @@ namespace MsgPack.Rpc.Core {
 		///		Value of error field of response.
 		///		This value is not nil, but its content is arbitary.
 		/// </value>
-		public MessagePackObject Error => _error;
+		public MessagePackObject Error => error;
 
 		// NOT readonly for safe deserialization
-		private MessagePackObject _errorDetail;
+		private MessagePackObject errorDetail;
 
 		/// <summary>
 		///		Get the value of return field of response in error.
@@ -38,7 +32,7 @@ namespace MsgPack.Rpc.Core {
 		///		Value of return field of response in error.
 		///		This value may be nil, but server can set any value.
 		/// </value>
-		public MessagePackObject ErrorDetail => _errorDetail;
+		public MessagePackObject ErrorDetail => errorDetail;
 
 		/// <summary>
 		///		Initialize new instance.
@@ -53,8 +47,8 @@ namespace MsgPack.Rpc.Core {
 		/// </param>
 		public UnexpectedRpcException(MessagePackObject error, MessagePackObject errorDetail)
 			: base(RpcError.Unexpected, RpcError.Unexpected.DefaultMessage, null) {
-			_error = error;
-			_errorDetail = errorDetail;
+			this.error = error;
+			this.errorDetail = errorDetail;
 		}
 
 		/// <summary>
@@ -70,8 +64,8 @@ namespace MsgPack.Rpc.Core {
 			base.OnSerializeObjectState(sender, e);
 			e.AddSerializedState(
 				new SerializedState() {
-					Error = _error,
-					ErrorDetail = _errorDetail
+					Error = error,
+					ErrorDetail = errorDetail
 				}
 			);
 		}
@@ -83,8 +77,8 @@ namespace MsgPack.Rpc.Core {
 
 			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as UnexpectedRpcException;
-				enclosing._error = Error;
-				enclosing._errorDetail = ErrorDetail;
+				enclosing.error = Error;
+				enclosing.errorDetail = ErrorDetail;
 			}
 		}
 	}

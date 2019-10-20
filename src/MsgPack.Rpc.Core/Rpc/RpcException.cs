@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Runtime.Serialization;
@@ -55,17 +54,9 @@ namespace MsgPack.Rpc.Core {
 	///		</para>
 	/// </remarks>
 	[Serializable]
-	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public partial class RpcException : Exception {
-		private const string _debugInformationKey = "DebugInformation";
-		private const string _remoteExceptionsKey = "RemoteExceptions";
-		private const string _rpcErrorIdentifierKey = "RpcError";
-		private const string _rpcErrorCodeKey = "RpcErrorCode";
-		private const string _preservedStackTraceKey = "PreservedStackTrace";
-
 		// NOT readonly for safe-deserialization
-		private RpcError _rpcError;
+		private RpcError rpcError;
 
 		/// <summary>
 		///		Gets the metadata of the error.
@@ -76,13 +67,13 @@ namespace MsgPack.Rpc.Core {
 		public RpcError RpcError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				Contract.Assert(_rpcError != null);
-				return _rpcError;
+				Contract.Assert(rpcError != null);
+				return rpcError;
 			}
 		}
 
 		// NOT readonly for safe-deserialization
-		private string _debugInformation;
+		private string debugInformation;
 
 		/// <summary>
 		///		Gets the debug information of the error.
@@ -91,7 +82,7 @@ namespace MsgPack.Rpc.Core {
 		///		The debug information of the error.
 		///		This value will not be <c>null</c> but may be empty for security reason, and its contents are for developers, not end users.
 		/// </value>
-		public string DebugInformation => _debugInformation ?? string.Empty;
+		public string DebugInformation => debugInformation ?? string.Empty;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcException"/> class with a specified error message.
@@ -148,8 +139,8 @@ namespace MsgPack.Rpc.Core {
 		/// </remarks>
 		public RpcException(RpcError rpcError, string message, string debugInformation, Exception inner)
 			: base(message ?? (rpcError ?? RpcError.RemoteRuntimeError).DefaultMessage, inner) {
-			_rpcError = rpcError ?? RpcError.RemoteRuntimeError;
-			_debugInformation = debugInformation;
+			this.rpcError = rpcError ?? RpcError.RemoteRuntimeError;
+			this.debugInformation = debugInformation;
 			RegisterSerializeObjectStateEventHandler();
 		}
 
@@ -180,10 +171,10 @@ namespace MsgPack.Rpc.Core {
 		protected virtual void OnSerializeObjectState(object sender, SafeSerializationEventArgs e) {
 			e.AddSerializedState(
 				new SerializedState() {
-					DebugInformation = _debugInformation,
-					RemoteExceptions = _remoteExceptions,
-					RpcErrorIdentifier = _rpcError.Identifier,
-					RpcErrorCode = _rpcError.ErrorCode,
+					DebugInformation = debugInformation,
+					RemoteExceptions = remoteExceptions,
+					RpcErrorIdentifier = rpcError.Identifier,
+					RpcErrorCode = rpcError.ErrorCode,
 					PreservedStackTrace = _preservedStackTrace
 				}
 			);
@@ -203,9 +194,9 @@ namespace MsgPack.Rpc.Core {
 
 			public void CompleteDeserialization(object deserialized) {
 				var enclosing = deserialized as RpcException;
-				enclosing._debugInformation = DebugInformation;
-				enclosing._remoteExceptions = RemoteExceptions;
-				enclosing._rpcError = MsgPack.Rpc.Core.RpcError.FromIdentifier(RpcErrorIdentifier, RpcErrorCode);
+				enclosing.debugInformation = DebugInformation;
+				enclosing.remoteExceptions = RemoteExceptions;
+				enclosing.rpcError = RpcError.FromIdentifier(RpcErrorIdentifier, RpcErrorCode);
 				enclosing._preservedStackTrace = PreservedStackTrace;
 				enclosing.RegisterSerializeObjectStateEventHandler();
 			}

@@ -1,6 +1,5 @@
 ﻿using MsgPack.Rpc.Core.Protocols;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Sockets;
@@ -12,7 +11,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 	///		Defines non-generic interface of <see cref="ClientTransportManager{T}"/> and provides related features.
 	/// </summary>
 	public abstract class ClientTransportManager : IDisposable {
-		private readonly ObjectPool<ClientRequestContext> _requestContextPool;
+		private readonly ObjectPool<ClientRequestContext> requestContextPool;
 
 		/// <summary>
 		///		Gets the <see cref="ObjectPool{T}"/> of <see cref="ClientRequestContext"/>.
@@ -25,11 +24,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			get {
 				Contract.Ensures(Contract.Result<ObjectPool<ClientRequestContext>>() != null);
 
-				return _requestContextPool;
+				return requestContextPool;
 			}
 		}
 
-		private readonly ObjectPool<ClientResponseContext> _responseContextPool;
+		private readonly ObjectPool<ClientResponseContext> responseContextPool;
 
 		/// <summary>
 		///		Gets the <see cref="ObjectPool{T}"/> of <see cref="ClientResponseContext"/>.
@@ -42,11 +41,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			get {
 				Contract.Ensures(Contract.Result<ObjectPool<ClientResponseContext>>() != null);
 
-				return _responseContextPool;
+				return responseContextPool;
 			}
 		}
 
-		private readonly RpcClientConfiguration _configuration;
+		private readonly RpcClientConfiguration configuration;
 
 		/// <summary>
 		///		Gets the <see cref="RpcClientConfiguration"/> which describes transport configuration.
@@ -59,11 +58,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			get {
 				Contract.Ensures(Contract.Result<RpcClientConfiguration>() != null);
 
-				return _configuration;
+				return configuration;
 			}
 		}
 
-		private int _isDisposed;
+		private int isDisposed;
 
 		/// <summary>
 		///		Gets a value indicating whether this instance is disposed.
@@ -71,9 +70,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <value>
 		/// 	<c>true</c> if this instance is disposed; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsDisposed => Interlocked.CompareExchange(ref _isDisposed, 0, 0) != 0;
+		public bool IsDisposed => Interlocked.CompareExchange(ref isDisposed, 0, 0) != 0;
 
-		private int _isInShutdown;
+		private int isInShutdown;
 
 		/// <summary>
 		///		Gets a value indicating whether this instance is in shutdown.
@@ -81,9 +80,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <value>
 		/// 	<c>true</c> if this instance is in shutdown; otherwise, <c>false</c>.
 		/// </value>
-		public bool IsInShutdown => Interlocked.CompareExchange(ref _isInShutdown, 0, 0) != 0;
+		public bool IsInShutdown => Interlocked.CompareExchange(ref isInShutdown, 0, 0) != 0;
 
-		private EventHandler<ShutdownCompletedEventArgs> _shutdownCompleted;
+		private EventHandler<ShutdownCompletedEventArgs> shutdownCompleted;
 
 		/// <summary>
 		///		Occurs when client shutdown is completed.
@@ -91,20 +90,20 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		public event EventHandler<ShutdownCompletedEventArgs> ShutdownCompleted {
 			add {
 				EventHandler<ShutdownCompletedEventArgs> oldHandler;
-				var currentHandler = _shutdownCompleted;
+				var currentHandler = shutdownCompleted;
 				do {
 					oldHandler = currentHandler;
 					var newHandler = Delegate.Combine(oldHandler, value) as EventHandler<ShutdownCompletedEventArgs>;
-					currentHandler = Interlocked.CompareExchange(ref _shutdownCompleted, newHandler, oldHandler);
+					currentHandler = Interlocked.CompareExchange(ref shutdownCompleted, newHandler, oldHandler);
 				} while (oldHandler != currentHandler);
 			}
 			remove {
 				EventHandler<ShutdownCompletedEventArgs> oldHandler;
-				var currentHandler = _shutdownCompleted;
+				var currentHandler = shutdownCompleted;
 				do {
 					oldHandler = currentHandler;
 					var newHandler = Delegate.Remove(oldHandler, value) as EventHandler<ShutdownCompletedEventArgs>;
-					currentHandler = Interlocked.CompareExchange(ref _shutdownCompleted, newHandler, oldHandler);
+					currentHandler = Interlocked.CompareExchange(ref shutdownCompleted, newHandler, oldHandler);
 				} while (oldHandler != currentHandler);
 			}
 		}
@@ -118,17 +117,13 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </exception>		
 		protected virtual void OnShutdownCompleted(ShutdownCompletedEventArgs e) {
 			if (e == null) {
-				throw new ArgumentNullException("e");
+				throw new ArgumentNullException(nameof(e));
 			}
 
 			Contract.EndContractBlock();
 
-			var handler = Interlocked.CompareExchange(ref _shutdownCompleted, null, null);
-			if (handler != null) {
-				handler(this, e);
-			}
-
-			Interlocked.Exchange(ref _isInShutdown, 0);
+			Interlocked.CompareExchange(ref shutdownCompleted, null, null)?.Invoke(this, e);
+			Interlocked.Exchange(ref isInShutdown, 0);
 		}
 
 		/// <summary>
@@ -146,15 +141,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <param name="e">The <see cref="UnknownResponseReceivedEventArgs"/> instance containing the event data.</param>
 		protected virtual void OnUnknownResponseReceived(UnknownResponseReceivedEventArgs e) {
 			if (e == null) {
-				throw new ArgumentNullException("e");
+				throw new ArgumentNullException(nameof(e));
 			}
 
 			Contract.EndContractBlock();
 
-			var handler = Interlocked.CompareExchange(ref UnknownResponseReceived, null, null);
-			if (handler != null) {
-				handler(this, e);
-			}
+			Interlocked.CompareExchange(ref UnknownResponseReceived, null, null)?.Invoke(this, e);
 		}
 
 		/// <summary>
@@ -167,34 +159,19 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		<paramref name="configuration"/> is <c>null</c>.
 		/// </exception>
 		protected ClientTransportManager(RpcClientConfiguration configuration) {
-			if (configuration == null) {
-				throw new ArgumentNullException("configuration");
-			}
-
 			Contract.EndContractBlock();
 
-			_configuration = configuration;
-			_requestContextPool = configuration.RequestContextPoolProvider(() => new ClientRequestContext(configuration), configuration.CreateRequestContextPoolConfiguration());
-			_responseContextPool = configuration.ResponseContextPoolProvider(() => new ClientResponseContext(configuration), configuration.CreateResponseContextPoolConfiguration());
+			this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+			requestContextPool = configuration.RequestContextPoolProvider(() => new ClientRequestContext(configuration), configuration.CreateRequestContextPoolConfiguration());
+			responseContextPool = configuration.ResponseContextPoolProvider(() => new ClientResponseContext(configuration), configuration.CreateResponseContextPoolConfiguration());
 		}
 
 		/// <summary>
 		///		Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		[SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly", Justification = "Must ensure exactly once.")]
 		public void Dispose() {
-			DisposeOnce(true);
+			Dispose(true);
 			GC.SuppressFinalize(this);
-		}
-
-		/// <summary>
-		///		Releases unmanaged and - optionally - managed resources.
-		/// </summary>
-		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-		private void DisposeOnce(bool disposing) {
-			if (Interlocked.CompareExchange(ref _isDisposed, 1, 0) == 0) {
-				Dispose(disposing);
-			}
 		}
 
 		/// <summary>
@@ -206,7 +183,10 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <remarks>
 		///		This method is guaranteed that this is invoked exactly once and after <see cref="IsDisposed"/> changed <c>true</c>.
 		/// </remarks>
-		protected virtual void Dispose(bool disposing) { }
+		protected virtual void Dispose(bool disposing) {
+			if (Interlocked.CompareExchange(ref isDisposed, 1, 0) == 0) {
+			}
+		}
 
 		/// <summary>
 		///		Initiates client shutdown.
@@ -216,7 +196,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		If shutdown is already initiated or completed, then <c>false</c>.
 		/// </returns>
 		public bool BeginShutdown() {
-			if (Interlocked.Exchange(ref _isInShutdown, 1) == 0) {
+			if (Interlocked.Exchange(ref isInShutdown, 1) == 0) {
 				BeginShutdownCore();
 				return true;
 			}
@@ -246,7 +226,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </exception>
 		public Task<ClientTransport> ConnectAsync(EndPoint targetEndPoint) {
 			if (targetEndPoint == null) {
-				throw new ArgumentNullException("targetEndPoint");
+				throw new ArgumentNullException(nameof(targetEndPoint));
 			}
 
 			Contract.Ensures(Contract.Result<Task<ClientTransport>>() != null);
@@ -274,7 +254,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		<see cref="RpcErrorMessage"/> corresponds for the socket error.
 		///		<c>null</c> if the operation result is not socket error.
 		/// </returns>
-		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Logically be instance method.")]
 		protected internal RpcErrorMessage? HandleSocketError(Socket socket, SocketAsyncEventArgs context) {
 			if (context.SocketError.IsError() == false) {
 				return null;
@@ -335,7 +314,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </exception>
 		protected internal void ReturnRequestContext(ClientRequestContext context) {
 			if (context == null) {
-				throw new ArgumentNullException("context");
+				throw new ArgumentNullException(nameof(context));
 			}
 
 			Contract.EndContractBlock();
@@ -354,7 +333,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </exception>
 		protected internal void ReturnResponseContext(ClientResponseContext context) {
 			if (context == null) {
-				throw new ArgumentNullException("context");
+				throw new ArgumentNullException(nameof(context));
 			}
 
 			Contract.EndContractBlock();
@@ -374,16 +353,16 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </exception>
 		protected ConnectTimeoutWatcher BeginConnectTimeoutWatch(Action onTimeout) {
 			if (onTimeout == null) {
-				throw new ArgumentNullException("onTimeout");
+				throw new ArgumentNullException(nameof(onTimeout));
 			}
 
 			Contract.Ensures(Contract.Result<ConnectTimeoutWatcher>() != null);
 
-			if (_configuration.ConnectTimeout == null) {
+			if (configuration.ConnectTimeout == null) {
 				return NullConnectTimeoutWatcher.Instance;
 			}
 			else {
-				return new DefaultConnectTimeoutWatcher(_configuration.ConnectTimeout.Value, onTimeout);
+				return new DefaultConnectTimeoutWatcher(configuration.ConnectTimeout.Value, onTimeout);
 			}
 		}
 
@@ -394,10 +373,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="watcher"/> is <c>null</c>.
 		/// </exception>
-		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Logically be instance method.")]
 		protected void EndConnectTimeoutWatch(ConnectTimeoutWatcher watcher) {
 			if (watcher == null) {
-				throw new ArgumentNullException("watcher");
+				throw new ArgumentNullException(nameof(watcher));
 			}
 
 			Contract.EndContractBlock();
@@ -435,19 +413,19 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		}
 
 		private sealed class DefaultConnectTimeoutWatcher : ConnectTimeoutWatcher {
-			private readonly TimeoutWatcher _watcher;
+			private readonly TimeoutWatcher watcher;
 
 			public DefaultConnectTimeoutWatcher(TimeSpan timeout, Action onTimeout) {
 				var watcher = new TimeoutWatcher();
 				watcher.Timeout += (sender, e) => onTimeout();
-				Interlocked.Exchange(ref _watcher, watcher);
+				Interlocked.Exchange(ref this.watcher, watcher);
 				watcher.Start(timeout);
 			}
 
 			protected override void Dispose(bool disposing) {
 				if (disposing) {
-					_watcher.Stop();
-					_watcher.Dispose();
+					watcher.Stop();
+					watcher.Dispose();
 				}
 
 				base.Dispose(disposing);

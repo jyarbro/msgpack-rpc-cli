@@ -53,7 +53,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 			set {
 				if (!(value >= default(int))) {
-					throw new ArgumentOutOfRangeException("value", "Argument cannot be negative number.");
+					throw new ArgumentOutOfRangeException(nameof(value), "Argument cannot be negative number.");
 				}
 
 				Contract.Ensures(Contract.Result<int>() >= default(int));
@@ -90,7 +90,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 			set {
 				if (!(value > default(int))) {
-					throw new ArgumentOutOfRangeException("value", "Argument must be positive number.");
+					throw new ArgumentOutOfRangeException(nameof(value), "Argument must be positive number.");
 				}
 
 				Contract.Ensures(Contract.Result<int>() > default(int));
@@ -127,7 +127,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 			set {
 				if (!(value == null || value.Value > default(TimeSpan))) {
-					throw new ArgumentOutOfRangeException("value", "Argument must be positive number.");
+					throw new ArgumentOutOfRangeException(nameof(value), "Argument must be positive number.");
 				}
 
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
@@ -164,7 +164,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 			set {
 				if (!(value == null || value.Value > default(TimeSpan))) {
-					throw new ArgumentOutOfRangeException("value", "Argument must be positive number.");
+					throw new ArgumentOutOfRangeException(nameof(value), "Argument must be positive number.");
 				}
 
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
@@ -201,7 +201,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 			set {
 				if (!(value != null)) {
-					throw new ArgumentNullException("value");
+					throw new ArgumentNullException(nameof(value));
 				}
 
 				Contract.Ensures(Contract.Result<Func<RpcClientConfiguration, ClientTransportManager>>() != null);
@@ -388,7 +388,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 			set {
 				if (!(value != null)) {
-					throw new ArgumentNullException("value");
+					throw new ArgumentNullException(nameof(value));
 				}
 
 				Contract.Ensures(Contract.Result<Func<Func<ClientRequestContext>, ObjectPoolConfiguration, ObjectPool<ClientRequestContext>>>() != null);
@@ -425,7 +425,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 			set {
 				if (!(value != null)) {
-					throw new ArgumentNullException("value");
+					throw new ArgumentNullException(nameof(value));
 				}
 
 				Contract.Ensures(Contract.Result<Func<Func<ClientResponseContext>, ObjectPoolConfiguration, ObjectPool<ClientResponseContext>>>() != null);
@@ -462,7 +462,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 			set {
 				if (!(value != null)) {
-					throw new ArgumentNullException("value");
+					throw new ArgumentNullException(nameof(value));
 				}
 
 				Contract.Ensures(Contract.Result<Func<Func<TcpClientTransport>, ObjectPoolConfiguration, ObjectPool<TcpClientTransport>>>() != null);
@@ -499,7 +499,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 			set {
 				if (!(value != null)) {
-					throw new ArgumentNullException("value");
+					throw new ArgumentNullException(nameof(value));
 				}
 
 				Contract.Ensures(Contract.Result<Func<Func<UdpClientTransport>, ObjectPoolConfiguration, ObjectPool<UdpClientTransport>>>() != null);

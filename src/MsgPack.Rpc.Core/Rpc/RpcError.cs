@@ -1,12 +1,9 @@
 ﻿using MsgPack.Rpc.Core.Protocols;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Reflection;
-
-[module: SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Scope = "member", Target = "MsgPack.Rpc.Core.RpcError.#.cctor()", Justification = "Type initializer is required.")]
 
 namespace MsgPack.Rpc.Core {
 	/// <summary>
@@ -18,7 +15,7 @@ namespace MsgPack.Rpc.Core {
 	public sealed class RpcError {
 		#region -- Built-in Errors --
 
-		private static readonly RpcError _timeoutError =
+		private static readonly RpcError timeoutError =
 			new RpcError(
 				"RPCError.TimeoutError",
 				-60,
@@ -37,11 +34,11 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError TimeoutError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._timeoutError;
+				return timeoutError;
 			}
 		}
 
-		private static readonly RpcError _transportError =
+		private static readonly RpcError transportError =
 			new RpcError(
 				"RPCError.ClientError.TransportError",
 				-50,
@@ -59,12 +56,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError TransportError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._transportError;
+				return transportError;
 			}
 		}
 
 
-		private static readonly RpcError _networkUnreacheableError =
+		private static readonly RpcError networkUnreacheableError =
 			new RpcError(
 				"RPCError.ClientError.TranportError.NetworkUnreacheableError",
 				-51,
@@ -82,12 +79,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError NetworkUnreacheableError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._networkUnreacheableError;
+				return networkUnreacheableError;
 			}
 		}
 
 
-		private static readonly RpcError _connectionRefusedError =
+		private static readonly RpcError connectionRefusedError =
 			new RpcError(
 				"RPCError.ClientError.TranportError.ConnectionRefusedError",
 				-52,
@@ -106,12 +103,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError ConnectionRefusedError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._connectionRefusedError;
+				return connectionRefusedError;
 			}
 		}
 
 
-		private static readonly RpcError _connectionTimeoutError =
+		private static readonly RpcError connectionTimeoutError =
 			new RpcError(
 				"RPCError.ClientError.TranportError.ConnectionTimeoutError",
 				-53,
@@ -130,12 +127,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError ConnectionTimeoutError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._connectionTimeoutError;
+				return connectionTimeoutError;
 			}
 		}
 
 
-		private static readonly RpcError _messageRefusedError =
+		private static readonly RpcError messageRefusedError =
 			new RpcError(
 				"RPCError.ClientError.MessageRefusedError",
 				-40,
@@ -179,12 +176,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError MessageRefusedError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._messageRefusedError;
+				return messageRefusedError;
 			}
 		}
 
 
-		private static readonly RpcError _messageTooLargeError =
+		private static readonly RpcError messageTooLargeError =
 			new RpcError(
 				"RPCError.ClientError.MessageRefusedError.MessageTooLargeError",
 				-41, "Message is too large.",
@@ -219,12 +216,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError MessageTooLargeError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._messageTooLargeError;
+				return messageTooLargeError;
 			}
 		}
 
 
-		private static readonly RpcError _callError =
+		private static readonly RpcError callError =
 			new RpcError(
 				"RPCError.ClientError.CallError",
 				-20,
@@ -242,12 +239,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError CallError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._callError;
+				return callError;
 			}
 		}
 
 
-		private static readonly RpcError _noMethodError =
+		private static readonly RpcError noMethodError =
 			new RpcError(
 				"RPCError.ClientError.CallError.NoMethodError",
 				-21,
@@ -265,12 +262,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError NoMethodError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._noMethodError;
+				return noMethodError;
 			}
 		}
 
 
-		private static readonly RpcError _argumentError =
+		private static readonly RpcError argumentError =
 			new RpcError(
 				"RPCError.ClientError.CallError.ArgumentError",
 				-22,
@@ -288,12 +285,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError ArgumentError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._argumentError;
+				return argumentError;
 			}
 		}
 
 
-		private static readonly RpcError _serverError =
+		private static readonly RpcError serverError =
 			new RpcError(
 				"RPCError.ServerError",
 				-30,
@@ -311,12 +308,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError ServerError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._serverError;
+				return serverError;
 			}
 		}
 
 
-		private static readonly RpcError _serverBusyError =
+		private static readonly RpcError serverBusyError =
 			new RpcError(
 				"RPCError.ServerError.ServerBusyError",
 				-31,
@@ -334,12 +331,12 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError ServerBusyError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._serverBusyError;
+				return serverBusyError;
 			}
 		}
 
 
-		private static readonly RpcError _remoteRuntimeError =
+		private static readonly RpcError remoteRuntimeError =
 			new RpcError(
 				"RPCError.RemoteRuntimeError",
 				-10,
@@ -356,20 +353,20 @@ namespace MsgPack.Rpc.Core {
 		public static RpcError RemoteRuntimeError {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._remoteRuntimeError;
+				return remoteRuntimeError;
 			}
 		}
 
 
 		#endregion -- Built-in Errors --
 
-		private const string _unexpectedErrorIdentifier = "RPCError.RemoteError.UnexpectedError";
-		private const int _unexpectedErrorCode = int.MaxValue;
+		private const string unexpectedErrorIdentifier = "RPCError.RemoteError.UnexpectedError";
+		private const int unexpectedErrorCode = int.MaxValue;
 
-		private static readonly RpcError _unexpected =
+		private static readonly RpcError unexpected =
 			new RpcError(
-				_unexpectedErrorIdentifier,
-				_unexpectedErrorCode,
+				unexpectedErrorIdentifier,
+				unexpectedErrorCode,
 				"Unexpected RPC error is occurred.",
 				(error, data) => new RpcException(error, data)
 			);
@@ -387,13 +384,13 @@ namespace MsgPack.Rpc.Core {
 		internal static RpcError Unexpected {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
-				return RpcError._unexpected;
+				return unexpected;
 			}
 		}
 
 
-		private static readonly Dictionary<string, RpcError> _identifierDictionary = new Dictionary<string, RpcError>();
-		private static readonly Dictionary<int, RpcError> _errorCodeDictionary = new Dictionary<int, RpcError>();
+		private static readonly Dictionary<string, RpcError> identifierDictionary = new Dictionary<string, RpcError>();
+		private static readonly Dictionary<int, RpcError> errorCodeDictionary = new Dictionary<int, RpcError>();
 
 		static RpcError() {
 			foreach (FieldInfo field in
@@ -405,8 +402,8 @@ namespace MsgPack.Rpc.Core {
 				)
 			) {
 				var builtInError = field.GetValue(null) as RpcError;
-				_identifierDictionary.Add(builtInError.Identifier, builtInError);
-				_errorCodeDictionary.Add(builtInError.ErrorCode, builtInError);
+				identifierDictionary.Add(builtInError.Identifier, builtInError);
+				errorCodeDictionary.Add(builtInError.ErrorCode, builtInError);
 			}
 		}
 
@@ -450,13 +447,13 @@ namespace MsgPack.Rpc.Core {
 				// TODO: localization key: Idnentifier ".DefaultMessage"
 				DefaultMessageInvariant;
 
-		private readonly Func<RpcError, MessagePackObject, RpcException> _exceptionUnmarshaler;
+		private readonly Func<RpcError, MessagePackObject, RpcException> exceptionUnmarshaler;
 
 		private RpcError(string identifier, int errorCode, string defaultMessageInvariant, Func<RpcError, MessagePackObject, RpcException> exceptionUnmarshaler) {
 			Identifier = identifier;
 			ErrorCode = errorCode;
 			DefaultMessageInvariant = defaultMessageInvariant;
-			_exceptionUnmarshaler = exceptionUnmarshaler;
+			this.exceptionUnmarshaler = exceptionUnmarshaler;
 		}
 
 		/// <summary>
@@ -469,9 +466,9 @@ namespace MsgPack.Rpc.Core {
 		///		<see cref="RpcException"/> which corresponds to this error with specified detailed information.
 		/// </returns>
 		internal RpcException ToException(MessagePackObject detail) {
-			Contract.Assume(_exceptionUnmarshaler != null);
+			Contract.Assume(exceptionUnmarshaler != null);
 
-			return _exceptionUnmarshaler(this, detail);
+			return exceptionUnmarshaler(this, detail);
 		}
 
 		/// <summary>
@@ -482,12 +479,11 @@ namespace MsgPack.Rpc.Core {
 		///		<c>true</c> if the specified <see cref="object"/> is equal to this instance; otherwise, <c>false</c>.
 		/// </returns>
 		public sealed override bool Equals(object obj) {
-			if (Object.ReferenceEquals(this, obj)) {
+			if (ReferenceEquals(this, obj)) {
 				return true;
 			}
 
-			var other = obj as RpcError;
-			if (Object.ReferenceEquals(other, null)) {
+			if (!(obj is RpcError other)) {
 				return false;
 			}
 
@@ -537,15 +533,15 @@ namespace MsgPack.Rpc.Core {
 		/// </exception>
 		public static RpcError CustomError(string identifier, int errorCode) {
 			if (identifier == null) {
-				throw new ArgumentNullException("identifier");
+				throw new ArgumentNullException(nameof(identifier));
 			}
 
 			if (string.IsNullOrWhiteSpace(identifier)) {
-				throw new ArgumentException("'identifier' cannot be empty.", "identifier");
+				throw new ArgumentException("'identifier' cannot be empty.", nameof(identifier));
 			}
 
 			if (errorCode < 0) {
-				throw new ArgumentOutOfRangeException("errorCode", errorCode, "Application error code must be grator than or equal to 0.");
+				throw new ArgumentOutOfRangeException(nameof(errorCode), errorCode, "Application error code must be grator than or equal to 0.");
 			}
 
 			Contract.EndContractBlock();
@@ -572,16 +568,15 @@ namespace MsgPack.Rpc.Core {
 		///		Built-in or custom <see cref="RpcError"/> corresponds to <paramref name="identifier"/> or <paramref name="errorCode"/>.
 		/// </returns>
 		public static RpcError FromIdentifier(string identifier, int? errorCode) {
-			RpcError result;
-			if (errorCode != null && _errorCodeDictionary.TryGetValue(errorCode.Value, out result)) {
+			if (errorCode != null && errorCodeDictionary.TryGetValue(errorCode.Value, out var result)) {
 				return result;
 			}
 
-			if (identifier != null && _identifierDictionary.TryGetValue(identifier, out result)) {
+			if (identifier != null && identifierDictionary.TryGetValue(identifier, out result)) {
 				return result;
 			}
 
-			return CustomError(string.IsNullOrWhiteSpace(identifier) ? _unexpectedErrorIdentifier : identifier, errorCode ?? _unexpectedErrorCode);
+			return CustomError(string.IsNullOrWhiteSpace(identifier) ? unexpectedErrorIdentifier : identifier, errorCode ?? unexpectedErrorCode);
 		}
 
 		/// <summary>
@@ -593,8 +588,8 @@ namespace MsgPack.Rpc.Core {
 		///		<c>true</c> if the <see cref="RpcError"/> instances are equivalent; otherwise, <c>false</c>.
 		/// </returns>
 		public static bool operator ==(RpcError left, RpcError right) {
-			if (Object.ReferenceEquals(left, null)) {
-				return Object.ReferenceEquals(right, null);
+			if (left is null) {
+				return right is null;
 			}
 			else {
 				return left.Equals(right);

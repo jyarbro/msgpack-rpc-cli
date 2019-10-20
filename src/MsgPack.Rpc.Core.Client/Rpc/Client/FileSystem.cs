@@ -14,7 +14,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		public static string EscapeInvalidPathChars(string value, string replacement) {
 			if (value == null) {
-				throw new ArgumentNullException("value");
+				throw new ArgumentNullException(nameof(value));
 			}
 
 			return _invalidPathChars.Replace(value, replacement ?? string.Empty);

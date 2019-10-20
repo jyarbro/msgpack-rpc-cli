@@ -66,9 +66,11 @@ namespace MsgPack.Rpc.Core.Client {
 					return new RpcErrorMessage(errorIdentifier, error.AsString(), null);
 				}
 				else {
-					var details = new MessagePackObjectDictionary(2);
-					details[RpcException.MessageKeyUtf8] = error;
-					details[RpcException.DebugInformationKeyUtf8] = detail;
+					var details = new MessagePackObjectDictionary(2) {
+						[RpcException.messageKeyUtf8] = error,
+						[RpcException.debugInformationKeyUtf8] = detail
+					};
+
 					return new RpcErrorMessage(errorIdentifier, new MessagePackObject(details, true));
 				}
 			}

@@ -68,7 +68,7 @@ namespace MsgPack.Rpc.Core {
 		/// </exception>
 		public void Return(T value) {
 			if (value == null) {
-				throw new ArgumentNullException("value");
+				throw new ArgumentNullException(nameof(value));
 			}
 
 			Contract.EndContractBlock();
@@ -90,7 +90,7 @@ namespace MsgPack.Rpc.Core {
 
 		protected sealed override T BorrowCore() {
 			Contract.Ensures(Contract.Result<T>() != null);
-			return default(T);
+			return default;
 		}
 
 		protected sealed override void ReturnCore(T value) {

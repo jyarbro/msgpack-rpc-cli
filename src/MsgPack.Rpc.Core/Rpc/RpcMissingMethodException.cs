@@ -1,6 +1,5 @@
 ﻿using MsgPack.Rpc.Core.Protocols;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace MsgPack.Rpc.Core {
@@ -8,8 +7,6 @@ namespace MsgPack.Rpc.Core {
 	///		Thrown when specified method is not exist on remote server.
 	/// </summary>
 	[Serializable]
-	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public sealed class RpcMissingMethodException : RpcMethodInvocationException {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcMissingMethodException"/> class with the default error message.

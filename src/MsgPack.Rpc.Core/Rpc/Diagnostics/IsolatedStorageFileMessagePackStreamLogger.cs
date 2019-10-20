@@ -11,7 +11,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 	///		Isolated storage file based <see cref="MessagePackStreamLogger"/> implementation.
 	/// </summary>
 	public class IsolatedStorageFileMessagePackStreamLogger : MessagePackStreamLogger {
-		private static readonly Regex _ipAddressEscapingRegex = new Regex(@"[:\./]", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
+		private static readonly Regex ipAddressEscapingRegex = new Regex(@"[:\./]", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="IsolatedStorageFileMessagePackStreamLogger"/> class.
@@ -27,10 +27,10 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		public override void Write(DateTimeOffset sessionStartTime, EndPoint remoteEndPoint, IEnumerable<byte> stream) {
 			string remoteEndPointString;
 			if (remoteEndPoint is DnsEndPoint dnsEndPoint) {
-				remoteEndPointString = _ipAddressEscapingRegex.Replace(dnsEndPoint.Host, "_");
+				remoteEndPointString = ipAddressEscapingRegex.Replace(dnsEndPoint.Host, "_");
 			}
 			else if (remoteEndPoint is IPEndPoint ipEndPoint) {
-				remoteEndPointString = _ipAddressEscapingRegex.Replace(ipEndPoint.Address.ToString(), "_");
+				remoteEndPointString = ipAddressEscapingRegex.Replace(ipEndPoint.Address.ToString(), "_");
 			}
 			else {
 				remoteEndPointString = "(unknown)";
@@ -40,13 +40,13 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 
 			while (true) {
 				try {
-					using (var storage = IsolatedStorageFile.GetUserStoreForApplication())
-					using (var fileStream = storage.OpenFile(fileName, FileMode.Append, FileAccess.Write, FileShare.Read)) {
-						if (stream != null) {
-							var written = fileStream.Length;
-							foreach (var b in Skip(stream, written)) {
-								fileStream.WriteByte(b);
-							}
+					using var storage = IsolatedStorageFile.GetUserStoreForApplication();
+					using var fileStream = storage.OpenFile(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
+
+					if (stream != null) {
+						var written = fileStream.Length;
+						foreach (var b in Skip(stream, written)) {
+							fileStream.WriteByte(b);
 						}
 					}
 

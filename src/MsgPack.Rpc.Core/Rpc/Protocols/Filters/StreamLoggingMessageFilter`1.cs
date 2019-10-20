@@ -20,13 +20,9 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 		///		<paramref name="logger"/> is <c>null</c>.
 		/// </exception>
 		protected StreamLoggingMessageFilter(IMessagePackStreamLogger logger) {
-			if (logger == null) {
-				throw new ArgumentNullException("logger");
-			}
-
 			Contract.EndContractBlock();
 
-			_logger = logger;
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		/// <summary>

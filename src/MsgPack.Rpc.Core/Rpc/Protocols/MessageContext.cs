@@ -25,9 +25,9 @@ namespace MsgPack.Rpc.Core.Protocols {
 
 		#region -- Session Management --
 
-		private static long _lastSessionId;
+		private static long lastSessionId;
 
-		private long _sessionId;
+		private long sessionId;
 
 		/// <summary>
 		///		Gets the ID of the session.
@@ -40,8 +40,8 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///		This information is intented for the tracking of session processing in debugging.
 		/// </remarks>
 		public long SessionId {
-			get { return _sessionId; }
-			internal set { _sessionId = value; }
+			get { return sessionId; }
+			internal set { sessionId = value; }
 		}
 
 		/// <summary>
@@ -90,12 +90,12 @@ namespace MsgPack.Rpc.Core.Protocols {
 
 		#region -- Transport --
 
-		private IContextBoundableTransport _boundTransport;
+		private IContextBoundableTransport boundTransport;
 
 		/// <summary>
 		///		Gets the bound <see cref="IContextBoundableTransport"/>.
 		/// </summary>
-		internal IContextBoundableTransport BoundTransport => _boundTransport;
+		internal IContextBoundableTransport BoundTransport => boundTransport;
 
 		/// <summary>
 		///		Sets the bound <see cref="IContextBoundableTransport"/>.
@@ -106,7 +106,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 			Contract.Requires(BoundTransport == null);
 			Contract.Ensures(BoundTransport != null);
 
-			var oldBoundTransport = Interlocked.CompareExchange(ref _boundTransport, transport, null);
+			var oldBoundTransport = Interlocked.CompareExchange(ref boundTransport, transport, null);
 			if (oldBoundTransport != null) {
 				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "This context is already bounded to '{0}'(Socket: 0x{1:X}).", transport.GetType(), transport.BoundSocket == null ? IntPtr.Zero : transport.BoundSocket.Handle));
 			}
@@ -114,8 +114,8 @@ namespace MsgPack.Rpc.Core.Protocols {
 			SocketContext.Completed += transport.OnSocketOperationCompleted;
 		}
 
-		private readonly TimeoutWatcher _timeoutWatcher;
-		private int _isTimeout;
+		private readonly TimeoutWatcher timeoutWatcher;
+		private int isTimeout;
 
 		/// <summary>
 		///		Gets a value indicating whether the watched operation is timed out.
@@ -123,7 +123,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		/// <value>
 		/// 	<c>true</c> if the watched operation is timed out; otherwise, <c>false</c>.
 		/// </value>
-		internal bool IsTimeout => Interlocked.CompareExchange(ref _isTimeout, 0, 0) != 0;
+		internal bool IsTimeout => Interlocked.CompareExchange(ref isTimeout, 0, 0) != 0;
 
 		/// <summary>
 		///		Occurs when the watched operation is timed out.
@@ -131,25 +131,22 @@ namespace MsgPack.Rpc.Core.Protocols {
 		internal event EventHandler Timeout;
 
 		private void OnTimeout() {
-			Interlocked.Exchange(ref _isTimeout, 1);
+			Interlocked.Exchange(ref isTimeout, 1);
 
-			var handler = Timeout;
-			if (handler != null) {
-				handler(this, EventArgs.Empty);
-			}
+			Timeout?.Invoke(this, EventArgs.Empty);
 		}
 
 		#endregion
 
 		#region -- Communication --
 
-		private int? _bytesTransferred;
+		private int? bytesTransferred;
 
 		/// <summary>
 		///		Gets the bytes count of transferred data.
 		/// </summary>
 		/// <returns>The bytes count of transferred data..</returns>
-		public int BytesTransferred => _bytesTransferred ?? SocketContext.BytesTransferred;
+		public int BytesTransferred => bytesTransferred ?? SocketContext.BytesTransferred;
 
 		/// <summary>
 		///		Gets or sets the remote end point.
@@ -190,7 +187,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		/// </summary>
 		/// <param name="value">The value.</param>
 		internal void SetBytesTransferred(int value) {
-			_bytesTransferred = value;
+			bytesTransferred = value;
 		}
 
 		internal byte[] Buffer => SocketContext.Buffer;
@@ -206,10 +203,11 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///		Initializes a new instance of the <see cref="MessageContext"/> class.
 		/// </summary>
 		protected MessageContext() {
-			SocketContext = new SocketAsyncEventArgs();
-			SocketContext.UserToken = this;
-			_timeoutWatcher = new TimeoutWatcher();
-			_timeoutWatcher.Timeout += (sender, e) => OnTimeout();
+			SocketContext = new SocketAsyncEventArgs {
+				UserToken = this
+			};
+			timeoutWatcher = new TimeoutWatcher();
+			timeoutWatcher.Timeout += (sender, e) => OnTimeout();
 		}
 
 		/// <summary>
@@ -229,7 +227,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		protected virtual void Dispose(bool disposing) {
 			if (disposing) {
 				SocketContext.Dispose();
-				_timeoutWatcher.Dispose();
+				timeoutWatcher.Dispose();
 			}
 		}
 
@@ -238,16 +236,16 @@ namespace MsgPack.Rpc.Core.Protocols {
 		/// </summary>
 		/// <param name="timeout">The timeout.</param>
 		internal virtual void StartWatchTimeout(TimeSpan timeout) {
-			Interlocked.Exchange(ref _isTimeout, 0);
-			_timeoutWatcher.Start(timeout);
+			Interlocked.Exchange(ref isTimeout, 0);
+			timeoutWatcher.Start(timeout);
 		}
 
 		/// <summary>
 		///		Stops timeout watch.
 		/// </summary>
 		internal virtual void StopWatchTimeout() {
-			_timeoutWatcher.Stop();
-			_timeoutWatcher.Reset();
+			timeoutWatcher.Stop();
+			timeoutWatcher.Reset();
 		}
 
 		/// <summary>
@@ -257,7 +255,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 			Contract.Ensures(SessionId > 0);
 			Contract.Ensures(SessionStartedAt >= DateTimeOffset.Now);
 
-			_sessionId = Interlocked.Increment(ref _lastSessionId);
+			sessionId = Interlocked.Increment(ref lastSessionId);
 			SessionStartedAt = DateTimeOffset.Now;
 		}
 
@@ -265,7 +263,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///		Clears the session id.
 		/// </summary>
 		internal void ClearSessionId() {
-			Interlocked.Exchange(ref _sessionId, 0);
+			Interlocked.Exchange(ref sessionId, 0);
 		}
 
 		/// <summary>
@@ -275,21 +273,21 @@ namespace MsgPack.Rpc.Core.Protocols {
 			Contract.Ensures(CompletedSynchronously == false);
 			Contract.Ensures(MessageId == null);
 			Contract.Ensures(SessionId == 0);
-			Contract.Ensures(SessionStartedAt == default(DateTimeOffset));
+			Contract.Ensures(SessionStartedAt == default);
 
 			CompletedSynchronously = false;
 			MessageId = null;
-			_sessionId = 0;
-			SessionStartedAt = default(DateTimeOffset);
-			_bytesTransferred = null;
-			_timeoutWatcher.Reset();
-			Interlocked.Exchange(ref _isTimeout, 0);
+			sessionId = 0;
+			SessionStartedAt = default;
+			bytesTransferred = null;
+			timeoutWatcher.Reset();
+			Interlocked.Exchange(ref isTimeout, 0);
 		}
 
 		internal void UnboundTransport() {
 			Contract.Ensures(BoundTransport == null);
 
-			var boundTransport = Interlocked.Exchange(ref _boundTransport, null);
+			var boundTransport = Interlocked.Exchange(ref this.boundTransport, null);
 			if (boundTransport != null) {
 				SocketContext.Completed -= boundTransport.OnSocketOperationCompleted;
 			}

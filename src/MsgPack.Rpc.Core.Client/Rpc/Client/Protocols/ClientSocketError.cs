@@ -1,5 +1,4 @@
 ﻿using MsgPack.Rpc.Core.Protocols;
-using System;
 using System.Net.Sockets;
 
 namespace MsgPack.Rpc.Core.Client.Protocols {

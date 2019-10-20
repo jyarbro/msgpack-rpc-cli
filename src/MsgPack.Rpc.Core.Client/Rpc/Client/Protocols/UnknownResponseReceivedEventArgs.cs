@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
 namespace MsgPack.Rpc.Core.Client.Protocols {
@@ -37,14 +36,6 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			MessageId = messageId;
 			Error = error;
 			ReturnValue = returnValue;
-		}
-
-		[ContractInvariantMethod]
-		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "ObjectInvariant.")]
-		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "ObjectInvariant.")]
-		private void ObjectInvariant() {
-			Contract.Invariant((Error.IsSuccess && Contract.Result<MessagePackObject?>() != null)
-				|| (!Error.IsSuccess && Contract.Result<MessagePackObject?>() == null));
 		}
 	}
 }

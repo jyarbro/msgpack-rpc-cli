@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
@@ -9,8 +8,6 @@ namespace MsgPack.Rpc.Core {
 	///		Thrown when RPC invocation was time out.
 	/// </summary>
 	[Serializable]
-	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public sealed class RpcTimeoutException : RpcException {
 		private const string _clientTimeoutKey = "ClientTimeout";
 		internal static readonly MessagePackObject ClientTimeoutKeyUtf8 = MessagePackConvert.EncodeString(_clientTimeoutKey);

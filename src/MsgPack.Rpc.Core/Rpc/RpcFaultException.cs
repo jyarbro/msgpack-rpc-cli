@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace MsgPack.Rpc.Core {
@@ -14,8 +13,6 @@ namespace MsgPack.Rpc.Core {
 	///		So, this class wraps the map as CLI <see cref="Exception"/> to interoperate MessagePack-RPC and CLI environment.
 	/// </remarks>
 	[Serializable]
-	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public class RpcFaultException : RpcException {
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcFaultException"/> class with a specified error message.

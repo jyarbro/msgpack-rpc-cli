@@ -29,7 +29,7 @@ namespace MsgPack.Rpc.Core {
 			}
 			set {
 				if (value < 0) {
-					throw new ArgumentOutOfRangeException("value");
+					throw new ArgumentOutOfRangeException(nameof(value));
 				}
 
 				Seek(value - _position);
@@ -77,12 +77,12 @@ namespace MsgPack.Rpc.Core {
 					break;
 				}
 				default: {
-					throw new ArgumentOutOfRangeException("origin");
+					throw new ArgumentOutOfRangeException(nameof(origin));
 				}
 			}
 
 			if (offsetFromCurrent + _position < 0 || length < offsetFromCurrent + _position) {
-				throw new ArgumentOutOfRangeException("offset");
+				throw new ArgumentOutOfRangeException(nameof(offset));
 			}
 
 			Seek(offsetFromCurrent);
@@ -131,11 +131,11 @@ namespace MsgPack.Rpc.Core {
 
 		public IList<ArraySegment<byte>> GetBuffer(long start, long length) {
 			if (start < 0) {
-				throw new ArgumentOutOfRangeException("start");
+				throw new ArgumentOutOfRangeException(nameof(start));
 			}
 
 			if (length < 0) {
-				throw new ArgumentOutOfRangeException("length");
+				throw new ArgumentOutOfRangeException(nameof(length));
 			}
 
 			var result = new List<ArraySegment<byte>>(_segments.Count);
@@ -171,7 +171,7 @@ namespace MsgPack.Rpc.Core {
 
 		public byte[] ToArray() {
 			if (_segments.Count == 0) {
-				return new byte[0];
+				return Array.Empty<byte>();
 			}
 
 			var result = _segments[0].AsEnumerable();
@@ -234,7 +234,7 @@ namespace MsgPack.Rpc.Core {
 
 			public long Length => _source.Length;
 
-			public IList<ArraySegment<byte>> Segments => _source._segments ?? new ArraySegment<byte>[0];
+			public IList<ArraySegment<byte>> Segments => _source._segments ?? Array.Empty<ArraySegment<byte>>();
 
 			public string Data => "[" +
 						string.Join(

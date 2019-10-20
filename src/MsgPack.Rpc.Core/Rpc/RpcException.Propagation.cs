@@ -10,7 +10,7 @@ using System.Security;
 
 namespace MsgPack.Rpc.Core {
 	partial class RpcException {
-		private static readonly MethodInfo _safeGetHRFromExceptionMethod = typeof(RpcException).GetMethod("SafeGetHRFromException", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+		private static readonly MethodInfo safeGetHRFromExceptionMethod = typeof(RpcException).GetMethod("SafeGetHRFromException", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 
 		/// <summary>
 		///		Initialize new instance with unpacked data.
@@ -25,20 +25,19 @@ namespace MsgPack.Rpc.Core {
 		///		Cannot deserialize instance from <paramref name="unpackedException"/>.
 		/// </exception>
 		protected internal RpcException(RpcError rpcError, MessagePackObject unpackedException)
-			: this(rpcError, unpackedException.GetString(MessageKeyUtf8), unpackedException.GetString(DebugInformationKeyUtf8)) {
+			: this(rpcError, unpackedException.GetString(messageKeyUtf8), unpackedException.GetString(debugInformationKeyUtf8)) {
 			if (unpackedException.IsDictionary) {
-				MessagePackObject mayBeArray;
-				if (unpackedException.AsDictionary().TryGetValue(_remoteExceptionsUtf8, out mayBeArray) && mayBeArray.IsArray) {
+				if (unpackedException.AsDictionary().TryGetValue(remoteExceptionsUtf8, out var mayBeArray) && mayBeArray.IsArray) {
 					var array = mayBeArray.AsList();
-					_remoteExceptions = new RemoteExceptionInformation[array.Count];
-					for (var i = 0; i < _remoteExceptions.Length; i++) {
+					remoteExceptions = new RemoteExceptionInformation[array.Count];
+					for (var i = 0; i < remoteExceptions.Length; i++) {
 						if (array[i].IsList) {
-							_remoteExceptions[i] = new RemoteExceptionInformation(array[i].AsList());
+							remoteExceptions[i] = new RemoteExceptionInformation(array[i].AsList());
 						}
 						else {
 							// Unexpected type.
 							Debug.WriteLine("Unexepcted ExceptionInformation at {0}, type: {1}, value: \"{2}\".", i, array[i].UnderlyingType, array[i]);
-							_remoteExceptions[i] = new RemoteExceptionInformation(new MessagePackObject[] { array[i] });
+							remoteExceptions[i] = new RemoteExceptionInformation(new MessagePackObject[] { array[i] });
 						}
 					}
 				}
@@ -48,7 +47,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		// NOT readonly for safe-deserialization
-		private RemoteExceptionInformation[] _remoteExceptions;
+		private RemoteExceptionInformation[] remoteExceptions;
 
 		[Serializable]
 		private sealed class RemoteExceptionInformation {
@@ -109,10 +108,10 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		internal static readonly MessagePackObject MessageKeyUtf8 = MessagePackConvert.EncodeString("Message");
-		internal static readonly MessagePackObject DebugInformationKeyUtf8 = MessagePackConvert.EncodeString("DebugInformation");
-		private static readonly MessagePackObject _errorCodeUtf8 = MessagePackConvert.EncodeString("ErrorCode");
-		private static readonly MessagePackObject _remoteExceptionsUtf8 = MessagePackConvert.EncodeString("RemoteExceptions");
+		internal static readonly MessagePackObject messageKeyUtf8 = MessagePackConvert.EncodeString("Message");
+		internal static readonly MessagePackObject debugInformationKeyUtf8 = MessagePackConvert.EncodeString("DebugInformation");
+		private static readonly MessagePackObject errorCodeUtf8 = MessagePackConvert.EncodeString("ErrorCode");
+		private static readonly MessagePackObject remoteExceptionsUtf8 = MessagePackConvert.EncodeString("RemoteExceptions");
 
 		/// <summary>
 		///		Get <see cref="MessagePackObject"/> which contains data about this instance.
@@ -124,9 +123,10 @@ namespace MsgPack.Rpc.Core {
 		///		<see cref="MessagePackObject"/> which contains data about this instance.
 		/// </returns>
 		public MessagePackObject GetExceptionMessage(bool isDebugMode) {
-			var store = new MessagePackObjectDictionary(2);
-			store.Add(_errorCodeUtf8, RpcError.ErrorCode);
-			store.Add(MessageKeyUtf8, isDebugMode ? Message : RpcError.DefaultMessageInvariant);
+			var store = new MessagePackObjectDictionary(2) {
+				{ errorCodeUtf8, RpcError.ErrorCode },
+				{ messageKeyUtf8, isDebugMode ? Message : RpcError.DefaultMessageInvariant }
+			};
 			GetExceptionMessage(store, isDebugMode);
 
 			return new MessagePackObject(store);
@@ -148,10 +148,10 @@ namespace MsgPack.Rpc.Core {
 				return;
 			}
 
-			if (InnerException != null || _remoteExceptions != null) {
+			if (InnerException != null || remoteExceptions != null) {
 				var innerList = new List<MessagePackObject>();
-				if (_remoteExceptions != null) {
-					foreach (var remoteException in _remoteExceptions) {
+				if (remoteExceptions != null) {
+					foreach (var remoteException in remoteExceptions) {
 						var properties = new MessagePackObject[6];
 						properties[0] = remoteException.Hop + 1;
 						properties[1] = MessagePackConvert.EncodeString(remoteException.TypeName);
@@ -207,10 +207,10 @@ namespace MsgPack.Rpc.Core {
 					innerList.Add(properties);
 				}
 
-				store.Add(_remoteExceptionsUtf8, new MessagePackObject(innerList));
+				store.Add(remoteExceptionsUtf8, new MessagePackObject(innerList));
 			}
 
-			store.Add(DebugInformationKeyUtf8, DebugInformation);
+			store.Add(debugInformationKeyUtf8, DebugInformation);
 
 		}
 
@@ -224,7 +224,7 @@ namespace MsgPack.Rpc.Core {
 				// ExternalException.ErrorCode is SecuritySafeCritical and its assembly must be fully trusted.
 				return asExternalException.ErrorCode;
 			}
-			else if (_safeGetHRFromExceptionMethod.IsSecuritySafeCritical) {
+			else if (safeGetHRFromExceptionMethod.IsSecuritySafeCritical) {
 				try {
 					// Can invoke Marshal.GetHRForException because this assembly is fully trusted.
 					return Marshal.GetHRForException(exception);

@@ -39,7 +39,7 @@ namespace MsgPack.Rpc.Core {
 
 		public IFreezable Freeze() {
 			Contract.Ensures(Contract.Result<IFreezable>() != null);
-			Contract.Ensures(Contract.ReferenceEquals(Contract.Result<IFreezable>(), this));
+			Contract.Ensures(ReferenceEquals(Contract.Result<IFreezable>(), this));
 			Contract.Ensures(IsFrozen);
 
 			return null;
@@ -47,7 +47,7 @@ namespace MsgPack.Rpc.Core {
 
 		public IFreezable AsFrozen() {
 			Contract.Ensures(Contract.Result<IFreezable>() != null);
-			Contract.Ensures(!Object.ReferenceEquals(Contract.Result<IFreezable>(), this));
+			Contract.Ensures(!ReferenceEquals(Contract.Result<IFreezable>(), this));
 			Contract.Ensures(Contract.Result<IFreezable>().IsFrozen);
 			Contract.Ensures(IsFrozen == Contract.OldValue(IsFrozen));
 

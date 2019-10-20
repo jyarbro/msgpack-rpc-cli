@@ -25,23 +25,20 @@ namespace MsgPack.Rpc.Core.Client {
 		/// <param name="completedSynchronously">When operation is completed same thread as initiater then <c>true</c>; otherwise, <c>false</c>.</param>
 		public void OnCompleted(ClientResponseContext context, Exception exception, bool completedSynchronously) {
 			if (exception != null) {
-				base.OnError(exception, completedSynchronously);
+				OnError(exception, completedSynchronously);
 			}
 			else {
 				var error = ErrorInterpreter.UnpackError(context);
 				if (!error.IsSuccess) {
-					base.OnError(error.ToException(), completedSynchronously);
+					OnError(error.ToException(), completedSynchronously);
 				}
 				else {
 					Interlocked.CompareExchange(ref _result, new ResultHolder(Unpacking.UnpackObject(context.ResultBuffer)), null);
-					base.Complete(completedSynchronously);
+					Complete(completedSynchronously);
 				}
 			}
 
-			var callback = AsyncCallback;
-			if (callback != null) {
-				callback(this);
-			}
+			AsyncCallback?.Invoke(this);
 		}
 
 		/// <summary>

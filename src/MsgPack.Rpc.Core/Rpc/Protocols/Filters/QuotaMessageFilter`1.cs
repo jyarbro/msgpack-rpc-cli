@@ -26,7 +26,7 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 		/// </exception>
 		protected QuotaMessageFilter(long quota) {
 			if (quota < 0) {
-				throw new ArgumentOutOfRangeException("quota", "Quota cannot be negative.");
+				throw new ArgumentOutOfRangeException(nameof(quota), "Quota cannot be negative.");
 			}
 
 			Contract.EndContractBlock();

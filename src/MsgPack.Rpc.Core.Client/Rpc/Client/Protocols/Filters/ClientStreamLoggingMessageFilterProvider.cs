@@ -7,7 +7,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 	///		<see cref="StreamLoggingMessageFilterProvider{T}"/> for <see cref="ClientResponseContext"/>.
 	/// </summary>
 	public sealed class ClientStreamLoggingMessageFilterProvider : StreamLoggingMessageFilterProvider<ClientResponseContext> {
-		private readonly ClientStreamLoggingMessageFilter _filterInstance;
+		private readonly ClientStreamLoggingMessageFilter filterInstance;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ClientStreamLoggingMessageFilterProvider"/> class.
@@ -16,9 +16,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 		/// <exception cref="ArgumentNullException">
 		///		<paramref name="logger"/> is <c>null</c>.
 		/// </exception>
-		public ClientStreamLoggingMessageFilterProvider(IMessagePackStreamLogger logger)
-			: base(logger) {
-			_filterInstance = new ClientStreamLoggingMessageFilter(Logger);
+		public ClientStreamLoggingMessageFilterProvider(IMessagePackStreamLogger logger) : base(logger) {
+			filterInstance = new ClientStreamLoggingMessageFilter(Logger);
 		}
 
 		/// <summary>
@@ -31,7 +30,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 				return null;
 			}
 			else {
-				return _filterInstance;
+				return filterInstance;
 			}
 		}
 	}

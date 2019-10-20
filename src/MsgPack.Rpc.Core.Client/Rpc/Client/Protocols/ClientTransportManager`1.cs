@@ -12,9 +12,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <typeparam name="TTransport"></typeparam>
 	public abstract class ClientTransportManager<TTransport> : ClientTransportManager
 		where TTransport : ClientTransport {
-		private readonly ConcurrentDictionary<TTransport, object> _activeTransports;
+		private readonly ConcurrentDictionary<TTransport, object> activeTransports;
 
-		private ObjectPool<TTransport> _transportPool;
+		private ObjectPool<TTransport> transportPool;
 
 		/// <summary>
 		///		Gets a value indicating whether the transport pool is set.
@@ -25,9 +25,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <remarks>
 		///		To set transport pool, invoke <see cref="SetTransportPool"/> method.
 		/// </remarks>
-		public bool IsTransportPoolSet => _transportPool != null;
+		public bool IsTransportPoolSet => transportPool != null;
 
-		private int _tranportIsInShutdown;
+		private int tranportIsInShutdown;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ClientTransportManager{T}"/> class.
@@ -44,7 +44,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </remarks>
 		protected ClientTransportManager(RpcClientConfiguration configuration)
 			: base(configuration) {
-			_activeTransports = new ConcurrentDictionary<TTransport, object>();
+			activeTransports = new ConcurrentDictionary<TTransport, object>();
 		}
 
 		/// <summary>
@@ -60,17 +60,13 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		This method is called more than once for this instance.
 		/// </exception>
 		protected void SetTransportPool(ObjectPool<TTransport> transportPool) {
-			if (transportPool == null) {
-				throw new ArgumentNullException("transportPool");
-			}
-
 			Contract.EndContractBlock();
 
-			if (_transportPool != null) {
+			if (this.transportPool != null) {
 				throw new InvalidOperationException("Already set.");
 			}
 
-			_transportPool = transportPool;
+			this.transportPool = transportPool ?? throw new ArgumentNullException(nameof(transportPool));
 		}
 
 		/// <summary>
@@ -79,11 +75,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		protected override void BeginShutdownCore() {
 			var registered = 0;
 
-			foreach (var transport in _activeTransports) {
+			foreach (var transport in activeTransports) {
 				try { }
 				finally {
 					transport.Key.ShutdownCompleted += OnTransportShutdownCompleted;
-					Interlocked.Increment(ref _tranportIsInShutdown);
+					Interlocked.Increment(ref tranportIsInShutdown);
 					registered++;
 				}
 
@@ -91,7 +87,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					try { }
 					finally {
 						transport.Key.ShutdownCompleted -= OnTransportShutdownCompleted;
-						Interlocked.Increment(ref _tranportIsInShutdown);
+						Interlocked.Increment(ref tranportIsInShutdown);
 						registered--;
 					}
 				}
@@ -110,7 +106,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			try { }
 			finally {
 				transport.ShutdownCompleted -= OnTransportShutdownCompleted;
-				if (Interlocked.Decrement(ref _tranportIsInShutdown) == 0) {
+				if (Interlocked.Decrement(ref tranportIsInShutdown) == 0) {
 					OnShutdownCompleted(e);
 				}
 			}
@@ -138,7 +134,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			finally {
 				transport = GetTransportCore(bindingSocket);
 				transport.BoundSocket = bindingSocket;
-				_activeTransports.TryAdd(transport, null);
+				activeTransports.TryAdd(transport, null);
 			}
 
 			return transport;
@@ -168,7 +164,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				throw new InvalidOperationException("Transport pool must be set via SetTransportPool().");
 			}
 
-			var transport = _transportPool.Borrow();
+			var transport = transportPool.Borrow();
 			return transport;
 		}
 
@@ -183,16 +179,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </exception>
 		protected void BindSocket(TTransport transport, Socket bindingSocket) {
 			if (transport == null) {
-				throw new ArgumentNullException("transport");
-			}
-
-			if (bindingSocket == null) {
-				throw new ArgumentNullException("bindingSocket");
+				throw new ArgumentNullException(nameof(transport));
 			}
 
 			Contract.EndContractBlock();
 
-			transport.BoundSocket = bindingSocket;
+			transport.BoundSocket = bindingSocket ?? throw new ArgumentNullException(nameof(bindingSocket));
 		}
 
 		/// <summary>
@@ -219,11 +211,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </exception>
 		protected void ReturnTransport(TTransport transport) {
 			if (transport == null) {
-				throw new ArgumentNullException("transport");
+				throw new ArgumentNullException(nameof(transport));
 			}
 
-			if (!Object.ReferenceEquals(this, transport.Manager)) {
-				throw new ArgumentException("The specified transport is not owned by this manager.", "transport");
+			if (!ReferenceEquals(this, transport.Manager)) {
+				throw new ArgumentException("The specified transport is not owned by this manager.", nameof(transport));
 			}
 
 			if (!IsTransportPoolSet) {
@@ -234,8 +226,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			try { }
 			finally {
-				object dummy;
-				_activeTransports.TryRemove(transport, out dummy);
+				activeTransports.TryRemove(transport, out _);
 				ReturnTransportCore(transport);
 			}
 		}
@@ -246,11 +237,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <param name="transport">The <see cref="ClientTransport"/> which was created by this manager.</param>
 		protected virtual void ReturnTransportCore(TTransport transport) {
 			Contract.Requires(transport != null);
-			Contract.Requires(Object.ReferenceEquals(this, transport.Manager));
+			Contract.Requires(ReferenceEquals(this, transport.Manager));
 			Contract.Requires(IsTransportPoolSet);
 
 			if (!transport.IsDisposed && !transport.IsClientShutdown && !transport.IsServerShutdown) {
-				_transportPool.Return(transport);
+				transportPool.Return(transport);
 			}
 		}
 	}

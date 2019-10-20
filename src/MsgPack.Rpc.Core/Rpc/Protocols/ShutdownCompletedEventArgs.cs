@@ -30,7 +30,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 					break;
 				}
 				default: {
-					throw new ArgumentOutOfRangeException("source");
+					throw new ArgumentOutOfRangeException(nameof(source));
 				}
 			}
 

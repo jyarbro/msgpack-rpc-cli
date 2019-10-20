@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
 namespace MsgPack.Rpc.Core.Client {
@@ -23,7 +22,7 @@ namespace MsgPack.Rpc.Core.Client {
 			get {
 				Contract.Ensures(Contract.Result<RpcClientConfiguration>() != null);
 
-				return RpcClientConfiguration._default;
+				return _default;
 			}
 		}
 
@@ -87,7 +86,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </returns>
 		public RpcClientConfiguration Clone() {
 			Contract.Ensures(Contract.Result<RpcClientConfiguration>() != null);
-			Contract.Ensures(!Object.ReferenceEquals(Contract.Result<RpcClientConfiguration>(), this));
+			Contract.Ensures(!ReferenceEquals(Contract.Result<RpcClientConfiguration>(), this));
 			Contract.Ensures(Contract.Result<RpcClientConfiguration>().IsFrozen == IsFrozen);
 
 			return CloneCore() as RpcClientConfiguration;
@@ -100,7 +99,7 @@ namespace MsgPack.Rpc.Core.Client {
 		///		This instance.
 		/// </returns>
 		public RpcClientConfiguration Freeze() {
-			Contract.Ensures(Object.ReferenceEquals(Contract.Result<RpcClientConfiguration>(), this));
+			Contract.Ensures(ReferenceEquals(Contract.Result<RpcClientConfiguration>(), this));
 			Contract.Ensures(IsFrozen);
 
 			return FreezeCore() as RpcClientConfiguration;
@@ -115,7 +114,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </returns>
 		public RpcClientConfiguration AsFrozen() {
 			Contract.Ensures(Contract.Result<RpcClientConfiguration>() != null);
-			Contract.Ensures(!Object.ReferenceEquals(Contract.Result<RpcClientConfiguration>(), this));
+			Contract.Ensures(!ReferenceEquals(Contract.Result<RpcClientConfiguration>(), this));
 			Contract.Ensures(Contract.Result<RpcClientConfiguration>().IsFrozen);
 			Contract.Ensures(IsFrozen == Contract.OldValue(IsFrozen));
 

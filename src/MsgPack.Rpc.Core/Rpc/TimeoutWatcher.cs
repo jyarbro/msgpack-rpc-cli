@@ -61,10 +61,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		private void OnTimeout() {
-			var handler = Interlocked.CompareExchange(ref _timeout, null, null);
-			if (handler != null) {
-				handler(this, EventArgs.Empty);
-			}
+			Interlocked.CompareExchange(ref _timeout, null, null)?.Invoke(this, EventArgs.Empty);
 		}
 
 		/// <summary>

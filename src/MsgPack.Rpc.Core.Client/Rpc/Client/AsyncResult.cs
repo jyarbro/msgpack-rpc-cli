@@ -108,11 +108,7 @@ namespace MsgPack.Rpc.Core {
 		///		<paramref name="owner"/> is null.
 		/// </exception>
 		protected AsyncResult(object owner, AsyncCallback asyncCallback, object asyncState) {
-			if (owner == null) {
-				throw new ArgumentNullException("owner");
-			}
-
-			Owner = owner;
+			Owner = owner ?? throw new ArgumentNullException(nameof(owner));
 			AsyncCallback = asyncCallback;
 			AsyncState = asyncState;
 		}
@@ -206,14 +202,14 @@ namespace MsgPack.Rpc.Core {
 			where TAsyncResult : AsyncResult {
 			Contract.Assert(owner != null);
 			if (asyncResult == null) {
-				throw new ArgumentNullException("asyncResult");
+				throw new ArgumentNullException(nameof(asyncResult));
 			}
 
 			if (!(asyncResult is TAsyncResult result)) {
-				throw new ArgumentException("Unknown asyncResult.", "asyncResult");
+				throw new ArgumentException("Unknown asyncResult.", nameof(asyncResult));
 			}
 
-			if (!Object.ReferenceEquals(result.Owner, owner)) {
+			if (!ReferenceEquals(result.Owner, owner)) {
 				throw new InvalidOperationException("Async operation was not started on this instance.");
 			}
 

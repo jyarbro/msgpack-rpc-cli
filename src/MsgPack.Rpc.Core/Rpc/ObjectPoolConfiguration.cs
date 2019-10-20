@@ -1,8 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-[module: SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase", Scope = "member", Target = "MsgPack.Rpc.Core.ObjectPoolConfiguration.#ToString`1(!!0,System.Text.StringBuilder)", Justification = "Boolean value should be lower case.")]
-
-namespace MsgPack.Rpc.Core {
+﻿namespace MsgPack.Rpc.Core {
 	/// <summary>
 	///		Represents configuratin of the <see cref="ObjectPool{T}"/>.
 	/// </summary>

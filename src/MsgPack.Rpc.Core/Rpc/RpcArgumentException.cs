@@ -1,7 +1,6 @@
 ﻿using MsgPack.Rpc.Core.Protocols;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
@@ -10,8 +9,6 @@ namespace MsgPack.Rpc.Core {
 	///		Thrown if some arguments are wrong like its type was not match, its value was out of range, its value was null but it is not illegal, so on.
 	/// </summary>
 	[Serializable]
-	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public sealed class RpcArgumentException : RpcMethodInvocationException {
 		private const string _parameterNameKey = "ParameterName";
 		internal static readonly MessagePackObject ParameterNameKeyUtf8 = MessagePackConvert.EncodeString(_parameterNameKey);
@@ -125,11 +122,11 @@ namespace MsgPack.Rpc.Core {
 		public RpcArgumentException(string methodName, string parameterName, string message, string debugInformation, Exception inner)
 			: base(RpcError.ArgumentError, methodName, message ?? RpcError.ArgumentError.DefaultMessage, debugInformation, inner) {
 			if (parameterName == null) {
-				throw new ArgumentNullException("parameterName");
+				throw new ArgumentNullException(nameof(parameterName));
 			}
 
 			if (string.IsNullOrWhiteSpace(parameterName)) {
-				throw new ArgumentException("'parameterName' cannot be empty.", "parameterName");
+				throw new ArgumentException("'parameterName' cannot be empty.", nameof(parameterName));
 			}
 
 			Contract.EndContractBlock();

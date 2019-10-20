@@ -31,7 +31,7 @@ namespace MsgPack.Rpc.Core {
 		///		String representation of this exception.
 		/// </returns>
 		public string ToString(bool includesDebugInformation) {
-			if ((!includesDebugInformation || _remoteExceptions == null) && (_preservedStackTrace == null || _preservedStackTrace.Count == 0)) {
+			if ((!includesDebugInformation || remoteExceptions == null) && (_preservedStackTrace == null || _preservedStackTrace.Count == 0)) {
 				return base.ToString();
 			}
 			else {
@@ -68,7 +68,7 @@ namespace MsgPack.Rpc.Core {
 			stringBuilder.Append(GetType().FullName).Append(": ").Append(Message);
 
 			if (InnerException != null) {
-				Contract.Assert(_remoteExceptions == null);
+				Contract.Assert(remoteExceptions == null);
 
 				for (var inner = InnerException; inner != null; inner = inner.InnerException) {
 					if (inner is RpcException asRpcException) {
@@ -81,8 +81,8 @@ namespace MsgPack.Rpc.Core {
 
 				stringBuilder.AppendLine();
 			}
-			else if (_remoteExceptions != null) {
-				foreach (var remoteException in _remoteExceptions) {
+			else if (remoteExceptions != null) {
+				foreach (var remoteException in remoteExceptions) {
 					stringBuilder.Append(" ---> ").Append(remoteException.TypeName).Append(": ").Append(remoteException.Message);
 				}
 
@@ -96,7 +96,7 @@ namespace MsgPack.Rpc.Core {
 		/// <param name="stringBuilder">Buffer.</param>
 		private void BuildExceptionStackTrace(StringBuilder stringBuilder) {
 			if (InnerException != null) {
-				Contract.Assert(_remoteExceptions == null);
+				Contract.Assert(remoteExceptions == null);
 
 				for (var inner = InnerException; inner != null; inner = inner.InnerException) {
 					if (inner is RpcException asRpcException) {
@@ -109,27 +109,27 @@ namespace MsgPack.Rpc.Core {
 					stringBuilder.Append("   --- End of inner exception stack trace ---").AppendLine();
 				}
 			}
-			else if (_remoteExceptions != null && _remoteExceptions.Length > 0) {
-				for (var i = 0; i < _remoteExceptions.Length; i++) {
+			else if (remoteExceptions != null && remoteExceptions.Length > 0) {
+				for (var i = 0; i < remoteExceptions.Length; i++) {
 					if (i > 0
-						&& _remoteExceptions[i].Hop != _remoteExceptions[i - 1].Hop
-						&& _remoteExceptions[i].TypeName == _remoteExceptions[i - 1].TypeName
+						&& remoteExceptions[i].Hop != remoteExceptions[i - 1].Hop
+						&& remoteExceptions[i].TypeName == remoteExceptions[i - 1].TypeName
 					) {
 						// Serialized -> Deserialized case
-						stringBuilder.AppendFormat(CultureInfo.CurrentCulture, "Exception transferred at [{0}]:", _remoteExceptions[i - 1].Hop).AppendLine();
+						stringBuilder.AppendFormat(CultureInfo.CurrentCulture, "Exception transferred at [{0}]:", remoteExceptions[i - 1].Hop).AppendLine();
 					}
 					else {
 						// Inner exception case
 						stringBuilder.Append("   --- End of inner exception stack trace ---").AppendLine();
 					}
 
-					foreach (var frame in _remoteExceptions[i].StackTrace) {
+					foreach (var frame in remoteExceptions[i].StackTrace) {
 						WriteStackFrame(frame, stringBuilder);
 						stringBuilder.AppendLine();
 					}
 				}
 
-				stringBuilder.AppendFormat(CultureInfo.CurrentCulture, "Exception transferred at [{0}]:", _remoteExceptions[_remoteExceptions.Length - 1].Hop).AppendLine();
+				stringBuilder.AppendFormat(CultureInfo.CurrentCulture, "Exception transferred at [{0}]:", remoteExceptions[^1].Hop).AppendLine();
 			}
 
 			BuildGeneralStackTrace(this, stringBuilder);

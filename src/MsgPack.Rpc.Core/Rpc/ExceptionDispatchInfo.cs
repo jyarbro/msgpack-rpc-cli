@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -12,38 +11,28 @@ using System.Security;
 
 namespace MsgPack.Rpc.Core {
 	internal sealed class ExceptionDispatchInfo {
-		private static readonly Type[] _constructorParameterStringException = new[] { typeof(string), typeof(Exception) };
-		private static readonly PropertyInfo _exceptionHResultProperty = typeof(Exception).GetProperty("HResult", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-		private static readonly MethodInfo _safeCreateMatroshikaMethod = typeof(ExceptionDispatchInfo).GetMethod("SafeCreateMatroshika", BindingFlags.Static | BindingFlags.NonPublic);
-		private static readonly MethodInfo _safeCreateWrapperWin32ExceptionMethod = typeof(ExceptionDispatchInfo).GetMethod("SafeCreateWrapperWin32Exception", BindingFlags.Static | BindingFlags.NonPublic);
+		private static readonly Type[] constructorParameterStringException = new[] { typeof(string), typeof(Exception) };
+		private static readonly PropertyInfo exceptionHResultProperty = typeof(Exception).GetProperty("HResult", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+		private static readonly MethodInfo safeCreateMatroshikaMethod = typeof(ExceptionDispatchInfo).GetMethod("SafeCreateMatroshika", BindingFlags.Static | BindingFlags.NonPublic);
+		private static readonly MethodInfo safeCreateWrapperWin32ExceptionMethod = typeof(ExceptionDispatchInfo).GetMethod("SafeCreateWrapperWin32Exception", BindingFlags.Static | BindingFlags.NonPublic);
 
-		private readonly Exception _source;
+		private readonly Exception source;
 
 		private ExceptionDispatchInfo(Exception source) {
-			if (source == null) {
-				throw new ArgumentNullException("source");
-			}
-
 			Contract.EndContractBlock();
 
-			_source = source;
+			this.source = source ?? throw new ArgumentNullException(nameof(source));
 			if (source is IStackTracePreservable preservable) {
 				preservable.PreserveStackTrace();
 			}
 		}
 
-		[ContractInvariantMethod]
-		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "ContractInvariantMethod")]
-		private void ObjectInvariant() {
-			Contract.Invariant(_source != null);
-		}
-
 		public void Throw() {
-			if (_source is IStackTracePreservable) {
-				throw _source;
+			if (source is IStackTracePreservable) {
+				throw source;
 			}
 			else {
-				throw CreateMatroshika(_source);
+				throw CreateMatroshika(source);
 			}
 		}
 
@@ -88,7 +77,7 @@ namespace MsgPack.Rpc.Core {
 			}
 
 			if (inner is Win32Exception asWin32Exception) {
-				if (_safeCreateWrapperWin32ExceptionMethod.IsSecuritySafeCritical) {
+				if (safeCreateWrapperWin32ExceptionMethod.IsSecuritySafeCritical) {
 					var result = SafeCreateWrapperWin32Exception(asWin32Exception);
 					return result;
 				}
@@ -102,7 +91,7 @@ namespace MsgPack.Rpc.Core {
 
 		private static Exception TryCreateMatroshikaWithExternalExceptionMatroshka(Exception inner) {
 			// Try matroshika with HResult setting(requires full trust).
-			if (_safeCreateMatroshikaMethod.IsSecuritySafeCritical) {
+			if (safeCreateMatroshikaMethod.IsSecuritySafeCritical) {
 				if (inner is ExternalException asExternalException) {
 					var matroshika = SafeCreateMatroshika(asExternalException);
 					if (matroshika != null) {
@@ -144,7 +133,7 @@ namespace MsgPack.Rpc.Core {
 		private static Exception SafeCreateMatroshika(ExternalException inner) {
 			var result = GetMatroshika(inner);
 			if (result != null) {
-				_exceptionHResultProperty.SetValue(result, Marshal.GetHRForException(inner), null);
+				exceptionHResultProperty.SetValue(result, Marshal.GetHRForException(inner), null);
 			}
 
 			return result;
@@ -158,7 +147,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		private static Exception GetMatroshika(Exception inner) {
-			var ctor = inner.GetType().GetConstructor(_constructorParameterStringException);
+			var ctor = inner.GetType().GetConstructor(constructorParameterStringException);
 			if (ctor == null) {
 				return null;
 			}
@@ -218,10 +207,10 @@ namespace MsgPack.Rpc.Core {
 
 		[Serializable]
 		private sealed class WrapperHttpListenerException : HttpListenerException {
-			private readonly string _innerStackTrace;
+			private readonly string innerStackTrace;
 
 			public sealed override string StackTrace => string.Join(
-							_innerStackTrace,
+							innerStackTrace,
 							"   --- End of preserved stack trace ---",
 							Environment.NewLine,
 							base.StackTrace
@@ -229,7 +218,7 @@ namespace MsgPack.Rpc.Core {
 
 			public WrapperHttpListenerException(HttpListenerException inner)
 				: base(inner.ErrorCode) {
-				_innerStackTrace = inner.StackTrace;
+				innerStackTrace = inner.StackTrace;
 			}
 
 			private WrapperHttpListenerException(SerializationInfo info, StreamingContext context) : base(info, context) { }
@@ -237,10 +226,10 @@ namespace MsgPack.Rpc.Core {
 
 		[Serializable]
 		private sealed class WrapperNetworkInformationException : NetworkInformationException {
-			private readonly string _innerStackTrace;
+			private readonly string innerStackTrace;
 
 			public sealed override string StackTrace => string.Join(
-							_innerStackTrace,
+							innerStackTrace,
 							"   --- End of preserved stack trace ---",
 							Environment.NewLine,
 							base.StackTrace
@@ -248,7 +237,7 @@ namespace MsgPack.Rpc.Core {
 
 			public WrapperNetworkInformationException(NetworkInformationException inner)
 				: base(inner.ErrorCode) {
-				_innerStackTrace = inner.StackTrace;
+				innerStackTrace = inner.StackTrace;
 			}
 
 			private WrapperNetworkInformationException(SerializationInfo info, StreamingContext context) : base(info, context) { }
@@ -256,10 +245,10 @@ namespace MsgPack.Rpc.Core {
 
 		[Serializable]
 		private sealed class WrapperSocketException : SocketException {
-			private readonly string _innerStackTrace;
+			private readonly string innerStackTrace;
 
 			public sealed override string StackTrace => string.Join(
-							_innerStackTrace,
+							innerStackTrace,
 							"   --- End of preserved stack trace ---",
 							Environment.NewLine,
 							base.StackTrace
@@ -267,7 +256,7 @@ namespace MsgPack.Rpc.Core {
 
 			public WrapperSocketException(SocketException inner)
 				: base(inner.ErrorCode) {
-				_innerStackTrace = inner.StackTrace;
+				innerStackTrace = inner.StackTrace;
 			}
 
 			private WrapperSocketException(SerializationInfo info, StreamingContext context) : base(info, context) { }

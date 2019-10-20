@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
@@ -9,8 +8,6 @@ namespace MsgPack.Rpc.Core.Protocols {
 	///		Thrown if something wrong during remote method invocation.
 	/// </summary>
 	[Serializable]
-	[SuppressMessage("Microsoft.Usage", "CA2240:ImplementISerializableCorrectly", Justification = "Using ISafeSerializationData.")]
-	[SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors", Justification = "Using ISafeSerializationData.")]
 	public class RpcMethodInvocationException : RpcException {
 		private const string _methodNameKey = "MethodName";
 		internal static readonly MessagePackObject MethodNameKeyUtf8 = MessagePackConvert.EncodeString(_methodNameKey);
@@ -123,11 +120,11 @@ namespace MsgPack.Rpc.Core.Protocols {
 		public RpcMethodInvocationException(RpcError rpcError, string methodName, string message, string debugInformation, Exception inner)
 			: base(rpcError ?? RpcError.CallError, message, debugInformation, inner) {
 			if (methodName == null) {
-				throw new ArgumentNullException("methodName");
+				throw new ArgumentNullException(nameof(methodName));
 			}
 
 			if (string.IsNullOrWhiteSpace(methodName)) {
-				throw new ArgumentException("'methodName' cannot be empty nor blank.", "methodName");
+				throw new ArgumentException("'methodName' cannot be empty nor blank.", nameof(methodName));
 			}
 
 			Contract.EndContractBlock();

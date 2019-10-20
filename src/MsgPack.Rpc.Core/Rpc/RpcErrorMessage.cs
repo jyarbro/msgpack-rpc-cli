@@ -74,13 +74,9 @@ namespace MsgPack.Rpc.Core {
 		///		<paramref name="error"/> is null.
 		/// </exception>
 		public RpcErrorMessage(RpcError error, MessagePackObject detail) {
-			if (error == null) {
-				throw new ArgumentNullException("error");
-			}
-
 			Contract.EndContractBlock();
 
-			_error = error;
+			_error = error ?? throw new ArgumentNullException(nameof(error));
 			_detail = detail;
 		}
 
@@ -94,21 +90,17 @@ namespace MsgPack.Rpc.Core {
 		///		<paramref name="error"/> is <c>null</c>.
 		/// </exception>
 		public RpcErrorMessage(RpcError error, string description, string debugInformation) {
-			if (error == null) {
-				throw new ArgumentNullException("error");
-			}
-
 			Contract.EndContractBlock();
 
-			_error = error;
+			_error = error ?? throw new ArgumentNullException(nameof(error));
 
 			var data = new MessagePackObjectDictionary(2);
 			if (description != null) {
-				data.Add(RpcException.MessageKeyUtf8, description);
+				data.Add(RpcException.messageKeyUtf8, description);
 			}
 
 			if (debugInformation != null) {
-				data.Add(RpcException.DebugInformationKeyUtf8, debugInformation);
+				data.Add(RpcException.debugInformationKeyUtf8, debugInformation);
 			}
 
 			_detail = new MessagePackObject(data);
@@ -122,7 +114,7 @@ namespace MsgPack.Rpc.Core {
 		///		<c>true</c> if the specified <see cref="object"/> is equal to this instance; otherwise, <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj) {
-			if (Object.ReferenceEquals(obj, null)) {
+			if (obj is null) {
 				return false;
 			}
 

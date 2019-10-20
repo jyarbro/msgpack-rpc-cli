@@ -53,7 +53,7 @@ namespace MsgPack.Rpc.Core {
 			}
 			set {
 				if (!(value >= default(int))) {
-					throw new ArgumentOutOfRangeException("value", "Argument cannot be negative number.");
+					throw new ArgumentOutOfRangeException(nameof(value), "Argument cannot be negative number.");
 				}
 
 				Contract.Ensures(Contract.Result<int>() >= default(int));
@@ -90,7 +90,7 @@ namespace MsgPack.Rpc.Core {
 			}
 			set {
 				if (!(value == null || value.Value >= default(int))) {
-					throw new ArgumentOutOfRangeException("value", "Argument cannot be negative number.");
+					throw new ArgumentOutOfRangeException(nameof(value), "Argument cannot be negative number.");
 				}
 
 				Contract.Ensures(Contract.Result<int?>() == null || Contract.Result<int?>().Value >= default(int));
@@ -127,7 +127,7 @@ namespace MsgPack.Rpc.Core {
 			}
 			set {
 				if (!(Enum.IsDefined(typeof(ExhausionPolicy), value))) {
-					throw new ArgumentOutOfRangeException("value", string.Format(CultureInfo.CurrentCulture, "Argument must be valid enum value of '{0}' type.", typeof(ExhausionPolicy)));
+					throw new ArgumentOutOfRangeException(nameof(value), string.Format(CultureInfo.CurrentCulture, "Argument must be valid enum value of '{0}' type.", typeof(ExhausionPolicy)));
 				}
 
 				Contract.Ensures(Enum.IsDefined(typeof(ExhausionPolicy), Contract.Result<ExhausionPolicy>()));
@@ -164,7 +164,7 @@ namespace MsgPack.Rpc.Core {
 			}
 			set {
 				if (!(value == null || value.Value > default(TimeSpan))) {
-					throw new ArgumentOutOfRangeException("value", "Argument must be positive number.");
+					throw new ArgumentOutOfRangeException(nameof(value), "Argument must be positive number.");
 				}
 
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
@@ -201,7 +201,7 @@ namespace MsgPack.Rpc.Core {
 			}
 			set {
 				if (!(value == null || value.Value > default(TimeSpan))) {
-					throw new ArgumentOutOfRangeException("value", "Argument must be positive number.");
+					throw new ArgumentOutOfRangeException(nameof(value), "Argument must be positive number.");
 				}
 
 				Contract.Ensures(Contract.Result<TimeSpan?>() == null || Contract.Result<TimeSpan?>().Value > default(TimeSpan));
