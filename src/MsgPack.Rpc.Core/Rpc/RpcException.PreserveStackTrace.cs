@@ -13,13 +13,7 @@ namespace MsgPack.Rpc.Core {
 				_preservedStackTrace = new List<string>();
 			}
 
-			_preservedStackTrace.Add(
-#if !SILVERLIGHT
-				new StackTrace(this, true)
-#else
-				new StackTrace( this )
-#endif
-				.ToString());
+			_preservedStackTrace.Add(new StackTrace(this, true).ToString());
 		}
 
 		/// <summary>

@@ -10,9 +10,7 @@ using System.Security;
 
 namespace MsgPack.Rpc.Core {
 	partial class RpcException {
-#if !SILVERLIGHT && !MONO
 		private static readonly MethodInfo _safeGetHRFromExceptionMethod = typeof(RpcException).GetMethod("SafeGetHRFromException", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-#endif
 
 		/// <summary>
 		///		Initialize new instance with unpacked data.
@@ -46,17 +44,13 @@ namespace MsgPack.Rpc.Core {
 				}
 			}
 
-#if !SILVERLIGHT && !MONO
 			RegisterSerializeObjectStateEventHandler();
-#endif
 		}
 
 		// NOT readonly for safe-deserialization
 		private RemoteExceptionInformation[] _remoteExceptions;
 
-#if !SILVERLIGHT
 		[Serializable]
-#endif
 		private sealed class RemoteExceptionInformation {
 			public readonly int Hop;
 			public readonly string TypeName;
@@ -79,9 +73,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-#if !SILVERLIGHT
 		[Serializable]
-#endif
 		private sealed class RemoteStackFrame {
 			public readonly string MethodSignature;
 			public readonly int ILOffset;
@@ -167,11 +159,7 @@ namespace MsgPack.Rpc.Core {
 						properties[2] = remoteException.HResult;
 						properties[3] = MessagePackConvert.EncodeString(remoteException.Message);
 						properties[4] =
-#if !SILVERLIGHT
 							Array.ConvertAll(
-#else
-							ArrayExtensions.ConvertAll(
-#endif
 								remoteException.StackTrace,
 								frame =>
 									frame.FileName == null
@@ -193,24 +181,16 @@ namespace MsgPack.Rpc.Core {
 
 					// stack trace
 					var innerStackTrace =
-#if !SILVERLIGHT
 						new StackTrace(inner, true);
-#else
-						new StackTrace( inner );
-#endif
 					var frames = new MessagePackObject[innerStackTrace.FrameCount];
 					for (var i = 0; i < frames.Length; i++) {
 						var frame = innerStackTrace.GetFrame(innerStackTrace.FrameCount - (i + 1));
-#if !SILVERLIGHT
 						if (frame.GetFileName() == null) {
-#endif
 							frames[i] = new MessagePackObject[] { ToStackFrameMethodSignature(frame.GetMethod()), frame.GetILOffset(), frame.GetNativeOffset() };
-#if !SILVERLIGHT
 						}
 						else {
 							frames[i] = new MessagePackObject[] { ToStackFrameMethodSignature(frame.GetMethod()), frame.GetILOffset(), frame.GetNativeOffset(), frame.GetFileName(), frame.GetFileLineNumber(), frame.GetFileColumnNumber() };
 						}
-#endif
 					}
 					properties[4] = new MessagePackObject(frames);
 
@@ -244,7 +224,6 @@ namespace MsgPack.Rpc.Core {
 				// ExternalException.ErrorCode is SecuritySafeCritical and its assembly must be fully trusted.
 				return asExternalException.ErrorCode;
 			}
-#if !SILVERLIGHT && !MONO
 			else if (_safeGetHRFromExceptionMethod.IsSecuritySafeCritical) {
 				try {
 					// Can invoke Marshal.GetHRForException because this assembly is fully trusted.
@@ -255,7 +234,6 @@ namespace MsgPack.Rpc.Core {
 
 				return 0;
 			}
-#endif
 			else {
 				// Cannot get HResult due to partial trust.
 				return 0;
