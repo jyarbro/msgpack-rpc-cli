@@ -129,7 +129,7 @@ namespace MsgPack.Rpc.Core {
 					}
 				}
 
-				stringBuilder.AppendFormat(CultureInfo.CurrentCulture, "Exception transferred at [{0}]:", remoteExceptions[remoteExceptions.Length - 1].Hop).AppendLine();
+				stringBuilder.AppendFormat(CultureInfo.CurrentCulture, "Exception transferred at [{0}]:", remoteExceptions[^1].Hop).AppendLine();
 			}
 
 			BuildGeneralStackTrace(this, stringBuilder);
