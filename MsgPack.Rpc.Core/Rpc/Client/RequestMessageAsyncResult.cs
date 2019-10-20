@@ -33,7 +33,7 @@ namespace MsgPack.Rpc.Core.Client {
 					OnError(error.ToException(), completedSynchronously);
 				}
 				else {
-					Interlocked.CompareExchange(ref _result, new ResultHolder(Unpacking.UnpackObject(context.ResultBuffer)), null);
+					Interlocked.CompareExchange(ref _result, new ResultHolder(Unpacking.UnpackObject(context.resultBuffer)), null);
 					Complete(completedSynchronously);
 				}
 			}

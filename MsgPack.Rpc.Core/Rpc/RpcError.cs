@@ -381,7 +381,7 @@ namespace MsgPack.Rpc.Core {
 		///		The <see cref="RemoteRuntimeError"/> should be used for caught 'unexpected' exception.
 		///		This value is for unexpected situation on exception marshaling.
 		/// </remarks>
-		internal static RpcError Unexpected {
+		public static RpcError Unexpected {
 			get {
 				Contract.Ensures(Contract.Result<RpcError>() != null);
 				return unexpected;

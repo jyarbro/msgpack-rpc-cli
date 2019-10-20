@@ -14,17 +14,17 @@ namespace MsgPack.Rpc.Core.Client {
 		/// <returns>An unpacked <see cref="RpcErrorMessage"/>.</returns>
 		internal static RpcErrorMessage UnpackError(ClientResponseContext context) {
 			Contract.Assert(context != null);
-			Contract.Assert(context.ErrorBuffer != null);
-			Contract.Assert(context.ErrorBuffer.Length > 0);
-			Contract.Assert(context.ResultBuffer != null);
-			Contract.Assert(context.ResultBuffer.Length > 0);
+			Contract.Assert(context.errorBuffer != null);
+			Contract.Assert(context.errorBuffer.Length > 0);
+			Contract.Assert(context.resultBuffer != null);
+			Contract.Assert(context.resultBuffer.Length > 0);
 
 			MessagePackObject error;
 			try {
-				error = Unpacking.UnpackObject(context.ErrorBuffer);
+				error = Unpacking.UnpackObject(context.errorBuffer);
 			}
 			catch (UnpackException) {
-				error = new MessagePackObject(context.ErrorBuffer.GetBuffer().SelectMany(segment => segment.AsEnumerable()).ToArray());
+				error = new MessagePackObject(context.errorBuffer.GetBuffer().SelectMany(segment => segment.AsEnumerable()).ToArray());
 			}
 
 			if (error.IsNil) {
@@ -48,15 +48,15 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 
 			MessagePackObject detail;
-			if (context.ResultBuffer.Length == 0) {
+			if (context.resultBuffer.Length == 0) {
 				detail = MessagePackObject.Nil;
 			}
 			else {
 				try {
-					detail = Unpacking.UnpackObject(context.ResultBuffer);
+					detail = Unpacking.UnpackObject(context.resultBuffer);
 				}
 				catch (UnpackException) {
-					detail = new MessagePackObject(context.ResultBuffer.GetBuffer().SelectMany(segment => segment.AsEnumerable()).ToArray());
+					detail = new MessagePackObject(context.resultBuffer.GetBuffer().SelectMany(segment => segment.AsEnumerable()).ToArray());
 				}
 			}
 

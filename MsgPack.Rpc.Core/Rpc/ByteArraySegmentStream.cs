@@ -7,11 +7,11 @@ using System.Linq;
 
 namespace MsgPack.Rpc.Core {
 	[DebuggerTypeProxy(typeof(DebuggerProxy))]
-	internal sealed class ByteArraySegmentStream : Stream {
-		readonly IList<ArraySegment<byte>> _segments;
+	public sealed class ByteArraySegmentStream : Stream {
+		readonly IList<ArraySegment<byte>> segments;
 
-		int _segmentIndex;
-		int _offsetInCurrentSegment;
+		int segmentIndex;
+		int offsetInCurrentSegment;
 
 		public sealed override bool CanRead => true;
 
@@ -19,42 +19,42 @@ namespace MsgPack.Rpc.Core {
 
 		public sealed override bool CanWrite => false;
 
-		public sealed override long Length => _segments.Sum(item => (long)item.Count);
+		public sealed override long Length => segments.Sum(item => (long)item.Count);
 
-		long _position;
+		long position;
 
 		public sealed override long Position {
 			get {
-				return _position;
+				return position;
 			}
 			set {
 				if (value < 0) {
 					throw new ArgumentOutOfRangeException(nameof(value));
 				}
 
-				Seek(value - _position);
+				Seek(value - position);
 			}
 		}
 
 		public ByteArraySegmentStream(IList<ArraySegment<byte>> underlying) {
-			_segments = underlying;
+			segments = underlying;
 		}
 
 		public sealed override int Read(byte[] buffer, int offset, int count) {
 			var remains = count;
 			var result = 0;
-			while (0 < remains && _segmentIndex < _segments.Count) {
-				var copied = _segments[_segmentIndex].CopyTo(_offsetInCurrentSegment, buffer, offset + result, remains);
+			while (0 < remains && segmentIndex < segments.Count) {
+				var copied = segments[segmentIndex].CopyTo(offsetInCurrentSegment, buffer, offset + result, remains);
 				result += copied;
 				remains -= copied;
-				_offsetInCurrentSegment += copied;
+				offsetInCurrentSegment += copied;
 
-				if (_offsetInCurrentSegment == _segments[_segmentIndex].Count) {
-					_segmentIndex++;
-					_offsetInCurrentSegment = 0;
+				if (offsetInCurrentSegment == segments[segmentIndex].Count) {
+					segmentIndex++;
+					offsetInCurrentSegment = 0;
 				}
 
-				_position += copied;
+				position += copied;
 			}
 
 			return result;
@@ -65,7 +65,7 @@ namespace MsgPack.Rpc.Core {
 			long offsetFromCurrent;
 			switch (origin) {
 				case SeekOrigin.Begin: {
-					offsetFromCurrent = offset - _position;
+					offsetFromCurrent = offset - position;
 					break;
 				}
 				case SeekOrigin.Current: {
@@ -73,7 +73,7 @@ namespace MsgPack.Rpc.Core {
 					break;
 				}
 				case SeekOrigin.End: {
-					offsetFromCurrent = length + offset - _position;
+					offsetFromCurrent = length + offset - position;
 					break;
 				}
 				default: {
@@ -81,52 +81,52 @@ namespace MsgPack.Rpc.Core {
 				}
 			}
 
-			if (offsetFromCurrent + _position < 0 || length < offsetFromCurrent + _position) {
+			if (offsetFromCurrent + position < 0 || length < offsetFromCurrent + position) {
 				throw new ArgumentOutOfRangeException(nameof(offset));
 			}
 
 			Seek(offsetFromCurrent);
-			return _position;
+			return position;
 		}
 
 		void Seek(long offsetFromCurrent) {
 #if DEBUG
-			Contract.Assert(0 <= offsetFromCurrent + _position, offsetFromCurrent + _position + " < 0");
-			Contract.Assert(offsetFromCurrent + _position <= Length, Length + " <= " + offsetFromCurrent + _position);
+			Contract.Assert(0 <= offsetFromCurrent + position, offsetFromCurrent + position + " < 0");
+			Contract.Assert(offsetFromCurrent + position <= Length, Length + " <= " + offsetFromCurrent + position);
 #endif
 
 			if (offsetFromCurrent < 0) {
 				for (long i = 0; offsetFromCurrent < i; i--) {
-					if (_offsetInCurrentSegment == 0) {
-						_segmentIndex--;
-						Contract.Assert(0 <= _segmentIndex);
-						_offsetInCurrentSegment = _segments[_segmentIndex].Count - 1;
+					if (offsetInCurrentSegment == 0) {
+						segmentIndex--;
+						Contract.Assert(0 <= segmentIndex);
+						offsetInCurrentSegment = segments[segmentIndex].Count - 1;
 					}
 					else {
-						_offsetInCurrentSegment--;
+						offsetInCurrentSegment--;
 					}
 
-					_position--;
+					position--;
 				}
 			}
 			else {
 				for (long i = 0; i < offsetFromCurrent; i++) {
-					if (_offsetInCurrentSegment == _segments[_segmentIndex].Count - 1) {
-						_segmentIndex++;
-						Contract.Assert(_segmentIndex <= _segments.Count);
-						_offsetInCurrentSegment = 0;
+					if (offsetInCurrentSegment == segments[segmentIndex].Count - 1) {
+						segmentIndex++;
+						Contract.Assert(segmentIndex <= segments.Count);
+						offsetInCurrentSegment = 0;
 					}
 					else {
-						_offsetInCurrentSegment++;
+						offsetInCurrentSegment++;
 					}
 
-					_position++;
+					position++;
 				}
 			}
 		}
 
 		public IList<ArraySegment<byte>> GetBuffer() {
-			return _segments;
+			return segments;
 		}
 
 		public IList<ArraySegment<byte>> GetBuffer(long start, long length) {
@@ -138,10 +138,10 @@ namespace MsgPack.Rpc.Core {
 				throw new ArgumentOutOfRangeException(nameof(length));
 			}
 
-			var result = new List<ArraySegment<byte>>(_segments.Count);
+			var result = new List<ArraySegment<byte>>(segments.Count);
 			long taken = 0;
 			var toBeSkipped = start;
-			foreach (var segment in _segments) {
+			foreach (var segment in segments) {
 				var skipped = 0;
 				if (toBeSkipped > 0) {
 					if (segment.Count <= toBeSkipped) {
@@ -170,13 +170,13 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		public byte[] ToArray() {
-			if (_segments.Count == 0) {
+			if (segments.Count == 0) {
 				return Array.Empty<byte>();
 			}
 
-			var result = _segments[0].AsEnumerable();
-			for (var i = 1; i < _segments.Count; i++) {
-				result = result.Concat(_segments[i].AsEnumerable());
+			var result = segments[0].AsEnumerable();
+			for (var i = 1; i < segments.Count; i++) {
+				result = result.Concat(segments[i].AsEnumerable());
 			}
 
 			return result.ToArray();
@@ -207,34 +207,34 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		internal sealed class DebuggerProxy {
-			readonly ByteArraySegmentStream _source;
+			readonly ByteArraySegmentStream source;
 
-			public bool CanSeek => _source.CanSeek;
+			public bool CanSeek => source.CanSeek;
 
-			public bool CanRead => _source.CanRead;
+			public bool CanRead => source.CanRead;
 
-			public bool CanWrite => _source.CanWrite;
+			public bool CanWrite => source.CanWrite;
 
-			public bool CanTimeout => _source.CanTimeout;
+			public bool CanTimeout => source.CanTimeout;
 
 			public int ReadTimeout {
-				get { return _source.ReadTimeout; }
-				set { _source.ReadTimeout = value; }
+				get { return source.ReadTimeout; }
+				set { source.ReadTimeout = value; }
 			}
 
 			public int WriteTimeout {
-				get { return _source.WriteTimeout; }
-				set { _source.WriteTimeout = value; }
+				get { return source.WriteTimeout; }
+				set { source.WriteTimeout = value; }
 			}
 
 			public long Position {
-				get { return _source.Position; }
-				set { _source.Position = value; }
+				get { return source.Position; }
+				set { source.Position = value; }
 			}
 
-			public long Length => _source.Length;
+			public long Length => source.Length;
 
-			public IList<ArraySegment<byte>> Segments => _source._segments ?? Array.Empty<ArraySegment<byte>>();
+			public IList<ArraySegment<byte>> Segments => source.segments ?? Array.Empty<ArraySegment<byte>>();
 
 			public string Data => "[" +
 						string.Join(
@@ -245,7 +245,7 @@ namespace MsgPack.Rpc.Core {
 						) + "]";
 
 			public DebuggerProxy(ByteArraySegmentStream source) {
-				_source = source;
+				this.source = source;
 			}
 		}
 	}

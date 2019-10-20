@@ -29,7 +29,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			if (!context.RootUnpacker.IsArrayHeader) {
 				HandleDeserializationError(context, "Invalid response message stream. Message must be array.", () => context.UnpackingBuffer.ToArray());
-				return context.NextProcess(context);
+				return context.nextProcess(context);
 			}
 
 			if (context.RootUnpacker.ItemsCount != 4) {
@@ -42,12 +42,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					),
 					() => context.UnpackingBuffer.ToArray()
 				);
-				return context.NextProcess(context);
+				return context.nextProcess(context);
 			}
 
 			context.HeaderUnpacker = context.RootUnpacker.ReadSubtree();
-			context.NextProcess = UnpackMessageType;
-			return context.NextProcess(context);
+			context.nextProcess = UnpackMessageType;
+			return context.nextProcess(context);
 		}
 
 		/// <summary>
@@ -70,7 +70,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 			catch (InvalidOperationException) {
 				HandleDeserializationError(context, "Invalid response message stream. Message Type must be Int32 compatible integer.", () => context.UnpackingBuffer.ToArray());
-				return context.NextProcess(context);
+				return context.nextProcess(context);
 			}
 
 			var type = (MessageType)numericType;
@@ -80,12 +80,12 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					string.Format(CultureInfo.CurrentCulture, "Unknown message type '{0:x8}'", numericType),
 					() => context.UnpackingBuffer.ToArray()
 				);
-				return context.NextProcess(context);
+				return context.nextProcess(context);
 			}
 
-			context.NextProcess = UnpackMessageId;
+			context.nextProcess = UnpackMessageId;
 
-			return context.NextProcess(context);
+			return context.nextProcess(context);
 		}
 
 		/// <summary>
@@ -111,11 +111,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 					"Invalid response message stream. ID must be UInt32 compatible integer.",
 					() => context.UnpackingBuffer.ToArray()
 				);
-				return context.NextProcess(context);
+				return context.nextProcess(context);
 			}
 
-			context.NextProcess = UnpackError;
-			return context.NextProcess(context);
+			context.nextProcess = UnpackError;
+			return context.nextProcess(context);
 		}
 
 		/// <summary>
@@ -128,8 +128,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </returns>
 		bool UnpackError(ClientResponseContext context) {
 			Contract.Assert(context.UnpackingBuffer.CanSeek);
-			if (context.ErrorStartAt == -1) {
-				context.ErrorStartAt = context.UnpackingBuffer.Position;
+			if (context.errorStartAt == -1) {
+				context.errorStartAt = context.UnpackingBuffer.Position;
 			}
 
 			var skipped = context.SkipErrorSegment();
@@ -138,10 +138,10 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				return false;
 			}
 
-			context.ErrorBuffer = new ByteArraySegmentStream(context.UnpackingBuffer.GetBuffer(context.ErrorStartAt, context.UnpackingBuffer.Position - context.ErrorStartAt));
-			context.NextProcess = UnpackResult;
+			context.errorBuffer = new ByteArraySegmentStream(context.UnpackingBuffer.GetBuffer(context.errorStartAt, context.UnpackingBuffer.Position - context.errorStartAt));
+			context.nextProcess = UnpackResult;
 
-			return context.NextProcess(context);
+			return context.nextProcess(context);
 		}
 
 		/// <summary>
@@ -154,8 +154,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </returns>
 		bool UnpackResult(ClientResponseContext context) {
 			Contract.Assert(context.UnpackingBuffer.CanSeek);
-			if (context.ResultStartAt == -1) {
-				context.ResultStartAt = context.UnpackingBuffer.Position;
+			if (context.resultStartAt == -1) {
+				context.resultStartAt = context.UnpackingBuffer.Position;
 			}
 
 			var skipped = context.SkipResultSegment();
@@ -164,10 +164,10 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				return false;
 			}
 
-			context.ResultBuffer = new ByteArraySegmentStream(context.UnpackingBuffer.GetBuffer(context.ResultStartAt, context.UnpackingBuffer.Position - context.ResultStartAt));
-			context.NextProcess = Dispatch;
+			context.resultBuffer = new ByteArraySegmentStream(context.UnpackingBuffer.GetBuffer(context.resultStartAt, context.UnpackingBuffer.Position - context.resultStartAt));
+			context.nextProcess = Dispatch;
 
-			return context.NextProcess(context);
+			return context.nextProcess(context);
 		}
 
 		/// <summary>
@@ -203,8 +203,8 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			if (context.UnpackingBuffer.Length > 0) {
 				// Subsequent request is already arrived.
-				context.NextProcess = UnpackResponseHeader;
-				return context.NextProcess(context);
+				context.nextProcess = UnpackResponseHeader;
+				return context.nextProcess(context);
 			}
 			else {
 				// Try receive subsequent.

@@ -445,7 +445,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			RaiseError(messageId, context.SessionId, GetRemoteEndPoint(BoundSocket, context), rpcError, context.CompletedSynchronously);
 
-			context.NextProcess = DumpCorrupttedData;
+			context.nextProcess = DumpCorrupttedData;
 		}
 
 		void RaiseError(int? messageId, long sessionId, EndPoint remoteEndPoint, RpcErrorMessage rpcError, bool completedSynchronously) {
@@ -484,7 +484,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 			MessagePackObject? returnValue = null;
 			if (error.IsSuccess) {
-				returnValue = Unpacking.UnpackObject(context.ResultBuffer);
+				returnValue = Unpacking.UnpackObject(context.resultBuffer);
 			}
 
 			HandleOrphan(context.MessageId, context.SessionId, GetRemoteEndPoint(BoundSocket, context), error, returnValue);
@@ -764,7 +764,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 		void DrainRemainingReceivedData(ClientResponseContext context) {
 			// Process remaining binaries. This pipeline recursively call this method on other thread.
-			if (!context.NextProcess(context)) {
+			if (!context.nextProcess(context)) {
 				// Draining was not ended. Try to take next bytes.
 				Receive(context);
 			}
@@ -859,7 +859,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				return;
 			}
 
-			if (!context.NextProcess(context)) {
+			if (!context.nextProcess(context)) {
 				if (IsServerShutdown) {
 					ShutdownReceiving();
 				}

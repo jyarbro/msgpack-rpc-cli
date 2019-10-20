@@ -10,21 +10,21 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <summary>
 		///		Next (that is, resuming) process on the deserialization pipeline.
 		/// </summary>
-		internal Func<ClientResponseContext, bool> NextProcess;
+		internal Func<ClientResponseContext, bool> nextProcess;
 
-		internal long ErrorStartAt;
+		internal long errorStartAt;
 
 		/// <summary>
 		///		Subtree <see cref="Unpacker"/> to parse error value as opaque sequence.
 		/// </summary>
-		internal ByteArraySegmentStream ErrorBuffer;
+		internal ByteArraySegmentStream errorBuffer;
 
-		internal long ResultStartAt;
+		internal long resultStartAt;
 
 		/// <summary>
 		///		Subtree <see cref="Unpacker"/> to parse return value as opaque sequence.
 		/// </summary>
-		internal ByteArraySegmentStream ResultBuffer;
+		internal ByteArraySegmentStream resultBuffer;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ClientResponseContext"/> class with default settings.
@@ -41,22 +41,26 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </param>
 		public ClientResponseContext(RpcClientConfiguration configuration)
 			: base((configuration ?? RpcClientConfiguration.Default).InitialReceiveBufferLength) {
-			ErrorStartAt = -1;
-			ResultStartAt = -1;
+			errorStartAt = -1;
+			resultStartAt = -1;
+		}
+
+		public ByteArraySegmentStream GetErrorBuffer() {
+			return errorBuffer;
 		}
 
 		internal long? SkipResultSegment() {
 #if DEBUG
-			Contract.Assert(ResultStartAt > -1);
+			Contract.Assert(resultStartAt > -1);
 #endif
-			return SkipHeader(ResultStartAt);
+			return SkipHeader(resultStartAt);
 		}
 
 		internal long? SkipErrorSegment() {
 #if DEBUG
-			Contract.Assert(ErrorStartAt > -1);
+			Contract.Assert(errorStartAt > -1);
 #endif
-			return SkipHeader(ErrorStartAt);
+			return SkipHeader(errorStartAt);
 		}
 
 		long? SkipHeader(long origin) {
@@ -76,7 +80,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		internal void SetTransport(ClientTransport transport) {
 			Contract.Requires(transport != null);
 
-			NextProcess = transport.UnpackResponseHeader;
+			nextProcess = transport.UnpackResponseHeader;
 			base.SetTransport(transport);
 		}
 
@@ -89,7 +93,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </summary>
 		internal sealed override void Clear() {
 			ClearBuffers();
-			NextProcess = InvalidFlow;
+			nextProcess = InvalidFlow;
 			base.Clear();
 		}
 
@@ -97,18 +101,18 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		Clears the buffers to deserialize message.
 		/// </summary>
 		internal override void ClearBuffers() {
-			if (ErrorBuffer != null) {
-				ErrorBuffer.Dispose();
-				ErrorBuffer = null;
+			if (errorBuffer != null) {
+				errorBuffer.Dispose();
+				errorBuffer = null;
 			}
 
-			if (ResultBuffer != null) {
-				ResultBuffer.Dispose();
-				ResultBuffer = null;
+			if (resultBuffer != null) {
+				resultBuffer.Dispose();
+				resultBuffer = null;
 			}
 
-			ErrorStartAt = -1;
-			ResultStartAt = -1;
+			errorStartAt = -1;
+			resultStartAt = -1;
 
 			base.ClearBuffers();
 		}
