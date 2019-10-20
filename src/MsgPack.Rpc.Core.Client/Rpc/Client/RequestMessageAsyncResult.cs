@@ -7,7 +7,7 @@ namespace MsgPack.Rpc.Core.Client {
 	///		<see cref="IAsyncResult"/> implementation for async RPC.
 	/// </summary>
 	internal sealed class RequestMessageAsyncResult : MessageAsyncResult {
-		private ResultHolder _result;
+		ResultHolder _result;
 
 		/// <summary>
 		///		Gets a response data.

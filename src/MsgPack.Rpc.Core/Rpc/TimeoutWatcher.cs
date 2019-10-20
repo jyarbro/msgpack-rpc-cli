@@ -6,15 +6,15 @@ namespace MsgPack.Rpc.Core {
 	///		Watches timeout.
 	/// </summary>
 	internal class TimeoutWatcher : IDisposable {
-		private const int StateIdle = 0;
-		private const int StateWatching = 1;
-		private const int StateTimeout = 2;
-		private const int StateDisposed = 3;
+		const int StateIdle = 0;
+		const int StateWatching = 1;
+		const int StateTimeout = 2;
+		const int StateDisposed = 3;
 
-		private readonly object _resourceLock = new object();
-		private ManualResetEvent _waitHandle;
-		private RegisteredWaitHandle _registeredWaitHandle;
-		private int _state;
+		readonly object _resourceLock = new object();
+		ManualResetEvent _waitHandle;
+		RegisteredWaitHandle _registeredWaitHandle;
+		int _state;
 
 		/// <summary>
 		///		Gets a value indicating whether timeout is occurred.
@@ -30,7 +30,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private EventHandler _timeout;
+		EventHandler _timeout;
 
 		/// <summary>
 		///		Occurs when operation timeout.
@@ -60,7 +60,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private void OnTimeout() {
+		void OnTimeout() {
 			Interlocked.CompareExchange(ref _timeout, null, null)?.Invoke(this, EventArgs.Empty);
 		}
 
@@ -88,7 +88,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private void VerifyIsNotDisposed() {
+		void VerifyIsNotDisposed() {
 			if (Interlocked.CompareExchange(ref _state, 0, 0) == StateDisposed) {
 				throw new ObjectDisposedException(ToString());
 			}
@@ -140,7 +140,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private void OnPulse(object state, bool isTimeout) {
+		void OnPulse(object state, bool isTimeout) {
 			if (isTimeout && Interlocked.CompareExchange(ref _state, StateTimeout, StateWatching) == StateWatching) {
 				OnTimeout();
 			}

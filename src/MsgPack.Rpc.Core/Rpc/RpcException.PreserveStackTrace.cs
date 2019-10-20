@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MsgPack.Rpc.Core {
 	partial class RpcException : IStackTracePreservable {
-		private List<string> _preservedStackTrace;
+		List<string> _preservedStackTrace;
 
 		void IStackTracePreservable.PreserveStackTrace() {
 			if (_preservedStackTrace == null) {

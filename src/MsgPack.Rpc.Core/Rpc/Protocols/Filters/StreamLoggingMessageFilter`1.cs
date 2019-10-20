@@ -10,7 +10,7 @@ namespace MsgPack.Rpc.Core.Protocols.Filters {
 	/// <typeparam name="T">The type of <see cref="InboundMessageContext"/>.</typeparam>
 	public abstract class StreamLoggingMessageFilter<T> : MessageFilter<T>
 		where T : InboundMessageContext {
-		private readonly IMessagePackStreamLogger _logger;
+		readonly IMessagePackStreamLogger _logger;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="StreamLoggingMessageFilter&lt;T&gt;"/> class.

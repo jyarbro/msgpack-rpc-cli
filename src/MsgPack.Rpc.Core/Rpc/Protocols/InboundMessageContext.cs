@@ -7,7 +7,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 	///		Defines basic functionality for inbound message contexts.
 	/// </summary>
 	public abstract class InboundMessageContext : MessageContext {
-		private readonly List<ArraySegment<byte>> _receivedData;
+		readonly List<ArraySegment<byte>> _receivedData;
 
 		/// <summary>
 		///		Gets the received data.
@@ -160,7 +160,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		/// <summary>
 		///		Truncates the used segments from the received data.
 		/// </summary>
-		private void TruncateUsedReceivedData() {
+		void TruncateUsedReceivedData() {
 			var removals = UnpackingBuffer.Position;
 			var segments = UnpackingBuffer.GetBuffer();
 			while (segments.Any() && 0 < removals) {

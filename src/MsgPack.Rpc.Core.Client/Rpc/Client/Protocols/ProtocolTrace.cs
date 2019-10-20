@@ -6,7 +6,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// 	Defines trace for MsgPack.Rpc.Core.Client.Protocols namespace.
 	/// </summary>
 	internal static partial class MsgPackRpcClientProtocolsTrace {
-		private static readonly Dictionary<MessageId, TraceEventType> _typeTable =
+		static readonly Dictionary<MessageId, TraceEventType> _typeTable =
 			new Dictionary<MessageId, TraceEventType>(25)
 			{
 				{ MessageId.DetectServerShutdown, TraceEventType.Information },

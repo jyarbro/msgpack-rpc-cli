@@ -13,8 +13,8 @@ namespace MsgPack.Rpc.Core {
 	/// </remarks>
 	public sealed class OnTheFlyObjectPool<T> : ObjectPool<T>
 		where T : class {
-		private readonly Func<ObjectPoolConfiguration, T> _factory;
-		private readonly ObjectPoolConfiguration _configuration;
+		readonly Func<ObjectPoolConfiguration, T> _factory;
+		readonly ObjectPoolConfiguration _configuration;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="OnTheFlyObjectPool&lt;T&gt;"/> class.

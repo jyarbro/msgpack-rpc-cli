@@ -56,7 +56,7 @@ namespace MsgPack.Rpc.Core {
 	[Serializable]
 	public partial class RpcException : Exception {
 		// NOT readonly for safe-deserialization
-		private RpcError rpcError;
+		RpcError rpcError;
 
 		/// <summary>
 		///		Gets the metadata of the error.
@@ -73,7 +73,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		// NOT readonly for safe-deserialization
-		private string debugInformation;
+		string debugInformation;
 
 		/// <summary>
 		///		Gets the debug information of the error.
@@ -180,12 +180,12 @@ namespace MsgPack.Rpc.Core {
 			);
 		}
 
-		private void RegisterSerializeObjectStateEventHandler() {
+		void RegisterSerializeObjectStateEventHandler() {
 			SerializeObjectState += OnSerializeObjectState;
 		}
 
 		[Serializable]
-		private sealed class SerializedState : ISafeSerializationData {
+		sealed class SerializedState : ISafeSerializationData {
 			public string DebugInformation;
 			public RemoteExceptionInformation[] RemoteExceptions;
 			public string RpcErrorIdentifier;

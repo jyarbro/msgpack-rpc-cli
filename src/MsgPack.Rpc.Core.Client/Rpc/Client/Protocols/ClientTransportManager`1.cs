@@ -12,9 +12,9 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 	/// <typeparam name="TTransport"></typeparam>
 	public abstract class ClientTransportManager<TTransport> : ClientTransportManager
 		where TTransport : ClientTransport {
-		private readonly ConcurrentDictionary<TTransport, object> activeTransports;
+		readonly ConcurrentDictionary<TTransport, object> activeTransports;
 
-		private ObjectPool<TTransport> transportPool;
+		ObjectPool<TTransport> transportPool;
 
 		/// <summary>
 		///		Gets a value indicating whether the transport pool is set.
@@ -27,7 +27,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </remarks>
 		public bool IsTransportPoolSet => transportPool != null;
 
-		private int tranportIsInShutdown;
+		int tranportIsInShutdown;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ClientTransportManager{T}"/> class.
@@ -100,7 +100,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private void OnTransportShutdownCompleted(object sender, ShutdownCompletedEventArgs e) {
+		void OnTransportShutdownCompleted(object sender, ShutdownCompletedEventArgs e) {
 			var transport = sender as TTransport;
 			Contract.Assert(transport != null);
 			try { }

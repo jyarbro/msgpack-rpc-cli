@@ -11,9 +11,9 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 	///		Implements basic common features for <see cref="IMessagePackStreamLogger"/>s.
 	/// </summary>
 	public abstract class MessagePackStreamLogger : IMessagePackStreamLogger, IDisposable {
-		private static readonly ThreadLocal<TraceEventCache> traceEventCache = new ThreadLocal<TraceEventCache>(() => new TraceEventCache());
+		static readonly ThreadLocal<TraceEventCache> traceEventCache = new ThreadLocal<TraceEventCache>(() => new TraceEventCache());
 
-		private static DateTime GetProcessStartTimeUtc() {
+		static DateTime GetProcessStartTimeUtc() {
 			try {
 				return PrivilegedGetProcessStartTimeUtc();
 			}
@@ -28,12 +28,12 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		}
 
 		[SecuritySafeCritical]
-		private static DateTime PrivilegedGetProcessStartTimeUtc() {
+		static DateTime PrivilegedGetProcessStartTimeUtc() {
 			using var process = Process.GetCurrentProcess();
 			return process.StartTime.ToUniversalTime();
 		}
 
-		private static string GetProcessName() {
+		static string GetProcessName() {
 			try {
 				return PrivilegedGetProcessName();
 			}
@@ -46,7 +46,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 		}
 
 		[SecuritySafeCritical]
-		private static string PrivilegedGetProcessName() {
+		static string PrivilegedGetProcessName() {
 			using var process = Process.GetCurrentProcess();
 			return Path.GetFileNameWithoutExtension(process.MainModule.ModuleName);
 		}

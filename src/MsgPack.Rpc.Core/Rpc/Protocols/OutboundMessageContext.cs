@@ -12,7 +12,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		///		The reusable buffer to pack message ID.
 		///		This value will not be <c>null</c>.
 		/// </summary>
-		private readonly MemoryStream _idBuffer;
+		readonly MemoryStream _idBuffer;
 
 		/// <summary>
 		///		Gets or sets the buffer lists for sending by socket.

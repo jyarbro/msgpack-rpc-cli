@@ -23,7 +23,7 @@ namespace MsgPack.Rpc.Core {
 		/// </value>
 		public bool IsSuccess => _error == null;
 
-		private readonly RpcError _error;
+		readonly RpcError _error;
 
 		/// <summary>
 		///		Get error information for this error.
@@ -44,7 +44,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private readonly MessagePackObject _detail;
+		readonly MessagePackObject _detail;
 
 		/// <summary>
 		///		Get detailed error information for this error.

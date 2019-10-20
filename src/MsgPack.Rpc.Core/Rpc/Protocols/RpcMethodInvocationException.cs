@@ -9,11 +9,11 @@ namespace MsgPack.Rpc.Core.Protocols {
 	/// </summary>
 	[Serializable]
 	public class RpcMethodInvocationException : RpcException {
-		private const string _methodNameKey = "MethodName";
+		const string _methodNameKey = "MethodName";
 		internal static readonly MessagePackObject MethodNameKeyUtf8 = MessagePackConvert.EncodeString(_methodNameKey);
 
 		// NOT readonly for safe deserialization
-		private string _methodName;
+		string _methodName;
 
 		/// <summary>
 		///		Gets the name of invoking method.
@@ -183,7 +183,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		}
 
 		[Serializable]
-		private sealed class SerializedState : ISafeSerializationData {
+		sealed class SerializedState : ISafeSerializationData {
 			public string MethodName;
 
 			public void CompleteDeserialization(object deserialized) {

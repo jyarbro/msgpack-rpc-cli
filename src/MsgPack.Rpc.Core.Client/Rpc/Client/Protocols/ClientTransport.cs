@@ -18,7 +18,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 	///		Defines interface of client protocol binding.
 	/// </summary>
 	public abstract partial class ClientTransport : IDisposable, IContextBoundableTransport {
-		private Socket boundSocket;
+		Socket boundSocket;
 
 		/// <summary>
 		///		Gets the bound <see cref="Socket"/>.
@@ -34,7 +34,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 
 		Socket IContextBoundableTransport.BoundSocket => boundSocket;
 
-		private int isDisposed;
+		int isDisposed;
 
 		/// <summary>
 		///		Gets a value indicating whether this instance is disposed.
@@ -44,10 +44,10 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </value>
 		public bool IsDisposed => Interlocked.CompareExchange(ref isDisposed, 0, 0) != 0;
 
-		private readonly ConcurrentDictionary<int, Action<ClientResponseContext, Exception, bool>> pendingRequestTable;
-		private readonly ConcurrentDictionary<long, Action<Exception, bool>> pendingNotificationTable;
+		readonly ConcurrentDictionary<int, Action<ClientResponseContext, Exception, bool>> pendingRequestTable;
+		readonly ConcurrentDictionary<long, Action<Exception, bool>> pendingNotificationTable;
 
-		private readonly ClientTransportManager manager;
+		readonly ClientTransportManager manager;
 
 		/// <summary>
 		///		Gets the <see cref="ClientTransportManager"/> which manages this instance.
@@ -74,7 +74,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			get;
 		}
 
-		private int shutdownSource;
+		int shutdownSource;
 
 		/// <summary>
 		///		Gets a value indicating whether this instance is in shutdown.
@@ -92,13 +92,13 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </value>
 		public bool IsServerShutdown => Interlocked.CompareExchange(ref shutdownSource, 0, 0) == (int)ShutdownSource.Server;
 
-		private bool IsInAnyShutdown => Interlocked.CompareExchange(ref shutdownSource, 0, 0) != 0;
+		bool IsInAnyShutdown => Interlocked.CompareExchange(ref shutdownSource, 0, 0) != 0;
 
 		internal IList<MessageFilter<ClientRequestContext>> AfterSerializationFilters { get; }
 
 		internal IList<MessageFilter<ClientResponseContext>> BeforeDeserializationFilters { get; }
 
-		private EventHandler<ShutdownCompletedEventArgs> shutdownCompleted;
+		EventHandler<ShutdownCompletedEventArgs> shutdownCompleted;
 
 		/// <summary>
 		///		Occurs when the initiated shutdown process is completed.
@@ -244,7 +244,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private void VerifyIsNotDisposed() {
+		void VerifyIsNotDisposed() {
 			if (IsDisposed) {
 				throw new ObjectDisposedException(ToString());
 			}
@@ -313,7 +313,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private void OnProcessFinished() {
+		void OnProcessFinished() {
 			if (IsInAnyShutdown) {
 				if (pendingNotificationTable.Count == 0 && pendingRequestTable.Count == 0) {
 					ShutdownReceiving();
@@ -321,7 +321,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private void OnSocketOperationCompleted(object sender, SocketAsyncEventArgs e) {
+		void OnSocketOperationCompleted(object sender, SocketAsyncEventArgs e) {
 			var socket = sender as Socket;
 			var context = e.GetContext();
 
@@ -367,15 +367,15 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		}
 
 
-		private void OnSendTimeout(object sender, EventArgs e) {
+		void OnSendTimeout(object sender, EventArgs e) {
 			OnWaitTimeout(sender as ClientRequestContext);
 		}
 
-		private void OnReceiveTimeout(object sender, EventArgs e) {
+		void OnReceiveTimeout(object sender, EventArgs e) {
 			OnWaitTimeout(sender as ClientResponseContext);
 		}
 
-		private void OnWaitTimeout(MessageContext context) {
+		void OnWaitTimeout(MessageContext context) {
 			Contract.Assert(context != null);
 
 			var asClientRequestContext = context as ClientRequestContext;
@@ -425,11 +425,11 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			return rpcError == null;
 		}
 
-		private void HandleDeserializationError(ClientResponseContext context, string message, Func<byte[]> invalidRequestHeaderProvider) {
+		void HandleDeserializationError(ClientResponseContext context, string message, Func<byte[]> invalidRequestHeaderProvider) {
 			HandleDeserializationError(context, context.MessageId, new RpcErrorMessage(RpcError.RemoteRuntimeError, "Invalid stream.", message), message, invalidRequestHeaderProvider);
 		}
 
-		private void HandleDeserializationError(ClientResponseContext context, int? messageId, RpcErrorMessage rpcError, string message, Func<byte[]> invalidRequestHeaderProvider) {
+		void HandleDeserializationError(ClientResponseContext context, int? messageId, RpcErrorMessage rpcError, string message, Func<byte[]> invalidRequestHeaderProvider) {
 			MsgPackRpcClientProtocolsTrace.TraceRpcError(
 				rpcError.Error,
 				"Deserialization error. {0} {{ \"Message ID\" : {1}, \"Error\" : {2} }}",
@@ -448,7 +448,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			context.NextProcess = DumpCorrupttedData;
 		}
 
-		private void RaiseError(int? messageId, long sessionId, EndPoint remoteEndPoint, RpcErrorMessage rpcError, bool completedSynchronously) {
+		void RaiseError(int? messageId, long sessionId, EndPoint remoteEndPoint, RpcErrorMessage rpcError, bool completedSynchronously) {
 			if (messageId != null) {
 				Action<ClientResponseContext, Exception, bool> handler = null;
 				try {
@@ -479,7 +479,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private void HandleOrphan(ClientResponseContext context) {
+		void HandleOrphan(ClientResponseContext context) {
 			var error = ErrorInterpreter.UnpackError(context);
 
 			MessagePackObject? returnValue = null;
@@ -490,7 +490,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			HandleOrphan(context.MessageId, context.SessionId, GetRemoteEndPoint(BoundSocket, context), error, returnValue);
 		}
 
-		private void HandleOrphan(int? messageId, long sessionId, EndPoint remoteEndPoint, RpcErrorMessage rpcError, MessagePackObject? returnValue) {
+		void HandleOrphan(int? messageId, long sessionId, EndPoint remoteEndPoint, RpcErrorMessage rpcError, MessagePackObject? returnValue) {
 			var socket = BoundSocket;
 			MsgPackRpcClientProtocolsTrace.TraceEvent(
 				MsgPackRpcClientProtocolsTrace.OrphanError,
@@ -508,7 +508,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			manager.HandleOrphan(messageId, rpcError, returnValue);
 		}
 
-		private Stream OpenDumpStream(DateTimeOffset sessionStartedAt, EndPoint destination, long sessionId, MessageType type, int? messageId) {
+		Stream OpenDumpStream(DateTimeOffset sessionStartedAt, EndPoint destination, long sessionId, MessageType type, int? messageId) {
 			var directoryPath =
 				string.IsNullOrWhiteSpace(Manager.Configuration.CorruptResponseDumpOutputDirectory)
 				? Path.Combine(
@@ -541,7 +541,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 				);
 		}
 
-		private static void ApplyFilters<T>(IList<MessageFilter<T>> filters, T context)
+		static void ApplyFilters<T>(IList<MessageFilter<T>> filters, T context)
 			where T : MessageContext {
 			foreach (var filter in filters) {
 				filter.ProcessMessage(context);
@@ -735,7 +735,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///	<exception cref="ObjectDisposedException">
 		///		This instance is disposed.
 		///	</exception>
-		private void Receive(ClientResponseContext context) {
+		void Receive(ClientResponseContext context) {
 			Contract.Assert(context != null);
 			Contract.Assert(context.BoundTransport == this, "Context is not bound to this object.");
 
@@ -762,7 +762,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private void DrainRemainingReceivedData(ClientResponseContext context) {
+		void DrainRemainingReceivedData(ClientResponseContext context) {
 			// Process remaining binaries. This pipeline recursively call this method on other thread.
 			if (!context.NextProcess(context)) {
 				// Draining was not ended. Try to take next bytes.
@@ -876,14 +876,14 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			FinishReceiving(context);
 		}
 
-		private void FinishReceiving(ClientResponseContext context) {
+		void FinishReceiving(ClientResponseContext context) {
 			context.StopWatchTimeout();
 			context.Timeout -= OnReceiveTimeout;
 			Manager.ReturnResponseContext(context);
 			//this.Manager.ReturnTransport( this );
 		}
 
-		private static int? TryDetectMessageId(ClientResponseContext context) {
+		static int? TryDetectMessageId(ClientResponseContext context) {
 			if (context.MessageId != null) {
 				return context.MessageId;
 			}

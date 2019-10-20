@@ -11,10 +11,10 @@ namespace MsgPack.Rpc.Core {
 		// There is NO SPEC for RPC identifiers, so use UAX-31.
 		// See http://www.unicode.org/reports/tr31/
 		// Note that UAX-31 (and CLS) does not allow leading underscore('_') in the identifier.
-		private const string _idStart = @"\p{L}\p{Nl}";
-		private const string _idContinue = @"\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}";
+		const string _idStart = @"\p{L}\p{Nl}";
+		const string _idContinue = @"\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}";
 
-		private static readonly Regex _validIdentififerPattern = new Regex("^[" + _idStart + "]([" + _idContinue + "]*)$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.Singleline);
+		static readonly Regex _validIdentififerPattern = new Regex("^[" + _idStart + "]([" + _idContinue + "]*)$", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture | RegexOptions.Singleline);
 
 		/// <summary>
 		///		Verifies the specified identifier is compliant to MessagePack-RPC spec and returns normalized one.
@@ -45,7 +45,7 @@ namespace MsgPack.Rpc.Core {
 			return normalized;
 		}
 
-		private static string Escape(string identifier) {
+		static string Escape(string identifier) {
 			var buffer = new StringBuilder(identifier.Length);
 			foreach (var c in identifier) {
 				switch (CharUnicodeInfo.GetUnicodeCategory(c)) {

@@ -86,7 +86,7 @@ namespace MsgPack.Rpc.Core {
 	[ContractClassFor(typeof(ObjectPool<>))]
 	internal abstract class ObjectPoolContracts<T> : ObjectPool<T>
 		where T : class {
-		private ObjectPoolContracts() { }
+		ObjectPoolContracts() { }
 
 		protected sealed override T BorrowCore() {
 			Contract.Ensures(Contract.Result<T>() != null);

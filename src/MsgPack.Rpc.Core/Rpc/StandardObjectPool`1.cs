@@ -16,33 +16,33 @@ namespace MsgPack.Rpc.Core {
 	/// </typeparam>
 	internal sealed class StandardObjectPool<T> : ObjectPool<T>
 		where T : class {
-		private static readonly bool isDisposableTInternal = typeof(IDisposable).IsAssignableFrom(typeof(T));
+		static readonly bool isDisposableTInternal = typeof(IDisposable).IsAssignableFrom(typeof(T));
 
 		// name for debugging purpose, explicitly specified, or automatically constructed.
-		private readonly string name;
+		readonly string name;
 
 		internal TraceSource TraceSource { get; }
 
-		private readonly ObjectPoolConfiguration configuration;
+		readonly ObjectPoolConfiguration configuration;
 
-		private int isCorrupted;
-		private bool IsCorrupted => Interlocked.CompareExchange(ref isCorrupted, 0, 0) != 0;
+		int isCorrupted;
+		bool IsCorrupted => Interlocked.CompareExchange(ref isCorrupted, 0, 0) != 0;
 
-		private readonly Func<T> factory;
-		private readonly BlockingCollection<T> pool;
-		private readonly TimeSpan borrowTimeout;
+		readonly Func<T> factory;
+		readonly BlockingCollection<T> pool;
+		readonly TimeSpan borrowTimeout;
 
 		// Debug
 		internal int PooledCount => pool.Count;
 
-		private readonly BlockingCollection<WeakReference> leases;
-		private readonly ReaderWriterLockSlim leasesLock;
+		readonly BlockingCollection<WeakReference> leases;
+		readonly ReaderWriterLockSlim leasesLock;
 
 		internal int LeasedCount => leases.Count;
 
 		// TODO: Timer might be too heavy.
-		private readonly Timer evictionTimer;
-		private readonly int? evictionIntervalMilliseconds;
+		readonly Timer evictionTimer;
+		readonly int? evictionIntervalMilliseconds;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="StandardObjectPool&lt;T&gt;"/> class.
@@ -130,7 +130,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private bool AddToPool(T value, int millisecondsTimeout) {
+		bool AddToPool(T value, int millisecondsTimeout) {
 			var result = false;
 			try { }
 			finally {
@@ -180,17 +180,17 @@ namespace MsgPack.Rpc.Core {
 			base.Dispose(disposing);
 		}
 
-		private void VerifyIsNotCorrupted() {
+		void VerifyIsNotCorrupted() {
 			if (IsCorrupted) {
 				throw new ObjectPoolCorruptedException();
 			}
 		}
 
-		private void SetIsCorrupted() {
+		void SetIsCorrupted() {
 			Interlocked.Exchange(ref isCorrupted, 1);
 		}
 
-		private void OnEvictionTimerElapsed(object state) {
+		void OnEvictionTimerElapsed(object state) {
 			EvictExtraItemsCore(false);
 
 			Contract.Assert(evictionIntervalMilliseconds.HasValue);
@@ -217,7 +217,7 @@ namespace MsgPack.Rpc.Core {
 			EvictExtraItemsCore(true);
 		}
 
-		private void EvictExtraItemsCore(bool isInduced) {
+		void EvictExtraItemsCore(bool isInduced) {
 			var remains = pool.Count - configuration.MinimumReserved;
 			var evicting = remains / 2 + remains % 2;
 			if (evicting > 0) {
@@ -273,7 +273,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private List<T> EvictItems(int count) {
+		List<T> EvictItems(int count) {
 			var disposed = new List<T>(count);
 			for (var i = 0; i < count; i++) {
 				if (!pool.TryTake(out var disposing, 0)) {
@@ -288,7 +288,7 @@ namespace MsgPack.Rpc.Core {
 			return disposed;
 		}
 
-		private void CollectLeases(List<T> disposed) {
+		void CollectLeases(List<T> disposed) {
 			var isSuccess = false;
 			try {
 				leasesLock.EnterWriteLock();
@@ -349,7 +349,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private static T SafeGetTarget(WeakReference item) {
+		static T SafeGetTarget(WeakReference item) {
 			try {
 				return item.Target as T;
 			}
@@ -442,7 +442,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private void TraceBorrow(T result) {
+		void TraceBorrow(T result) {
 			TraceSource.TraceEvent(
 				StandardObjectPoolTrace.BorrowFromPool,
 				"Borrow the value from the pool. {{ \"Name\" : \"{0}\", \"Type\" : \"{1}\", \"HashCode\" : 0x{2:X}, \"Evicted\" : 0x{2:X}, \"Resource\" : \"{3}\", \"HashCodeOfResource\" : 0x{4:X} }}",
@@ -454,7 +454,7 @@ namespace MsgPack.Rpc.Core {
 			);
 		}
 
-		private static void DisposeItem(T item) {
+		static void DisposeItem(T item) {
 			if (isDisposableTInternal) {
 				((IDisposable)item).Dispose();
 			}

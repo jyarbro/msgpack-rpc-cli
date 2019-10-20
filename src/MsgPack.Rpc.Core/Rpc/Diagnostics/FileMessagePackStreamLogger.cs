@@ -17,7 +17,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 	///		</note>
 	/// </remarks>
 	public class FileMessagePackStreamLogger : MessagePackStreamLogger {
-		private static readonly Regex ipAddressEscapingRegex = new Regex(@"[:\./]", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
+		static readonly Regex ipAddressEscapingRegex = new Regex(@"[:\./]", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
 
 		/// <summary>
 		///		Gets the base directory path.
@@ -91,7 +91,7 @@ namespace MsgPack.Rpc.Core.Diagnostics {
 			}
 		}
 
-		private static IEnumerable<T> Skip<T>(IEnumerable<T> source, long count) {
+		static IEnumerable<T> Skip<T>(IEnumerable<T> source, long count) {
 			long index = 0;
 			foreach (var item in source) {
 				if (index >= count) {

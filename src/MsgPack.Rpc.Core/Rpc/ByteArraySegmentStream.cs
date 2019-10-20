@@ -8,10 +8,10 @@ using System.Linq;
 namespace MsgPack.Rpc.Core {
 	[DebuggerTypeProxy(typeof(DebuggerProxy))]
 	internal sealed class ByteArraySegmentStream : Stream {
-		private readonly IList<ArraySegment<byte>> _segments;
+		readonly IList<ArraySegment<byte>> _segments;
 
-		private int _segmentIndex;
-		private int _offsetInCurrentSegment;
+		int _segmentIndex;
+		int _offsetInCurrentSegment;
 
 		public sealed override bool CanRead => true;
 
@@ -21,7 +21,7 @@ namespace MsgPack.Rpc.Core {
 
 		public sealed override long Length => _segments.Sum(item => (long)item.Count);
 
-		private long _position;
+		long _position;
 
 		public sealed override long Position {
 			get {
@@ -89,7 +89,7 @@ namespace MsgPack.Rpc.Core {
 			return _position;
 		}
 
-		private void Seek(long offsetFromCurrent) {
+		void Seek(long offsetFromCurrent) {
 #if DEBUG
 			Contract.Assert(0 <= offsetFromCurrent + _position, offsetFromCurrent + _position + " < 0");
 			Contract.Assert(offsetFromCurrent + _position <= Length, Length + " <= " + offsetFromCurrent + _position);
@@ -207,7 +207,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		internal sealed class DebuggerProxy {
-			private readonly ByteArraySegmentStream _source;
+			readonly ByteArraySegmentStream _source;
 
 			public bool CanSeek => _source.CanSeek;
 

@@ -71,7 +71,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			return source.Task;
 		}
 
-		private void OnCompleted(object sender, SocketAsyncEventArgs e) {
+		void OnCompleted(object sender, SocketAsyncEventArgs e) {
 			var socket = sender as Socket;
 			var userToken = e.UserToken as Tuple<TaskCompletionSource<ClientTransport>, ConnectTimeoutWatcher>;
 			var taskCompletionSource = userToken.Item1;
@@ -106,7 +106,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private void OnConnected(Socket connectSocket, SocketAsyncEventArgs context, TaskCompletionSource<ClientTransport> taskCompletionSource) {
+		void OnConnected(Socket connectSocket, SocketAsyncEventArgs context, TaskCompletionSource<ClientTransport> taskCompletionSource) {
 			try {
 				if (connectSocket == null || !connectSocket.Connected) {
 					// canceled.

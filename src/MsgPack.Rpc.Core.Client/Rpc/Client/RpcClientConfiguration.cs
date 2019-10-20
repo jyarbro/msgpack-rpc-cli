@@ -9,7 +9,7 @@ namespace MsgPack.Rpc.Core.Client {
 	///		Represents client side configuration settings.
 	/// </summary>
 	public sealed partial class RpcClientConfiguration : FreezableObject {
-		private static readonly RpcClientConfiguration _default = new RpcClientConfiguration().Freeze();
+		static readonly RpcClientConfiguration _default = new RpcClientConfiguration().Freeze();
 
 		/// <summary>
 		///		Gets the default frozen instance.

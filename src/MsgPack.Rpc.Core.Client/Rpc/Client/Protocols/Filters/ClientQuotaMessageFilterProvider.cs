@@ -6,7 +6,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 	///		<see cref="QuotaMessageFilterProvider{T}"/> for <see cref="ClientResponseContext"/>.
 	/// </summary>
 	public sealed class ClientQuotaMessageFilterProvider : QuotaMessageFilterProvider<ClientResponseContext> {
-		private readonly ClientQuotaMessageFilter _filterInstance;
+		readonly ClientQuotaMessageFilter _filterInstance;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ClientQuotaMessageFilterProvider"/> class.

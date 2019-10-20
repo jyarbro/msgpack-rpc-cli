@@ -71,7 +71,7 @@ namespace MsgPack.Rpc.Core.Client {
 	///		</note>
 	/// </remarks>
 	public sealed class DynamicRpcProxy : DynamicObject, IDisposable {
-		private readonly RpcClient client;
+		readonly RpcClient client;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="DynamicRpcProxy"/> class.

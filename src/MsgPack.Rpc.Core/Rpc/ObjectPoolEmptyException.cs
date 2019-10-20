@@ -43,6 +43,6 @@ namespace MsgPack.Rpc.Core {
 		///		THe class name is <c>null</c>,
 		///		or <see cref="P:System.Exception.HResult"/> is zero.
 		///	</exception>
-		private ObjectPoolEmptyException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+		ObjectPoolEmptyException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 	}
 }

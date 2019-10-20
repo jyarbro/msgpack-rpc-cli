@@ -8,11 +8,11 @@ namespace MsgPack.Rpc.Core {
 	/// </summary>
 	internal class AsyncResult : IAsyncResult {
 		// State flags
-		private const int _initialized = 0;
-		private const int _completed = 0x100;
-		private const int _completedSynchronously = 0x101;
-		private const int _finished = 0x2;
-		private const int _neverSet = unchecked((int)0x80000000);
+		const int _initialized = 0;
+		const int _completed = 0x100;
+		const int _completedSynchronously = 0x101;
+		const int _finished = 0x2;
+		const int _neverSet = unchecked((int)0x80000000);
 
 		/// <summary>
 		///		Gets an owner of asynchrnous invocation.
@@ -40,7 +40,7 @@ namespace MsgPack.Rpc.Core {
 		/// </value>
 		public object AsyncState { get; }
 
-		private ManualResetEvent _asyncWaitHandle;
+		ManualResetEvent _asyncWaitHandle;
 
 		/// <summary>
 		///		Gets a <see cref="WaitHandle"/> to be used coordinate multiple asynchronous invocation.
@@ -60,7 +60,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		// manipulated via Interlocked methods.
-		private int _state;
+		int _state;
 
 		bool IAsyncResult.CompletedSynchronously => (_state & _completedSynchronously) == _completedSynchronously;
 
@@ -80,7 +80,7 @@ namespace MsgPack.Rpc.Core {
 		/// </value>
 		public bool IsFinished => (_state & _finished) == _finished;
 
-		private Exception _error;
+		Exception _error;
 
 		/// <summary>
 		///		Gets an error corresponds to this message.

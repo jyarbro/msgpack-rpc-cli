@@ -6,7 +6,7 @@ namespace MsgPack.Rpc.Core {
 	///		The standard implementation of the <see cref="IFreezable"/> interface.
 	/// </summary>
 	public abstract class FreezableObject : IFreezable, ICloneable {
-		private int _isFrozen;
+		int _isFrozen;
 
 		/// <summary>
 		///		Gets a value indicating whether this instance is frozen.

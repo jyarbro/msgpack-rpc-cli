@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace MsgPack.Rpc.Core.Client {
 	internal static class FileSystem {
-		private static readonly Regex _invalidPathChars =
+		static readonly Regex _invalidPathChars =
 			new Regex(
 				"[" + Regex.Escape(string.Join(string.Empty, Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).Distinct())) + "]",
 				 RegexOptions.Compiled |

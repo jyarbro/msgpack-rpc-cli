@@ -25,9 +25,9 @@ namespace MsgPack.Rpc.Core.Protocols {
 
 		#region -- Session Management --
 
-		private static long lastSessionId;
+		static long lastSessionId;
 
-		private long sessionId;
+		long sessionId;
 
 		/// <summary>
 		///		Gets the ID of the session.
@@ -90,7 +90,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 
 		#region -- Transport --
 
-		private IContextBoundableTransport boundTransport;
+		IContextBoundableTransport boundTransport;
 
 		/// <summary>
 		///		Gets the bound <see cref="IContextBoundableTransport"/>.
@@ -114,8 +114,8 @@ namespace MsgPack.Rpc.Core.Protocols {
 			SocketContext.Completed += transport.OnSocketOperationCompleted;
 		}
 
-		private readonly TimeoutWatcher timeoutWatcher;
-		private int isTimeout;
+		readonly TimeoutWatcher timeoutWatcher;
+		int isTimeout;
 
 		/// <summary>
 		///		Gets a value indicating whether the watched operation is timed out.
@@ -130,7 +130,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 		/// </summary>
 		internal event EventHandler Timeout;
 
-		private void OnTimeout() {
+		void OnTimeout() {
 			Interlocked.Exchange(ref isTimeout, 1);
 
 			Timeout?.Invoke(this, EventArgs.Empty);
@@ -140,7 +140,7 @@ namespace MsgPack.Rpc.Core.Protocols {
 
 		#region -- Communication --
 
-		private int? bytesTransferred;
+		int? bytesTransferred;
 
 		/// <summary>
 		///		Gets the bytes count of transferred data.

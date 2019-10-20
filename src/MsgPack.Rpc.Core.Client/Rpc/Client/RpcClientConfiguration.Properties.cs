@@ -8,7 +8,7 @@ namespace MsgPack.Rpc.Core.Client {
 	// Do not modify this file. Edit RpcClientConfiguration.tt instead.
 
 	partial class RpcClientConfiguration {
-		private bool _preferIPv4 = false;
+		bool _preferIPv4 = false;
 
 		/// <summary>
 		/// 	Gets or sets whether use IP v4 even when IP v6 is supported.
@@ -37,7 +37,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoercePreferIPv4Value(ref bool value);
 
-		private int _minimumConcurrentRequest = 2;
+		int _minimumConcurrentRequest = 2;
 
 		/// <summary>
 		/// 	Gets or sets the minimum concurrency for the each clients.
@@ -74,7 +74,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceMinimumConcurrentRequestValue(ref int value);
 
-		private int _maximumConcurrentRequest = 10;
+		int _maximumConcurrentRequest = 10;
 
 		/// <summary>
 		/// 	Gets or sets the maximum concurrency for the each clients.
@@ -111,7 +111,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceMaximumConcurrentRequestValue(ref int value);
 
-		private TimeSpan? _connectTimeout = TimeSpan.FromSeconds(120);
+		TimeSpan? _connectTimeout = TimeSpan.FromSeconds(120);
 
 		/// <summary>
 		/// 	Gets or sets the timeout value to connect.
@@ -148,7 +148,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceConnectTimeoutValue(ref TimeSpan? value);
 
-		private TimeSpan? _waitTimeout = TimeSpan.FromSeconds(120);
+		TimeSpan? _waitTimeout = TimeSpan.FromSeconds(120);
 
 		/// <summary>
 		/// 	Gets or sets the timeout value to wait response.
@@ -185,7 +185,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceWaitTimeoutValue(ref TimeSpan? value);
 
-		private Func<RpcClientConfiguration, ClientTransportManager> _transportManagerProvider = (configuration) => new TcpClientTransportManager(configuration);
+		Func<RpcClientConfiguration, ClientTransportManager> _transportManagerProvider = (configuration) => new TcpClientTransportManager(configuration);
 
 		/// <summary>
 		/// 	Gets or sets the factory function which creates new <see cref="ClientTransportManager" />.
@@ -222,7 +222,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceTransportManagerProviderValue(ref Func<RpcClientConfiguration, ClientTransportManager> value);
 
-		private int _initialMethodNameBufferLength = 256;
+		int _initialMethodNameBufferLength = 256;
 
 		/// <summary>
 		/// 	Gets or sets the initial buffer size to pack method name.
@@ -251,7 +251,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceInitialMethodNameBufferLengthValue(ref int value);
 
-		private int _initialArgumentsBufferLength = 65536;
+		int _initialArgumentsBufferLength = 65536;
 
 		/// <summary>
 		/// 	Gets or sets the initial buffer size to pack arguments.
@@ -280,7 +280,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceInitialArgumentsBufferLengthValue(ref int value);
 
-		private int _initialReceiveBufferLength = 65536;
+		int _initialReceiveBufferLength = 65536;
 
 		/// <summary>
 		/// 	Gets or sets the initial buffer size to receive packets.
@@ -309,7 +309,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceInitialReceiveBufferLengthValue(ref int value);
 
-		private bool _dumpCorruptResponse = false;
+		bool _dumpCorruptResponse = false;
 
 		/// <summary>
 		/// 	Gets or sets the value whether transport should dump invalid response stream for debugging purposes.
@@ -338,7 +338,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceDumpCorruptResponseValue(ref bool value);
 
-		private string _corruptResponseDumpOutputDirectory = null;
+		string _corruptResponseDumpOutputDirectory = null;
 
 		/// <summary>
 		/// 	Gets or sets the directory path the corrupt response dump file is created.
@@ -372,7 +372,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceCorruptResponseDumpOutputDirectoryValue(ref string value);
 
-		private Func<Func<ClientRequestContext>, ObjectPoolConfiguration, ObjectPool<ClientRequestContext>> _requestContextPoolProvider = (factory, configuration) => new StandardObjectPool<ClientRequestContext>(factory, configuration);
+		Func<Func<ClientRequestContext>, ObjectPoolConfiguration, ObjectPool<ClientRequestContext>> _requestContextPoolProvider = (factory, configuration) => new StandardObjectPool<ClientRequestContext>(factory, configuration);
 
 		/// <summary>
 		/// 	Gets or sets the factory function which creates new <see cref="ObjectPool{T}" /> of <see cref="ClientRequestContext" />.
@@ -409,7 +409,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceRequestContextPoolProviderValue(ref Func<Func<ClientRequestContext>, ObjectPoolConfiguration, ObjectPool<ClientRequestContext>> value);
 
-		private Func<Func<ClientResponseContext>, ObjectPoolConfiguration, ObjectPool<ClientResponseContext>> _responseContextPoolProvider = (factory, configuration) => new StandardObjectPool<ClientResponseContext>(factory, configuration);
+		Func<Func<ClientResponseContext>, ObjectPoolConfiguration, ObjectPool<ClientResponseContext>> _responseContextPoolProvider = (factory, configuration) => new StandardObjectPool<ClientResponseContext>(factory, configuration);
 
 		/// <summary>
 		/// 	Gets or sets the factory function which creates new <see cref="ObjectPool{T}" /> of <see cref="ClientResponseContext" />.
@@ -446,7 +446,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceResponseContextPoolProviderValue(ref Func<Func<ClientResponseContext>, ObjectPoolConfiguration, ObjectPool<ClientResponseContext>> value);
 
-		private Func<Func<TcpClientTransport>, ObjectPoolConfiguration, ObjectPool<TcpClientTransport>> _tcpTransportPoolProvider = (factory, configuration) => new StandardObjectPool<TcpClientTransport>(factory, configuration);
+		Func<Func<TcpClientTransport>, ObjectPoolConfiguration, ObjectPool<TcpClientTransport>> _tcpTransportPoolProvider = (factory, configuration) => new StandardObjectPool<TcpClientTransport>(factory, configuration);
 
 		/// <summary>
 		/// 	Gets or sets the factory function which creates new <see cref="ObjectPool{T}" /> of <see cref="TcpClientTransport" />.
@@ -483,7 +483,7 @@ namespace MsgPack.Rpc.Core.Client {
 
 		static partial void CoerceTcpTransportPoolProviderValue(ref Func<Func<TcpClientTransport>, ObjectPoolConfiguration, ObjectPool<TcpClientTransport>> value);
 
-		private Func<Func<UdpClientTransport>, ObjectPoolConfiguration, ObjectPool<UdpClientTransport>> _udpTransportPoolProvider = (factory, configuration) => new StandardObjectPool<UdpClientTransport>(factory, configuration);
+		Func<Func<UdpClientTransport>, ObjectPoolConfiguration, ObjectPool<UdpClientTransport>> _udpTransportPoolProvider = (factory, configuration) => new StandardObjectPool<UdpClientTransport>(factory, configuration);
 
 		/// <summary>
 		/// 	Gets or sets the factory function which creates new <see cref="ObjectPool{T}" /> of <see cref="UdpClientTransport" />.
@@ -577,7 +577,7 @@ namespace MsgPack.Rpc.Core.Client {
 			return buffer.ToString();
 		}
 
-		private static void ToString<T>(T value, StringBuilder buffer) {
+		static void ToString<T>(T value, StringBuilder buffer) {
 			if (value == null) {
 				buffer.Append("null");
 			}

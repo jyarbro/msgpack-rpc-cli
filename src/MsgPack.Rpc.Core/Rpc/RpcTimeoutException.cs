@@ -9,7 +9,7 @@ namespace MsgPack.Rpc.Core {
 	/// </summary>
 	[Serializable]
 	public sealed class RpcTimeoutException : RpcException {
-		private const string _clientTimeoutKey = "ClientTimeout";
+		const string _clientTimeoutKey = "ClientTimeout";
 		internal static readonly MessagePackObject ClientTimeoutKeyUtf8 = MessagePackConvert.EncodeString(_clientTimeoutKey);
 
 		/// <summary>
@@ -127,7 +127,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		[Serializable]
-		private sealed class SerializedState : ISafeSerializationData {
+		sealed class SerializedState : ISafeSerializationData {
 			public TimeSpan? ClientTimeout;
 
 			public void CompleteDeserialization(object deserialized) {

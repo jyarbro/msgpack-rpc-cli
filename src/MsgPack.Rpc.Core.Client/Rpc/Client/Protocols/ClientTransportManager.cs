@@ -11,7 +11,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 	///		Defines non-generic interface of <see cref="ClientTransportManager{T}"/> and provides related features.
 	/// </summary>
 	public abstract class ClientTransportManager : IDisposable {
-		private readonly ObjectPool<ClientRequestContext> requestContextPool;
+		readonly ObjectPool<ClientRequestContext> requestContextPool;
 
 		/// <summary>
 		///		Gets the <see cref="ObjectPool{T}"/> of <see cref="ClientRequestContext"/>.
@@ -28,7 +28,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private readonly ObjectPool<ClientResponseContext> responseContextPool;
+		readonly ObjectPool<ClientResponseContext> responseContextPool;
 
 		/// <summary>
 		///		Gets the <see cref="ObjectPool{T}"/> of <see cref="ClientResponseContext"/>.
@@ -45,7 +45,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private readonly RpcClientConfiguration configuration;
+		readonly RpcClientConfiguration configuration;
 
 		/// <summary>
 		///		Gets the <see cref="RpcClientConfiguration"/> which describes transport configuration.
@@ -62,7 +62,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private int isDisposed;
+		int isDisposed;
 
 		/// <summary>
 		///		Gets a value indicating whether this instance is disposed.
@@ -72,7 +72,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </value>
 		public bool IsDisposed => Interlocked.CompareExchange(ref isDisposed, 0, 0) != 0;
 
-		private int isInShutdown;
+		int isInShutdown;
 
 		/// <summary>
 		///		Gets a value indicating whether this instance is in shutdown.
@@ -82,7 +82,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </value>
 		public bool IsInShutdown => Interlocked.CompareExchange(ref isInShutdown, 0, 0) != 0;
 
-		private EventHandler<ShutdownCompletedEventArgs> shutdownCompleted;
+		EventHandler<ShutdownCompletedEventArgs> shutdownCompleted;
 
 		/// <summary>
 		///		Occurs when client shutdown is completed.
@@ -406,14 +406,14 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private sealed class NullConnectTimeoutWatcher : ConnectTimeoutWatcher {
+		sealed class NullConnectTimeoutWatcher : ConnectTimeoutWatcher {
 			public static readonly NullConnectTimeoutWatcher Instance = new NullConnectTimeoutWatcher();
 
-			private NullConnectTimeoutWatcher() { }
+			NullConnectTimeoutWatcher() { }
 		}
 
-		private sealed class DefaultConnectTimeoutWatcher : ConnectTimeoutWatcher {
-			private readonly TimeoutWatcher watcher;
+		sealed class DefaultConnectTimeoutWatcher : ConnectTimeoutWatcher {
+			readonly TimeoutWatcher watcher;
 
 			public DefaultConnectTimeoutWatcher(TimeSpan timeout, Action onTimeout) {
 				var watcher = new TimeoutWatcher();

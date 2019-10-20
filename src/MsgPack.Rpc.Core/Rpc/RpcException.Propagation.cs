@@ -10,7 +10,7 @@ using System.Security;
 
 namespace MsgPack.Rpc.Core {
 	partial class RpcException {
-		private static readonly MethodInfo safeGetHRFromExceptionMethod = typeof(RpcException).GetMethod("SafeGetHRFromException", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+		static readonly MethodInfo safeGetHRFromExceptionMethod = typeof(RpcException).GetMethod("SafeGetHRFromException", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 
 		/// <summary>
 		///		Initialize new instance with unpacked data.
@@ -47,10 +47,10 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		// NOT readonly for safe-deserialization
-		private RemoteExceptionInformation[] remoteExceptions;
+		RemoteExceptionInformation[] remoteExceptions;
 
 		[Serializable]
-		private sealed class RemoteExceptionInformation {
+		sealed class RemoteExceptionInformation {
 			public readonly int Hop;
 			public readonly string TypeName;
 			public readonly int HResult;
@@ -73,7 +73,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		[Serializable]
-		private sealed class RemoteStackFrame {
+		sealed class RemoteStackFrame {
 			public readonly string MethodSignature;
 			public readonly int ILOffset;
 			public readonly int NativeOffset;
@@ -110,8 +110,8 @@ namespace MsgPack.Rpc.Core {
 
 		internal static readonly MessagePackObject messageKeyUtf8 = MessagePackConvert.EncodeString("Message");
 		internal static readonly MessagePackObject debugInformationKeyUtf8 = MessagePackConvert.EncodeString("DebugInformation");
-		private static readonly MessagePackObject errorCodeUtf8 = MessagePackConvert.EncodeString("ErrorCode");
-		private static readonly MessagePackObject remoteExceptionsUtf8 = MessagePackConvert.EncodeString("RemoteExceptions");
+		static readonly MessagePackObject errorCodeUtf8 = MessagePackConvert.EncodeString("ErrorCode");
+		static readonly MessagePackObject remoteExceptionsUtf8 = MessagePackConvert.EncodeString("RemoteExceptions");
 
 		/// <summary>
 		///		Get <see cref="MessagePackObject"/> which contains data about this instance.
@@ -214,12 +214,12 @@ namespace MsgPack.Rpc.Core {
 
 		}
 
-		private static MessagePackObject ToStackFrameMethodSignature(MethodBase methodBase) {
+		static MessagePackObject ToStackFrameMethodSignature(MethodBase methodBase) {
 			return string.Concat(methodBase.DeclaringType.FullName, ".", methodBase.Name, "(", string.Join(", ", methodBase.GetParameters().Select(p => p.ParameterType.FullName)), ")");
 		}
 
 		[SecuritySafeCritical]
-		private static int SafeGetHRFromException(Exception exception) {
+		static int SafeGetHRFromException(Exception exception) {
 			if (exception is ExternalException asExternalException) {
 				// ExternalException.ErrorCode is SecuritySafeCritical and its assembly must be fully trusted.
 				return asExternalException.ErrorCode;

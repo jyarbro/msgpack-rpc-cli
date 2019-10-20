@@ -6,7 +6,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			Source.TraceEvent(GetTypeForRpcError(rpcError), GetIdForRpcError(rpcError), format, args);
 		}
 
-		private static TraceEventType GetTypeForRpcError(RpcError rpcError) {
+		static TraceEventType GetTypeForRpcError(RpcError rpcError) {
 			if (0 < rpcError.ErrorCode || rpcError.ErrorCode == -31) {
 				return TraceEventType.Warning;
 			}
@@ -26,7 +26,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			}
 		}
 
-		private static int GetIdForRpcError(RpcError rpcError) {
+		static int GetIdForRpcError(RpcError rpcError) {
 			if (0 < rpcError.ErrorCode) {
 				return 20000;
 			}

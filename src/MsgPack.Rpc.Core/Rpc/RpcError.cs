@@ -15,7 +15,7 @@ namespace MsgPack.Rpc.Core {
 	public sealed class RpcError {
 		#region -- Built-in Errors --
 
-		private static readonly RpcError timeoutError =
+		static readonly RpcError timeoutError =
 			new RpcError(
 				"RPCError.TimeoutError",
 				-60,
@@ -38,7 +38,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private static readonly RpcError transportError =
+		static readonly RpcError transportError =
 			new RpcError(
 				"RPCError.ClientError.TransportError",
 				-50,
@@ -61,7 +61,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError networkUnreacheableError =
+		static readonly RpcError networkUnreacheableError =
 			new RpcError(
 				"RPCError.ClientError.TranportError.NetworkUnreacheableError",
 				-51,
@@ -84,7 +84,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError connectionRefusedError =
+		static readonly RpcError connectionRefusedError =
 			new RpcError(
 				"RPCError.ClientError.TranportError.ConnectionRefusedError",
 				-52,
@@ -108,7 +108,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError connectionTimeoutError =
+		static readonly RpcError connectionTimeoutError =
 			new RpcError(
 				"RPCError.ClientError.TranportError.ConnectionTimeoutError",
 				-53,
@@ -132,7 +132,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError messageRefusedError =
+		static readonly RpcError messageRefusedError =
 			new RpcError(
 				"RPCError.ClientError.MessageRefusedError",
 				-40,
@@ -181,7 +181,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError messageTooLargeError =
+		static readonly RpcError messageTooLargeError =
 			new RpcError(
 				"RPCError.ClientError.MessageRefusedError.MessageTooLargeError",
 				-41, "Message is too large.",
@@ -221,7 +221,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError callError =
+		static readonly RpcError callError =
 			new RpcError(
 				"RPCError.ClientError.CallError",
 				-20,
@@ -244,7 +244,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError noMethodError =
+		static readonly RpcError noMethodError =
 			new RpcError(
 				"RPCError.ClientError.CallError.NoMethodError",
 				-21,
@@ -267,7 +267,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError argumentError =
+		static readonly RpcError argumentError =
 			new RpcError(
 				"RPCError.ClientError.CallError.ArgumentError",
 				-22,
@@ -290,7 +290,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError serverError =
+		static readonly RpcError serverError =
 			new RpcError(
 				"RPCError.ServerError",
 				-30,
@@ -313,7 +313,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError serverBusyError =
+		static readonly RpcError serverBusyError =
 			new RpcError(
 				"RPCError.ServerError.ServerBusyError",
 				-31,
@@ -336,7 +336,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly RpcError remoteRuntimeError =
+		static readonly RpcError remoteRuntimeError =
 			new RpcError(
 				"RPCError.RemoteRuntimeError",
 				-10,
@@ -360,10 +360,10 @@ namespace MsgPack.Rpc.Core {
 
 		#endregion -- Built-in Errors --
 
-		private const string unexpectedErrorIdentifier = "RPCError.RemoteError.UnexpectedError";
-		private const int unexpectedErrorCode = int.MaxValue;
+		const string unexpectedErrorIdentifier = "RPCError.RemoteError.UnexpectedError";
+		const int unexpectedErrorCode = int.MaxValue;
 
-		private static readonly RpcError unexpected =
+		static readonly RpcError unexpected =
 			new RpcError(
 				unexpectedErrorIdentifier,
 				unexpectedErrorCode,
@@ -389,8 +389,8 @@ namespace MsgPack.Rpc.Core {
 		}
 
 
-		private static readonly Dictionary<string, RpcError> identifierDictionary = new Dictionary<string, RpcError>();
-		private static readonly Dictionary<int, RpcError> errorCodeDictionary = new Dictionary<int, RpcError>();
+		static readonly Dictionary<string, RpcError> identifierDictionary = new Dictionary<string, RpcError>();
+		static readonly Dictionary<int, RpcError> errorCodeDictionary = new Dictionary<int, RpcError>();
 
 		static RpcError() {
 			foreach (FieldInfo field in
@@ -447,9 +447,9 @@ namespace MsgPack.Rpc.Core {
 				// TODO: localization key: Idnentifier ".DefaultMessage"
 				DefaultMessageInvariant;
 
-		private readonly Func<RpcError, MessagePackObject, RpcException> exceptionUnmarshaler;
+		readonly Func<RpcError, MessagePackObject, RpcException> exceptionUnmarshaler;
 
-		private RpcError(string identifier, int errorCode, string defaultMessageInvariant, Func<RpcError, MessagePackObject, RpcException> exceptionUnmarshaler) {
+		RpcError(string identifier, int errorCode, string defaultMessageInvariant, Func<RpcError, MessagePackObject, RpcException> exceptionUnmarshaler) {
 			Identifier = identifier;
 			ErrorCode = errorCode;
 			DefaultMessageInvariant = defaultMessageInvariant;

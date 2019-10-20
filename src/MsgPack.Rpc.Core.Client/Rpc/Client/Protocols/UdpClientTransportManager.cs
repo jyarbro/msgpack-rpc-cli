@@ -34,7 +34,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			return task;
 		}
 
-		private UdpClientTransport CreateTransport(object state) {
+		UdpClientTransport CreateTransport(object state) {
 			var socket =
 				new Socket(
 					(Configuration.PreferIPv4 || !Socket.OSSupportsIPv6) ? AddressFamily.InterNetwork : AddressFamily.InterNetworkV6,

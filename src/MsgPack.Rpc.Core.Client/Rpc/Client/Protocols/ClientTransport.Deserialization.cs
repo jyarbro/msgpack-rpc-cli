@@ -58,7 +58,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		<c>true</c>, if the pipeline is finished;
 		///		<c>false</c>, the pipeline is interruppted because extra data is needed.
 		/// </returns>
-		private bool UnpackMessageType(ClientResponseContext context) {
+		bool UnpackMessageType(ClientResponseContext context) {
 			if (!context.ReadFromHeaderUnpacker()) {
 				MsgPackRpcClientProtocolsTrace.TraceEvent(MsgPackRpcClientProtocolsTrace.NeedMessageType, "Message Type is needed. {{ \"SessionID\" : {0} }}", context.SessionId);
 				return false;
@@ -96,7 +96,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		<c>true</c>, if the pipeline is finished;
 		///		<c>false</c>, the pipeline is interruppted because extra data is needed.
 		/// </returns>
-		private bool UnpackMessageId(ClientResponseContext context) {
+		bool UnpackMessageId(ClientResponseContext context) {
 			if (!context.ReadFromHeaderUnpacker()) {
 				MsgPackRpcClientProtocolsTrace.TraceEvent(MsgPackRpcClientProtocolsTrace.NeedMessageId, "Message ID is needed. {{ \"SessionID\" : {0} }}", context.SessionId);
 				return false;
@@ -126,7 +126,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		<c>true</c>, if the pipeline is finished;
 		///		<c>false</c>, the pipeline is interruppted because extra data is needed.
 		/// </returns>
-		private bool UnpackError(ClientResponseContext context) {
+		bool UnpackError(ClientResponseContext context) {
 			Contract.Assert(context.UnpackingBuffer.CanSeek);
 			if (context.ErrorStartAt == -1) {
 				context.ErrorStartAt = context.UnpackingBuffer.Position;
@@ -152,7 +152,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		<c>true</c>, if the pipeline is finished;
 		///		<c>false</c>, the pipeline is interruppted because extra data is needed.
 		/// </returns>
-		private bool UnpackResult(ClientResponseContext context) {
+		bool UnpackResult(ClientResponseContext context) {
 			Contract.Assert(context.UnpackingBuffer.CanSeek);
 			if (context.ResultStartAt == -1) {
 				context.ResultStartAt = context.UnpackingBuffer.Position;
@@ -178,7 +178,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		<c>true</c>, if the pipeline is finished;
 		///		<c>false</c>, the pipeline is interruppted because extra data is needed.
 		/// </returns>
-		private bool Dispatch(ClientResponseContext context) {
+		bool Dispatch(ClientResponseContext context) {
 			Contract.Assert(context.MessageId != null);
 
 			try {

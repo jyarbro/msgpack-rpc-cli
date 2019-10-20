@@ -6,7 +6,7 @@ namespace MsgPack.Rpc.Core.StandardObjectPoolTracing {
 	/// 	Defines trace for MsgPack.Rpc.Core.StandardObjectPoolTracing namespace.
 	/// </summary>
 	internal static partial class StandardObjectPoolTrace {
-		private static readonly Dictionary<MessageId, TraceEventType> _typeTable =
+		static readonly Dictionary<MessageId, TraceEventType> _typeTable =
 			new Dictionary<MessageId, TraceEventType>(18)
 			{
 				{ MessageId.InitializedWithDefaultConfiguration, TraceEventType.Verbose },

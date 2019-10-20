@@ -8,7 +8,7 @@ namespace MsgPack.Rpc.Core {
 	// Do not modify this file. Edit ObjectPoolConfiguration.tt instead.
 
 	partial class ObjectPoolConfiguration {
-		private string _name = null;
+		string _name = null;
 
 		/// <summary>
 		/// 	Gets or sets the name of the pool for debugging.
@@ -37,7 +37,7 @@ namespace MsgPack.Rpc.Core {
 
 		static partial void CoerceNameValue(ref string value);
 
-		private int _minimumReserved = 1;
+		int _minimumReserved = 1;
 
 		/// <summary>
 		/// 	Gets or sets the minimum reserved object count in the pool.
@@ -74,7 +74,7 @@ namespace MsgPack.Rpc.Core {
 
 		static partial void CoerceMinimumReservedValue(ref int value);
 
-		private int? _maximumPooled = null;
+		int? _maximumPooled = null;
 
 		/// <summary>
 		/// 	Gets or sets the maximum poolable objects count.
@@ -111,7 +111,7 @@ namespace MsgPack.Rpc.Core {
 
 		static partial void CoerceMaximumPooledValue(ref int? value);
 
-		private ExhausionPolicy _exhausionPolicy = ExhausionPolicy.BlockUntilAvailable;
+		ExhausionPolicy _exhausionPolicy = ExhausionPolicy.BlockUntilAvailable;
 
 		/// <summary>
 		/// 	Gets or sets the exhausion policy of the pool.
@@ -148,7 +148,7 @@ namespace MsgPack.Rpc.Core {
 
 		static partial void CoerceExhausionPolicyValue(ref ExhausionPolicy value);
 
-		private TimeSpan? _borrowTimeout = null;
+		TimeSpan? _borrowTimeout = null;
 
 		/// <summary>
 		/// 	Gets or sets the maximum concurrency for the each clients.
@@ -185,7 +185,7 @@ namespace MsgPack.Rpc.Core {
 
 		static partial void CoerceBorrowTimeoutValue(ref TimeSpan? value);
 
-		private TimeSpan? _evitionInterval = TimeSpan.FromMinutes(3);
+		TimeSpan? _evitionInterval = TimeSpan.FromMinutes(3);
 
 		/// <summary>
 		/// 	Gets or sets the interval to evict extra pooled objects.
@@ -252,7 +252,7 @@ namespace MsgPack.Rpc.Core {
 			return buffer.ToString();
 		}
 
-		private static void ToString<T>(T value, StringBuilder buffer) {
+		static void ToString<T>(T value, StringBuilder buffer) {
 			if (value == null) {
 				buffer.Append("null");
 			}

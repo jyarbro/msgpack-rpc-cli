@@ -11,8 +11,8 @@ namespace MsgPack.Rpc.Core.Client {
 	///		Entry point of MessagePack-RPC client.
 	/// </summary>
 	public sealed class RpcClient : IDisposable {
-		private static int messageIdGenerator;
-		private static int NextId() {
+		static int messageIdGenerator;
+		static int NextId() {
 			return Interlocked.Increment(ref messageIdGenerator);
 		}
 
@@ -20,11 +20,11 @@ namespace MsgPack.Rpc.Core.Client {
 
 		internal ClientTransportManager TransportManager { get; }
 
-		private ClientTransport transport;
+		ClientTransport transport;
 
 		internal ClientTransport Transport => transport;
 
-		private TaskCompletionSource<object> transportShutdownCompletionSource;
+		TaskCompletionSource<object> transportShutdownCompletionSource;
 
 		/// <summary>
 		///		Gets a value indicating whether this instance is connected to the server.
@@ -34,7 +34,7 @@ namespace MsgPack.Rpc.Core.Client {
 		/// </value>
 		public bool IsConnected => Interlocked.CompareExchange(ref transport, null, null) != null;
 
-		private Task<ClientTransport> connectTask;
+		Task<ClientTransport> connectTask;
 
 		internal void EnsureConnected() {
 			var task = Interlocked.CompareExchange(ref connectTask, null, null);
@@ -45,7 +45,7 @@ namespace MsgPack.Rpc.Core.Client {
 			}
 		}
 
-		private bool isDisposed;
+		bool isDisposed;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="RpcClient"/> class.
@@ -128,7 +128,7 @@ namespace MsgPack.Rpc.Core.Client {
 			TransportManager.Dispose();
 		}
 
-		private void VerifyIsNotDisposed() {
+		void VerifyIsNotDisposed() {
 			if (isDisposed) {
 				throw new ObjectDisposedException(ToString());
 			}
@@ -169,7 +169,7 @@ namespace MsgPack.Rpc.Core.Client {
 			return taskCompletionSource.Task;
 		}
 
-		private void OnTranportShutdownComplete(object sender, EventArgs e) {
+		void OnTranportShutdownComplete(object sender, EventArgs e) {
 			var taskCompletionSource = Interlocked.CompareExchange(ref transportShutdownCompletionSource, null, transportShutdownCompletionSource);
 			if (taskCompletionSource != null) {
 				var transport = sender as ClientTransport;

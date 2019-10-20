@@ -7,7 +7,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols.Filters {
 	///		<see cref="StreamLoggingMessageFilterProvider{T}"/> for <see cref="ClientResponseContext"/>.
 	/// </summary>
 	public sealed class ClientStreamLoggingMessageFilterProvider : StreamLoggingMessageFilterProvider<ClientResponseContext> {
-		private readonly ClientStreamLoggingMessageFilter filterInstance;
+		readonly ClientStreamLoggingMessageFilter filterInstance;
 
 		/// <summary>
 		///		Initializes a new instance of the <see cref="ClientStreamLoggingMessageFilterProvider"/> class.

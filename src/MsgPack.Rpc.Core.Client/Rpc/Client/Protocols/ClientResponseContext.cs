@@ -59,7 +59,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			return SkipHeader(ErrorStartAt);
 		}
 
-		private long? SkipHeader(long origin) {
+		long? SkipHeader(long origin) {
 			var result = HeaderUnpacker.Skip();
 			if (result == null) {
 				// Revert buffer position to handle next attempt.
@@ -80,7 +80,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			base.SetTransport(transport);
 		}
 
-		private static bool InvalidFlow(ClientResponseContext context) {
+		static bool InvalidFlow(ClientResponseContext context) {
 			throw new InvalidOperationException("Invalid state transition.");
 		}
 

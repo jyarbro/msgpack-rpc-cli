@@ -64,7 +64,7 @@ namespace MsgPack.Rpc.Core {
 		///		Build exception message to specified buffer.
 		/// </summary>
 		/// <param name="stringBuilder">Buffer.</param>
-		private void BuildExceptionMessage(StringBuilder stringBuilder) {
+		void BuildExceptionMessage(StringBuilder stringBuilder) {
 			stringBuilder.Append(GetType().FullName).Append(": ").Append(Message);
 
 			if (InnerException != null) {
@@ -94,7 +94,7 @@ namespace MsgPack.Rpc.Core {
 		///		Build stack trace string to specified buffer.
 		/// </summary>
 		/// <param name="stringBuilder">Buffer.</param>
-		private void BuildExceptionStackTrace(StringBuilder stringBuilder) {
+		void BuildExceptionStackTrace(StringBuilder stringBuilder) {
 			if (InnerException != null) {
 				Contract.Assert(remoteExceptions == null);
 
@@ -140,7 +140,7 @@ namespace MsgPack.Rpc.Core {
 		/// </summary>
 		/// <param name="target">Exception which is source of stack trace.</param>
 		/// <param name="stringBuilder">Buffer.</param>
-		private static void BuildGeneralStackTrace(Exception target, StringBuilder stringBuilder) {
+		static void BuildGeneralStackTrace(Exception target, StringBuilder stringBuilder) {
 			stringBuilder.Append(target.StackTrace);
 		}
 
@@ -149,7 +149,7 @@ namespace MsgPack.Rpc.Core {
 		/// </summary>
 		/// <param name="frame">Stack frame to write.</param>
 		/// <param name="stringBuilder">Buffer.</param>
-		private static void WriteStackFrame(RemoteStackFrame frame, StringBuilder stringBuilder) {
+		static void WriteStackFrame(RemoteStackFrame frame, StringBuilder stringBuilder) {
 			const string stackFrameTemplateWithFileInfo = "   at {0} in {1}:line {2}";
 			const string stackFrameTemplateWithoutFileInfo = "   at {0}";
 			if (frame.FileName != null) {

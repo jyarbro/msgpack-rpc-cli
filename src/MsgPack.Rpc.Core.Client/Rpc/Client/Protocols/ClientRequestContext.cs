@@ -12,22 +12,22 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// <summary>
 		///		Constant part of the request header.
 		/// </summary>
-		private static readonly ArraySegment<byte> requestHeader =
+		static readonly ArraySegment<byte> requestHeader =
 			new ArraySegment<byte>(new byte[] { 0x94, 0x00 }); // [FixArray4], [Request:0]
 
 		/// <summary>
 		///		Constant part of the request header.
 		/// </summary>
-		private static readonly ArraySegment<byte> notificationHeader =
+		static readonly ArraySegment<byte> notificationHeader =
 			new ArraySegment<byte>(new byte[] { 0x94, 0x02 }); // [FixArray4], [Notification:2]
 
 		/// <summary>
 		///		Empty array of <see cref="ArraySegment{T}"/> of <see cref="byte"/>.
 		/// </summary>
-		private static readonly ArraySegment<byte> emptyBuffer =
+		static readonly ArraySegment<byte> emptyBuffer =
 			new ArraySegment<byte>(Array.Empty<byte>(), 0, 0);
 
-		private MessageType messageType;
+		MessageType messageType;
 
 		/// <summary>
 		///		Gets the type of the message.
@@ -71,13 +71,13 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		///		The reusable buffer to pack method name.
 		///		This value will not be <c>null</c>.
 		/// </summary>
-		private readonly MemoryStream methodNameBuffer;
+		readonly MemoryStream methodNameBuffer;
 
 		/// <summary>
 		///		The reusable buffer to pack arguments.
 		///		This value will not be <c>null</c>.
 		/// </summary>
-		private readonly MemoryStream argumentsBuffer;
+		readonly MemoryStream argumentsBuffer;
 
 		/// <summary>
 		///		The resusable buffer to hold sending response data.
@@ -147,7 +147,7 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 		/// </remarks>
 		public Action<ClientResponseContext, Exception, bool> RequestCompletionCallback { get; private set; }
 
-		private readonly Stopwatch stopwatch;
+		readonly Stopwatch stopwatch;
 
 		internal TimeSpan ElapsedTime => stopwatch.Elapsed;
 

@@ -11,7 +11,7 @@ namespace MsgPack.Rpc.Core {
 	[Serializable]
 	public sealed class UnexpectedRpcException : RpcException {
 		// NOT readonly for safe deserialization
-		private MessagePackObject error;
+		MessagePackObject error;
 
 		/// <summary>
 		///		Get the value of error field of response.
@@ -23,7 +23,7 @@ namespace MsgPack.Rpc.Core {
 		public MessagePackObject Error => error;
 
 		// NOT readonly for safe deserialization
-		private MessagePackObject errorDetail;
+		MessagePackObject errorDetail;
 
 		/// <summary>
 		///		Get the value of return field of response in error.
@@ -71,7 +71,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		[Serializable]
-		private sealed class SerializedState : ISafeSerializationData {
+		sealed class SerializedState : ISafeSerializationData {
 			public MessagePackObject Error;
 			public MessagePackObject ErrorDetail;
 

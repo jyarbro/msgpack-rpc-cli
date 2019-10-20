@@ -8,13 +8,13 @@ namespace MsgPack.Rpc.Core {
 	/// </summary>
 	public sealed class RpcApplicationContext : IDisposable {
 		internal static readonly object HardTimeoutToken = new object();
-		private const int StateActive = 0;
-		private const int StateSoftTimeout = 1;
-		private const int StateHardTimeout = 2;
-		private const int StateDisposed = 3;
+		const int StateActive = 0;
+		const int StateSoftTimeout = 1;
+		const int StateHardTimeout = 2;
+		const int StateDisposed = 3;
 
 		[ThreadStatic]
-		private static RpcApplicationContext _current;
+		static RpcApplicationContext _current;
 
 		/// <summary>
 		///		Gets the current context.
@@ -84,17 +84,17 @@ namespace MsgPack.Rpc.Core {
 		internal bool IsSoftTimeout => _softTimeoutWatcher.IsTimeout;
 
 		// Set from SetCurrent
-		private WeakReference _boundThread;
-		private AggregateException _exceptionInCancellationCallback;
-		private readonly TimeoutWatcher _softTimeoutWatcher;
-		private readonly TimeoutWatcher _hardTimeoutWatcher;
-		private readonly CancellationTokenSource _cancellationTokenSource;
+		WeakReference _boundThread;
+		AggregateException _exceptionInCancellationCallback;
+		readonly TimeoutWatcher _softTimeoutWatcher;
+		readonly TimeoutWatcher _hardTimeoutWatcher;
+		readonly CancellationTokenSource _cancellationTokenSource;
 
 #if DEBUG
 		[Obsolete("DO NOT use this member except testing purposes.")]
 		internal event EventHandler DebugSoftTimeout;
 
-		private void OnDebugSoftTimeout() {
+		void OnDebugSoftTimeout() {
 			DebugSoftTimeout?.Invoke(this, EventArgs.Empty);
 		}
 #endif
@@ -107,11 +107,11 @@ namespace MsgPack.Rpc.Core {
 		/// </value>
 		public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
-		private TimeSpan? _softTimeout;
+		TimeSpan? _softTimeout;
 
-		private TimeSpan? _hardTimeout;
+		TimeSpan? _hardTimeout;
 
-		private int _state;
+		int _state;
 
 		internal bool IsDisposed => Interlocked.CompareExchange(ref _state, 0, 0) == StateDisposed;
 
@@ -137,7 +137,7 @@ namespace MsgPack.Rpc.Core {
 			}
 		}
 
-		private void OnSoftTimeout() {
+		void OnSoftTimeout() {
 			if (Interlocked.CompareExchange(ref _state, StateSoftTimeout, StateActive) != StateActive) {
 				return;
 			}
@@ -158,7 +158,7 @@ namespace MsgPack.Rpc.Core {
 #endif
 		}
 
-		private void OnHardTimeout() {
+		void OnHardTimeout() {
 			if (Interlocked.CompareExchange(ref _state, StateHardTimeout, StateSoftTimeout) != StateSoftTimeout) {
 				return;
 			}
@@ -171,7 +171,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		[SecuritySafeCritical]
-		private void DoHardTimeout() {
+		void DoHardTimeout() {
 			if (_boundThread.Target is Thread thread) {
 				try {
 					thread.Abort(HardTimeoutToken);

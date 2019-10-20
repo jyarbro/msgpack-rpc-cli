@@ -10,11 +10,11 @@ namespace MsgPack.Rpc.Core {
 	/// </summary>
 	[Serializable]
 	public sealed class RpcArgumentException : RpcMethodInvocationException {
-		private const string _parameterNameKey = "ParameterName";
+		const string _parameterNameKey = "ParameterName";
 		internal static readonly MessagePackObject ParameterNameKeyUtf8 = MessagePackConvert.EncodeString(_parameterNameKey);
 
 		// NOT readonly for safe deserialization
-		private string _parameterName;
+		string _parameterName;
 
 		/// <summary>
 		///		Gets the name of parameter causing this exception.
@@ -182,7 +182,7 @@ namespace MsgPack.Rpc.Core {
 		}
 
 		[Serializable]
-		private sealed class SerializedState : ISafeSerializationData {
+		sealed class SerializedState : ISafeSerializationData {
 			public string ParameterName;
 
 			public void CompleteDeserialization(object deserialized) {

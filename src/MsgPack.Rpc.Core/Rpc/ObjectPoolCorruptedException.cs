@@ -43,7 +43,7 @@ namespace MsgPack.Rpc.Core {
 		///		THe class name is <c>null</c>,
 		///		or <see cref="P:System.Exception.HResult"/> is zero.
 		///	</exception>
-		private ObjectPoolCorruptedException(SerializationInfo info, StreamingContext context)
+		ObjectPoolCorruptedException(SerializationInfo info, StreamingContext context)
 			: base(info, context) { }
 	}
 }
