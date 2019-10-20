@@ -45,6 +45,10 @@ namespace MsgPack.Rpc.Core.Client.Protocols {
 			resultStartAt = -1;
 		}
 
+		public ByteArraySegmentStream GetResultBuffer() {
+			return resultBuffer;
+		}
+
 		public ByteArraySegmentStream GetErrorBuffer() {
 			return errorBuffer;
 		}
