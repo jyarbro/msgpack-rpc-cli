@@ -1,5 +1,6 @@
 .vs/
 .nuget/
+.editorconfig
 
 *.sln.*
 *.suo
